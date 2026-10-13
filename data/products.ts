@@ -10,9 +10,9 @@ export const products: Product[] = [
     originalPrice: 229.9,
     installment: { count: 10, value: 18.99, hasInterest: false },
     images: [
-      "https://www.seuprodutonaweb.com.br/fotos/20250224_115849_postagem03.jpg",
-      "/products/obra02.jpg",
-      "/products/obra03.jpg",
+      "/products/porcelanato-marmore-1.jpg",
+      "/products/porcelanato-marmore-2.jpg",
+      "/products/porcelanato-marmore-3.jpg",
     ],
     shortDescription: "Acabamento polido, efeito mármore, alta resistência a tráfego.",
     description:
@@ -32,7 +32,7 @@ export const products: Product[] = [
     category: "Metais e Louças",
     price: 349.0,
     installment: { count: 6, value: 58.16, hasInterest: false },
-    images: ["/products/obra02.jpg", "/products/obra03.jpg"],
+    images: ["/products/torneira-1.jpg", "/products/torneira-2.jpg"],
     shortDescription: "Design minimalista, acabamento preto fosco, bica alta.",
     description:
       "Torneira monocomando para bancada com bica alta, ideal para cubas de apoio. Estrutura em metal cromado com pintura preto fosco de alta durabilidade, arejador removível para fácil limpeza.",
@@ -51,7 +51,7 @@ export const products: Product[] = [
     category: "Iluminação",
     price: 219.9,
     installment: { count: 4, value: 54.98, hasInterest: false },
-    images: ["/products/obra05.jpg"],
+    images: ["/products/luminaria-pendente-1.jpg"],
     shortDescription: "Estilo industrial, cúpula em metal cobre escovado.",
     description:
       "Pendente com cúpula em metal cobre escovado, indicado para mesas de jantar, balcões e bancadas. Compatível com lâmpadas E27 (não inclusas).",
@@ -68,7 +68,7 @@ export const products: Product[] = [
     name: "Rodapé em Poliestireno Liso 10cm (barra 2,4m)",
     category: "Acabamentos Gerais",
     price: 34.9,
-    images: ["/products/obra04.jpg"],
+    images: ["/products/rodape-1.jpg"],
     shortDescription: "Leve, resistente à umidade, fácil instalação com cola.",
     description:
       "Rodapé liso em poliestireno de alta densidade, não empena e não é atacado por cupim. Instalação simples com cola de contato, sem necessidade de furos ou parafusos.",
