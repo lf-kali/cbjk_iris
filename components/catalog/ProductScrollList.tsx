@@ -1,60 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils"; // ajuste o caminho se o seu cn() estiver em outro lugar
-import { products as mockedProducts} from "@/data/products"
-import type { Product }from "@/types/product";
-import { ProductMiniCard } from "./ProductMiniCard";
+import { cn } from "@/lib/utils";
+import type { Product } from "@/types/catalog";
+import { CatalogMiniCard } from "./CatalogMiniCard";
 
 const CARDS_PER_SCROLL = 3;
 
 interface ProductScrollListProps {
+  /** Produtos já filtrados (ex.: catalog.listProducts({ category, excludeSlug, limit })) */
+  products: Product[];
   title?: string;
-  products?: Product[];
-  hrefBase?: string;
   className?: string;
-  /** Filtra pela categoria do produto (comparação exata, case-insensitive). */
-  category?: string;
-  /** Remove um produto da lista pelo slug — útil pra "relacionados" na página do próprio produto. */
-  excludeSlug?: string;
-  /** Limita a quantidade de itens exibidos após os filtros. */
-  limit?: number;
-  /** Mensagem exibida quando o filtro não retorna nenhum produto. Se omitida, a seção some. */
+  /** Mensagem exibida quando a lista vem vazia. Se omitida, a seção some. */
   emptyMessage?: string;
 }
 
 export function ProductScrollList({
+  products,
   title = "",
-  products = mockedProducts,
-  hrefBase,
   className,
-  category,
-  excludeSlug,
-  limit,
   emptyMessage,
 }: ProductScrollListProps) {
-  const filteredProducts = useMemo(() => {
-    let result = products;
-
-    if (category) {
-      const normalized = category.trim().toLowerCase();
-      result = result.filter(
-        (product) => product.category.trim().toLowerCase() === normalized,
-      );
-    }
-
-    if (excludeSlug) {
-      result = result.filter((product) => product.slug !== excludeSlug);
-    }
-
-    if (typeof limit === "number") {
-      result = result.slice(0, limit);
-    }
-
-    return result;
-  }, [products, category, excludeSlug, limit]);
-
   const scrollerRef = useRef<HTMLDivElement>(null);
   const firstCardRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +49,7 @@ export function ProductScrollList({
     resizeObserver.observe(el);
 
     return () => resizeObserver.disconnect();
-  }, [updateArrowState, filteredProducts.length]);
+  }, [updateArrowState, products.length]);
 
   const getScrollStep = useCallback(() => {
     const el = scrollerRef.current;
@@ -109,7 +77,7 @@ export function ProductScrollList({
     [getScrollStep],
   );
 
-  if (filteredProducts.length === 0) {
+  if (products.length === 0) {
     if (!emptyMessage) return null;
 
     return (
@@ -157,9 +125,9 @@ export function ProductScrollList({
           )}
           tabIndex={0}
         >
-          {filteredProducts.map((product, index) => (
+          {products.map((product, index) => (
             <div key={product.slug} ref={index === 0 ? firstCardRef : undefined}>
-              <ProductMiniCard product={product} hrefBase={hrefBase} />
+              <CatalogMiniCard product={product} />
             </div>
           ))}
         </div>

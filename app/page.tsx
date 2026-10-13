@@ -1,8 +1,11 @@
 import { FadeCarousel } from '../components/FadeCarousel';
-import { ProductScrollList } from "@/components/product/ProductScrollList"
+import { ProductScrollList } from "@/components/catalog/ProductScrollList"
+import { catalog } from "@/lib/catalog";
 import { siteConfig } from "@/site.config";
 
-export default function Home() {
+export default async function Home() {
+  const products = await catalog.listProducts();
+
   return (
     <div className="flex flex-col overflow-x-hidden flex-1 items-center justify-center font-bold">
       <FadeCarousel
@@ -19,7 +22,7 @@ export default function Home() {
         }))}
       />
 
-      <ProductScrollList className="p-4.5"/>
+      <ProductScrollList products={products} className="p-4.5"/>
     </div>
   );
 }

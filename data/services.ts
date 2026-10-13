@@ -1,7 +1,8 @@
-import type { Service } from "@/types/service";
+import type { Service } from "@/types/catalog";
 
 export const services: Service[] = [
   {
+    kind: "service",
     slug: "instalacao-porcelanato",
     name: "Instalação de Porcelanato",
     shortDescription:
@@ -20,6 +21,7 @@ export const services: Service[] = [
     ],
   },
   {
+    kind: "service",
     slug: "instalacao-hidraulica",
     name: "Instalação Hidráulica",
     shortDescription:
@@ -34,6 +36,7 @@ export const services: Service[] = [
     ],
   },
   {
+    kind: "service",
     slug: "instalacao-eletrica",
     name: "Instalação Elétrica",
     shortDescription:
@@ -48,6 +51,7 @@ export const services: Service[] = [
     ],
   },
   {
+    kind: "service",
     slug: "gesso-e-drywall",
     name: "Gesso e Drywall",
     shortDescription:
@@ -61,7 +65,3 @@ export const services: Service[] = [
     ],
   },
 ];
-
-export function getServiceBySlug(slug: string): Service | undefined {
-  return services.find((service) => service.slug === slug);
-}

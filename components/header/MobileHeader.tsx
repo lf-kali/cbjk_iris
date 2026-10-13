@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Logo from "@/public/JRiso.svg"
-import MenuIcon from "@/public/menuIcon.svg"
+import { Menu } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -19,7 +18,9 @@ import { siteConfig } from "@/site.config"
 import type { MenuItem } from "@/types/site-config"
 import { ThemeToggle } from "@/components/theme/ThemeToggle"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
+import { SiteLogo } from "@/components/brand/SiteLogo"
+import { whatsappUrl } from "@/lib/whatsapp"
 
 function MobileHeader() {
   const [open, setOpen] = useState(false)
@@ -27,27 +28,28 @@ function MobileHeader() {
   return (
     <header className="sticky top-0 z-50 h-20 w-full flex bg-background/86 backdrop-blur-2xl">
       <nav className="h-full flex flex-row items-center justify-between px-5 w-full">
-        <div className="flex flex-row cursor-pointer items-end gap-1 text-foreground">
-          <Logo className="h-14" />
-          <h1 className="font-heading font-extrabold text-xl">Acabamentos</h1>
-        </div>
+        <SiteLogo logoClassName="h-14" textClassName="text-xl" />
 
         <div className="flex items-center gap-1">
         {siteConfig.theme.colorMode === "system" && <ThemeToggle className="mt-4" />}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger>
-            <div className="flex self-center">
-              <MenuIcon className="h-6.5 mt-4 cursor-pointer" />
-            </div>
+          <SheetTrigger aria-label="Abrir menu" className="mt-4 flex cursor-pointer self-center text-foreground">
+            <Menu className="size-6.5" />
           </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader></SheetHeader>
             <div className="mt-4 px-4">
               <MenuList items={siteConfig.menu} onNavigate={() => setOpen(false)} />
             </div>
-            <Button className="my-10" onClick={() => setOpen(false)}>
-              FAÇA SEU ORÇAMENTO
-            </Button>
+            <a
+              href={whatsappUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className={buttonVariants({ className: "my-10" })}
+            >
+              {siteConfig.texts.headerCta}
+            </a>
           </SheetContent>
         </Sheet>
         </div>

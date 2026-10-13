@@ -1,7 +1,8 @@
-import type { Product } from "@/types/product";
+import type { Product } from "@/types/catalog";
 
 export const products: Product[] = [
   {
+    kind: "product",
     slug: "porcelanato-marmo-carrara-90x90",
     name: "Porcelanato Mármore Carrara 90x90",
     category: "Pisos e Revestimentos",
@@ -25,6 +26,7 @@ export const products: Product[] = [
     stockQty: 10,
   },
   {
+    kind: "product",
     slug: "torneira-monocomando-bancada-preta",
     name: "Torneira Monocomando de Bancada Preto Fosco",
     category: "Metais e Louças",
@@ -43,6 +45,7 @@ export const products: Product[] = [
     stockQty: 10,
   },
   {
+    kind: "product",
     slug: "luminaria-pendente-industrial-cobre",
     name: "Luminária Pendente Industrial Cobre",
     category: "Iluminação",
@@ -60,6 +63,7 @@ export const products: Product[] = [
     stockQty: 0,
   },
   {
+    kind: "product",
     slug: "rodape-poliestireno-liso-10cm",
     name: "Rodapé em Poliestireno Liso 10cm (barra 2,4m)",
     category: "Acabamentos Gerais",
@@ -76,7 +80,3 @@ export const products: Product[] = [
     stockQty: 10,
   },
 ];
-
-export function getProductBySlug(slug: string): Product | undefined {
-  return products.find((product) => product.slug === slug);
-}

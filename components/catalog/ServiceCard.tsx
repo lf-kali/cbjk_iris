@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import type { MouseEvent, KeyboardEvent } from "react";
 
 import { FadeCarousel, type CarouselSlide } from "@/components/FadeCarousel";
-import type { Service } from "@/types/service";
+import type { Service } from "@/types/catalog";
+import { siteConfig } from "@/site.config";
+import { itemHref } from "@/lib/routes";
 
 export function ServiceCard({ service }: { service: Service }) {
   const router = useRouter();
@@ -16,7 +18,7 @@ export function ServiceCard({ service }: { service: Service }) {
   }));
 
   function goToService() {
-    router.push(`/servico/${service.slug}`);
+    router.push(itemHref(service));
   }
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
@@ -57,7 +59,7 @@ export function ServiceCard({ service }: { service: Service }) {
           {service.shortDescription}
         </p>
         <span className="mt-2 text-sm font-medium text-cta group-hover:underline">
-          Ver detalhes e pedir orçamento →
+          {siteConfig.texts.services.cardLink}
         </span>
       </div>
     </div>

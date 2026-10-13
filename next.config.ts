@@ -1,26 +1,12 @@
 import type { NextConfig } from "next";
-import { Configuration } from 'webpack';
+import { siteConfig } from "./site.config";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    rules: {
-      "*.svg": {
-        loaders: ["@svgr/webpack"],
-        as: "*.js",
-      },
-    },
-  },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "www.seuprodutonaweb.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "http2.mlstatic.com"
-      }
-    ],
+    remotePatterns: siteConfig.images.remoteHosts.map((hostname) => ({
+      protocol: "https",
+      hostname,
+    })),
   },
 };
 

@@ -57,6 +57,17 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Remover `tailwind.config.ts` e o bloco duplicado de dark
 
 ### Fase 2 — Camada de dados e componentes unificados
+
+**Status: concluída.** Como ficou:
+- `types/catalog.ts`: `CatalogItem = Product | Service` (discriminado por `kind`), base comum com slug, nome, descrições, imagens e specs
+- `lib/catalog/`: interface `CatalogRepository` (async), `mockCatalog` lendo `data/`, e `catalog` (fonte ativa) em `index.ts`. Filtros de categoria/exclusão/limite saíram do `ProductScrollList` para o repositório
+- `components/catalog/`: `CatalogCard`, `CatalogMiniCard` (agora `next/image`), `PriceBlock` e `ProductBadges` compartilhados, `WhatsappButton` (um `<a>` com `buttonVariants`, sem `<a>` dentro de `<button>`), `CatalogDetail` (detalhe de produto e serviço), `ImageGallery`, `ServiceCard`, `ProductScrollList`
+- Config ganhou `currency`, `brand` (logo + texto), modelos de mensagem do WhatsApp, `images.remoteHosts` (vira `remotePatterns` no `next.config.ts`) e `texts` (textos comerciais visíveis). `formatPrice` e `fillTemplate` em `lib/format.ts`
+- `SiteLogo`: SVG monocromático vira máscara CSS com a cor do texto (acompanha o modo escuro); logo colorido usa `next/image`. Logo agora é link para a home. Ícone do menu veio do lucide; SVGR, `@svgr/webpack` e `webpack` removidos, e o `tsc` passa num clone limpo
+- CTA "Faça seu orçamento" do header agora abre o WhatsApp (antes não fazia nada)
+- Bugs corrigidos de passagem: "Débitoou Crédito", `text-Foreground`, `<a>` dentro de `<Button>`, link dentro de link no card de produto, badges sobrepostos no mini card, dois `<h1>` por página vindos dos headers
+- Fica em código, de propósito: textos de acessibilidade (aria-label) e rótulos do botão de tema, em pt-BR
+- Pendente observado: "Comprar agora" corta no card estreito do mobile (já era assim no JR); home e últimos projetos não têm `<h1>`
 - `CatalogRepository` + mock; páginas e `ProductScrollList` passam a consumir o repositório
 - `CatalogCard`/`CatalogMiniCard`, `WhatsappButton`, `CatalogDetail`, `ImageGallery`
 - Textos e moeda via config; logo como componente; `remotePatterns` derivado do config
