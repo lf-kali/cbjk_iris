@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 // md (card da grade) mostra o preço "de" na mesma linha; sm e lg, acima.
 const SIZES = {
   sm: { prices: "flex flex-col", original: "text-xs", price: "text-sm", note: "text-[11px]" },
-  md: { prices: "flex items-baseline gap-2", original: "text-xs", price: "text-lg", note: "text-xs" },
+  md: { prices: "flex flex-wrap items-baseline gap-x-2", original: "text-xs", price: "text-lg", note: "text-xs" },
   lg: { prices: "flex flex-col gap-1", original: "text-sm", price: "text-3xl", note: "text-sm" },
 };
 

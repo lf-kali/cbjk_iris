@@ -38,7 +38,13 @@ export function CatalogCard({ product }: { product: Product }) {
       </Link>
 
       <CardFooter className="px-4 pb-4">
-        <WhatsappButton href={whatsappUrlFor(product)} label={siteConfig.texts.products.buy} size="sm" />
+        <WhatsappButton
+          href={whatsappUrlFor(product)}
+          label={siteConfig.texts.products.buy}
+          size="sm"
+          // card estreito no mobile: menos espaçamento entre letras e, no limite, quebra em duas linhas
+          className="h-auto min-h-8 whitespace-normal py-1.5 text-center leading-tight tracking-wider sm:tracking-widest"
+        />
       </CardFooter>
     </Card>
   );

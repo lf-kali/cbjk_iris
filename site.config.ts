@@ -22,7 +22,8 @@ export const siteConfig: SiteConfig = {
     },
   },
   images: {
-    remoteHosts: ["www.seuprodutonaweb.com.br", "http2.mlstatic.com"],
+    // ex.: ["ik.imagekit.io"] — vazio enquanto todas as imagens forem locais
+    remoteHosts: [],
   },
   theme: {
     colorMode: "system",
@@ -36,13 +37,13 @@ export const siteConfig: SiteConfig = {
   home: {
     slides: [
       {
-        image: "https://www.seuprodutonaweb.com.br/fotos/20240429_122606_empreiteiro-de-obras-alto-padrao.jpg",
+        image: "/home/slide-1.jpg",
         alt: "",
         title: "Acabamentos de precisão",
         subtitle: "Do projeto à entrega, sem retrabalho.",
       },
       {
-        image: "https://www.seuprodutonaweb.com.br/fotos/20240429_122606_empreiteiro-de-obras-alto-padrao.jpg",
+        image: "/home/slide-2.jpg",
         alt: "",
         title: "Acabamentos de precisão",
         subtitle: "Do projeto à entrega, sem retrabalho.",

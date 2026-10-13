@@ -8,6 +8,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col overflow-x-hidden flex-1 items-center justify-center font-bold">
+      <h1 className="sr-only">{siteConfig.seo.title}</h1>
       <FadeCarousel
         slides={siteConfig.home.slides.map((slide, i) => ({
           id: i,
