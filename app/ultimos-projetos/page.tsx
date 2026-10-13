@@ -13,7 +13,7 @@ export default function GaleriaPage() {
   return (
     <main style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>
       <section className="text-center">
-        <h2 className="text-4xl py-4 font-bold">{siteConfig.texts.gallery.title}</h2>
+        <h1 className="text-4xl py-4 font-bold">{siteConfig.texts.gallery.title}</h1>
         <GaleriaColumns photos={photos} />
       </section>
     </main>
