@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,33 +7,34 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import type { CatalogItem } from "@/types/catalog";
 import { siteConfig } from "@/site.config";
-import { fillTemplate } from "@/lib/format";
-import { routes } from "@/lib/routes";
-import { whatsappUrlFor } from "@/lib/whatsapp";
 import { ImageGallery } from "./ImageGallery";
-import { PriceBlock } from "./PriceBlock";
-import { WhatsappButton } from "./WhatsappButton";
 
-type Crumb = { label: string; href: string };
+export type Crumb = { label: string; href: string };
 
-// Página de detalhe compartilhada por produtos e serviços.
-export function CatalogDetail({ item }: { item: CatalogItem }) {
+// Página de detalhe genérica. O que é próprio de cada módulo (badge, preço,
+// botão, aviso) chega pronto pelas props, então este componente não depende
+// de produtos nem de serviços e sobrevive à remoção de qualquer um deles.
+export function CatalogDetail({
+  item,
+  crumbs,
+  badge,
+  price,
+  action,
+  notice,
+}: {
+  item: CatalogItem;
+  crumbs: Crumb[];
+  badge?: ReactNode;
+  price?: ReactNode;
+  action: ReactNode;
+  notice?: string;
+}) {
   const { texts } = siteConfig;
-  const isProduct = item.kind === "product";
-  const kindTexts = isProduct ? texts.products : texts.services;
-
-  const crumbs: Crumb[] = isProduct
-    ? [
-        { label: texts.products.title, href: routes.products },
-        { label: item.category, href: `${routes.products}?categoria=${encodeURIComponent(item.category)}` },
-      ]
-    : [{ label: texts.services.title, href: routes.services }];
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
@@ -57,25 +58,17 @@ export function CatalogDetail({ item }: { item: CatalogItem }) {
         <ImageGallery images={item.images} alt={item.name} />
 
         <div className="flex flex-col gap-4">
-          {isProduct && !item.stockQty && (
-            <Badge className="w-fit bg-primary text-primary-foreground">{texts.products.madeToOrder}</Badge>
-          )}
+          {badge}
 
           <h1 className="text-2xl font-semibold text-foreground">{item.name}</h1>
           <p className="text-sm text-muted-foreground">{item.shortDescription}</p>
 
           <Separator />
 
-          {isProduct && <PriceBlock product={item} size="lg" className="gap-1" />}
+          {price}
+          {action}
 
-          <WhatsappButton
-            href={whatsappUrlFor(item)}
-            label={isProduct ? texts.products.buyOnWhatsapp : texts.services.quote}
-          />
-
-          <p className="text-xs text-muted-foreground">
-            {fillTemplate(kindTexts.whatsappNotice, { business: siteConfig.name })}
-          </p>
+          {notice && <p className="text-xs text-muted-foreground">{notice}</p>}
         </div>
       </div>
 

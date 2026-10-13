@@ -1,7 +1,7 @@
-import { catalog } from "@/lib/catalog";
+import { productCatalog } from "@/lib/catalog/products";
 import { siteConfig } from "@/site.config";
 import { fillTemplate } from "@/lib/format";
-import { CatalogCard } from "@/components/catalog/CatalogCard";
+import { CatalogCard } from "@/components/products/CatalogCard";
 
 const texts = siteConfig.texts.products;
 
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ProdutosPage() {
-  const products = await catalog.listProducts();
+  const products = await productCatalog.list();
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

@@ -1,0 +1,50 @@
+{
+  "$comment": "Módulos opcionais do template. Um módulo está ativo quando o primeiro de seus 'paths' (a rota principal) existe. Para desligar: apague os paths, tire os itens de 'menu' e as seções de 'homeSections' do site.config.ts, desinstale as 'dependencies' e rode npm run modules:sync. npm run modules:check testa a remoção de cada módulo.",
+  "modules": [
+    {
+      "id": "products",
+      "name": "Produtos",
+      "paths": [
+        "app/produtos",
+        "app/produto",
+        "components/products",
+        "lib/catalog/products.ts",
+        "data/products.ts",
+        "public/products"
+      ],
+      "menu": ["/produtos"],
+      "homeSections": {
+        "products": { "from": "@/components/products/ProductsSection", "export": "ProductsSection" }
+      },
+      "dependencies": []
+    },
+    {
+      "id": "services",
+      "name": "Serviços",
+      "paths": [
+        "app/servicos",
+        "app/servico",
+        "components/services",
+        "lib/catalog/services.ts",
+        "data/services.ts",
+        "public/services"
+      ],
+      "menu": ["/servicos"],
+      "homeSections": {},
+      "dependencies": []
+    },
+    {
+      "id": "gallery",
+      "name": "Últimos projetos",
+      "paths": [
+        "app/ultimos-projetos",
+        "components/gallery",
+        "lib/gallery.ts",
+        "public/ultimos_projetos"
+      ],
+      "menu": ["/ultimos-projetos"],
+      "homeSections": {},
+      "dependencies": ["image-size", "react-photo-album"]
+    }
+  ]
+}

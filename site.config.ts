@@ -49,6 +49,7 @@ export const siteConfig: SiteConfig = {
         subtitle: "Do projeto à entrega, sem retrabalho.",
       },
     ],
+    sections: [{ type: "products" }],
   },
   texts: {
     headerCta: "Faça seu orçamento!",
@@ -80,6 +81,7 @@ export const siteConfig: SiteConfig = {
     },
     gallery: {
       title: "Nossos últimos serviços",
+      empty: "Em breve, fotos dos nossos projetos.",
     },
   },
 };
