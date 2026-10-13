@@ -109,7 +109,10 @@ export function FadeCarousel({
   }, []);
 
   const SWIPE_THRESHOLD = 50; // px mínimos de arraste pra contar como swipe
+  const FLICK_MIN_DISTANCE = 20; // gesto rápido e curto também conta...
+  const FLICK_MIN_VELOCITY = 0.35; // ...acima desta velocidade (px/ms)
   const draggingRef = useRef(false);
+  const dragStartTime = useRef(0);
 
   // Fim de um arraste (mouse ou toque): decide o slide e marca o arraste para
   // o clique seguinte não abrir links.
@@ -117,8 +120,12 @@ export function FadeCarousel({
     if (!draggingRef.current) return;
     draggingRef.current = false;
     const delta = dragDeltaX.current;
-    if (delta > SWIPE_THRESHOLD) prev();
-    else if (delta < -SWIPE_THRESHOLD) next();
+    const velocity = Math.abs(delta) / Math.max(1, performance.now() - dragStartTime.current);
+    const isSwipe =
+      Math.abs(delta) > SWIPE_THRESHOLD ||
+      (Math.abs(delta) > FLICK_MIN_DISTANCE && velocity > FLICK_MIN_VELOCITY);
+    if (isSwipe && delta > 0) prev();
+    else if (isSwipe && delta < 0) next();
     if (Math.abs(delta) > 8) draggedRef.current = true;
     dragDeltaX.current = 0;
     setIsDragging(false);
@@ -130,9 +137,10 @@ export function FadeCarousel({
   }, [finishDrag]);
 
   // Toque: Touch Events nativos, o caminho mais confiável nos navegadores móveis
-  // (o Safari do iOS tem particularidades com captura de pointer). O eixo trava
-  // nos primeiros pixels: horizontal troca de slide e bloqueia a rolagem;
-  // vertical deixa a página rolar normalmente.
+  // (o Safari do iOS tem particularidades com captura de pointer). O iOS decide no
+  // primeiro touchmove se o gesto é dele (rolagem) ou da página: por isso o
+  // movimento horizontal é reivindicado (preventDefault) já no primeiro evento,
+  // e o eixo trava nos primeiros pixels. Vertical deixa a página rolar.
   useEffect(() => {
     const el = containerRef.current;
     if (!el || slides.length <= 1) return;
@@ -147,6 +155,7 @@ export function FadeCarousel({
       startY = e.touches[0].clientY;
       axis = null;
       dragDeltaX.current = 0;
+      dragStartTime.current = performance.now();
       draggedRef.current = false;
       draggingRef.current = true;
       setIsDragging(true);
@@ -156,7 +165,9 @@ export function FadeCarousel({
       if (!draggingRef.current) return;
       const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
-      if (!axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (!axis && Math.max(Math.abs(dx), Math.abs(dy)) > 4) axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      // ainda indefinido mas mais horizontal que vertical: segura o gesto para o iOS não assumir
+      if (!axis && Math.abs(dx) >= Math.abs(dy)) e.preventDefault();
       if (axis === "y") {
         // gesto vertical: é rolagem da página, não swipe
         draggingRef.current = false;
@@ -193,6 +204,7 @@ export function FadeCarousel({
 
     draggingRef.current = true;
     setIsDragging(true);
+    dragStartTime.current = performance.now();
     dragStartX.current = e.clientX;
     dragDeltaX.current = 0;
     draggedRef.current = false;
@@ -214,7 +226,9 @@ export function FadeCarousel({
     <div
       ref={containerRef}
       className={cn(
-        "relative w-full h-[70vh] overflow-hidden select-none touch-pan-y",
+        // imagens não recebem toque: no iOS elas iniciam gestos próprios (arrastar,
+        // pré-visualização) que cancelam o swipe
+        "relative w-full h-[70vh] overflow-hidden select-none touch-pan-y overscroll-x-contain [-webkit-touch-callout:none] [&_img]:pointer-events-none [&_img]:[-webkit-user-drag:none]",
         className
       )}
       onPointerDown={handlePointerDown}
@@ -249,6 +263,7 @@ export function FadeCarousel({
               fill
               priority={i === 0}
               sizes="100vw"
+              draggable={false}
               className="object-cover"
             />
 
