@@ -8,10 +8,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* cores e fontes vêm de siteConfig.brand: as cores são injetadas pelo layout
-     (lib/brand.ts) e as fontes definem --font-brand-* (app/fonts.generated.ts) */
-  --font-sans: var(--font-brand-sans), sans-serif;
-  --font-heading: var(--font-brand-heading, var(--font-brand-sans)), sans-serif;
+  /* cores vêm do tema (themes/) com a marca por cima, injetadas pelo layout (lib/brand.ts);
+     fontes definem --font-brand-* (app/fonts.generated.ts, gerado por npm run brand:sync) */
+  --font-sans: var(--font-brand-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-heading: var(--font-brand-heading, var(--font-brand-sans, ui-sans-serif, system-ui, sans-serif));
+  /* sombras e espaçamento de letras também vêm do tema (padrões do Tailwind quando ele não define) */
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -60,6 +69,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: var(--tracking-normal);
   }
   html {
     @apply font-sans;

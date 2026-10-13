@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 import DesktopHeader from '../components/header/DesktopHeader';
 import { siteConfig } from "@/site.config";
 import { themeInitScript } from "@/lib/theme";
-import { renderBrandCss } from "@/lib/brand";
+import { renderThemeCss, resolveSiteTheme } from "@/lib/brand";
+import { SiteFooter } from "@/components/footer/SiteFooter";
 
 export const metadata: Metadata = {
   title: {
@@ -31,8 +32,8 @@ export default function RootLayout({
       suppressHydrationWarning={colorMode === "system"}
     >
       <head>
-        {/* cores da marca (siteConfig.brand) viram as variáveis CSS do shadcn */}
-        <style dangerouslySetInnerHTML={{ __html: renderBrandCss(siteConfig.brand) }} />
+        {/* tema (themes/) + cores da marca viram as variáveis CSS do shadcn */}
+        <style dangerouslySetInnerHTML={{ __html: renderThemeCss(resolveSiteTheme(siteConfig.theme.name, siteConfig.brand)) }} />
         {colorMode === "system" && (
           <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         )}
@@ -45,6 +46,7 @@ export default function RootLayout({
           <DesktopHeader/>
         </div>
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 // npm run brand:sync            -> gera app/fonts.generated.ts a partir de siteConfig.brand.fonts
+//                                  (ou, em branco, da fonte --font-sans do tema)
 // npm run brand:sync -- --check -> falha se o arquivo estiver desatualizado
 // Roda sozinho antes de "dev" e "build". Também imprime o relatório de contraste das cores.
 // O next/font só aceita chamadas estáticas, por isso as fontes viram código gerado.
@@ -11,7 +12,8 @@ const OUT = "app/fonts.generated.ts";
 const require = createRequire(import.meta.url);
 
 const { siteConfig } = await import(path.join(ROOT, "site.config.ts"));
-const { contrastReport } = await import(path.join(ROOT, "lib/brand.ts"));
+const { contrastReport, resolveSiteTheme } = await import(path.join(ROOT, "lib/brand.ts"));
+const { readThemeFile, firstFontFamily } = await import(path.join(ROOT, "lib/theme-file.ts"));
 const googleFonts = require(path.join(ROOT, "node_modules/next/dist/compiled/@next/font/dist/google/font-data.json"));
 
 const errors = [];
@@ -49,7 +51,16 @@ function localCall(role, font) {
   };
 }
 
-const roles = Object.entries(siteConfig.brand.fonts).filter(([, font]) => font);
+// fonte da marca tem prioridade; sem ela, a sans do tema, se for do Google Fonts
+const theme = readThemeFile(siteConfig.theme.name);
+const themeSans = firstFontFamily(theme.light["font-sans"]);
+const fonts = { ...siteConfig.brand.fonts };
+if (!fonts.sans && themeSans) {
+  if (googleFonts[themeSans]) fonts.sans = { google: themeSans };
+  else console.warn(`Fonte do tema "${themeSans}" não está no Google Fonts; o site usa a fonte do sistema.`);
+}
+
+const roles = Object.entries(fonts).filter(([, font]) => font);
 const calls = roles.map(([role, font]) => [role, "google" in font ? googleCall(role, font) : localCall(role, font)]);
 
 if (errors.length) {
@@ -86,7 +97,7 @@ if (current !== content) {
   console.log(`${OUT} atualizado.`);
 }
 
-const lowContrast = contrastReport(siteConfig.brand);
+const lowContrast = contrastReport(resolveSiteTheme(siteConfig.theme.name, siteConfig.brand));
 if (lowContrast.length) {
   console.warn("Aviso de contraste (texto pequeno pede 4.5:1, WCAG AA):");
   for (const r of lowContrast) console.warn(`  ${r.mode.padEnd(5)} ${r.pair}: ${r.ratio.toFixed(2)}:1`);

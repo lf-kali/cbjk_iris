@@ -9,6 +9,7 @@ import {
   type PointerEvent,
 } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils"; // helper padrão do shadcn (clsx + tailwind-merge)
 
@@ -17,6 +18,16 @@ export type CarouselSlide = {
   image: string;
   alt: string;
   content?: ReactNode;
+  /** slide inteiro clicável */
+  href?: string;
+  /** posição do conteúdo */
+  align?: "left" | "center" | "right";
+};
+
+const ALIGN = {
+  left: "items-start text-left",
+  center: "items-center text-center",
+  right: "items-end text-right",
 };
 
 type FadeCarouselProps = {
@@ -36,6 +47,8 @@ export function FadeCarousel({
   const [isDragging, setIsDragging] = useState(false);
   const dragStartX = useRef(0);
   const dragDeltaX = useRef(0);
+  // marca um arraste recém-terminado, para o clique que vem em seguida não abrir links
+  const draggedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const wheelLockRef = useRef(false);
   const wheelResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -106,7 +119,9 @@ export function FadeCarousel({
     setIsDragging(true);
     dragStartX.current = e.clientX;
     dragDeltaX.current = 0;
-    containerRef.current?.setPointerCapture(e.pointerId);
+    draggedRef.current = false;
+    // em links não captura o pointer: com captura, o clique cairia no container e o link não abriria
+    if (!(e.target as HTMLElement).closest("a")) containerRef.current?.setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -119,6 +134,7 @@ export function FadeCarousel({
     const threshold = 50; // px mínimos de arraste pra contar como swipe
     if (dragDeltaX.current > threshold) prev();
     else if (dragDeltaX.current < -threshold) next();
+    if (Math.abs(dragDeltaX.current) > 8) draggedRef.current = true;
     setIsDragging(false);
     dragDeltaX.current = 0;
   };
@@ -134,6 +150,16 @@ export function FadeCarousel({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      // o arraste nativo de links/imagens cancela os eventos de pointer e travaria o swipe
+      onDragStart={(e) => e.preventDefault()}
+      onClickCapture={(e) => {
+        if (draggedRef.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          draggedRef.current = false;
+        }
+      }}
     >
       {slides.map((slide, i) => {
         const isActive = i === index;
@@ -158,13 +184,25 @@ export function FadeCarousel({
             {/* leve overlay pra garantir legibilidade do texto */}
             <div className="absolute inset-0 bg-black/30" />
 
+            {slide.href && (
+              <Link
+                href={slide.href}
+                aria-label={slide.alt}
+                tabIndex={isActive ? 0 : -1}
+                className="absolute inset-0 z-[1]"
+                draggable={false}
+              />
+            )}
+
             {slide.content && (
               <div
                 // a key muda quando o slide fica ativo, forçando o React a
                 // remontar o bloco e disparar a animação de entrada de novo
                 key={`${slide.id}-${isActive}`}
                 className={cn(
-                  "absolute inset-0 flex flex-col items-start justify-end p-8 md:p-16",
+                  // o conteúdo não bloqueia o link do slide; só os botões dentro dele recebem clique
+                  "pointer-events-none absolute inset-0 z-[2] flex flex-col justify-end p-8 pb-14 md:p-16 [&_a]:pointer-events-auto",
+                  ALIGN[slide.align ?? "left"],
                   isActive &&
                     "fill-mode-both animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-700 ease-out motion-reduce:animate-none"
                 )}
@@ -178,11 +216,12 @@ export function FadeCarousel({
 
       {slides.length > 1 && (
         <>
+          {/* no celular, setas escondidas: o arraste troca de slide e o texto fica livre */}
           <button
             type="button"
             onClick={prev}
             aria-label="Slide anterior"
-            className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-background/80 p-2 backdrop-blur transition hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="absolute left-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full sm:block bg-background/80 p-2 backdrop-blur transition hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -190,7 +229,7 @@ export function FadeCarousel({
             type="button"
             onClick={next}
             aria-label="Próximo slide"
-            className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-background/80 p-2 backdrop-blur transition hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full sm:block bg-background/80 p-2 backdrop-blur transition hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

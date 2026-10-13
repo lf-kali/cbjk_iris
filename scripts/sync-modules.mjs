@@ -1,4 +1,4 @@
-// npm run modules:sync           -> regenera components/home/sections.tsx
+// npm run modules:sync           -> regenera components/sections/registry.tsx
 // npm run modules:sync -- --check -> falha se o arquivo estiver desatualizado
 import { syncRegistry, REGISTRY_FILE } from "./modules.mjs";
 
