@@ -12,9 +12,9 @@ Um comando cria o projeto, faz o setup por perguntas e entrega um site-vitrine p
 
 ## Fluxo
 
-1. Perguntas (ou flags, para modo não interativo: `--theme warm --yes`)
+1. Perguntas (ou flags, para modo não interativo: `--primary "#1d4ed8" --yes`)
 2. Copiar `template/` para a pasta do projeto
-3. Aplicar respostas (escrever `site.config.ts`, copiar o tema escolhido, apagar módulos desligados, renomear `package.json`)
+3. Aplicar respostas (escrever `site.config.ts` com a marca, apagar módulos desligados conforme `modules.json`, rodar `modules:sync` e `brand:sync`, renomear `package.json`)
 4. Instalar dependências (gerenciador detectado automaticamente)
 5. `git init` e commit inicial
 6. Mostrar próximos passos
@@ -23,17 +23,17 @@ Um comando cria o projeto, faz o setup por perguntas e entrega um site-vitrine p
 
 - Nome do projeto, nome do negócio e WhatsApp
 - Módulos: produtos, serviços, últimos projetos (galeria)
-- Tema (lista de temas prontos, com fonte incluída)
+- Marca: cores (cinzas, principal, CTA, destaque) e fontes (Google ou arquivo local)
 - Modo escuro: sistema, só claro ou só escuro
 - Origem das imagens: locais ou ImageKit
 - Gerenciador de pacotes, instalar dependências, iniciar git
 
 ## Decisões de design
 
-- **Template como projeto rodável.** Desenvolvido e testado com `npm run dev` dentro do repo do CLI. O CLI não faz string-replace em código: só escreve `site.config.ts` e copia o tema.
+- **Template como projeto rodável.** Desenvolvido e testado com `npm run dev` dentro do repo do CLI. O CLI não faz string-replace em código: só escreve `site.config.ts`, apaga caminhos de módulos e roda os scripts de sync.
 - **Módulos desligados são apagados na geração** (rotas, itens de menu, dados), como o `create-next-app` faz. Sem flags mortas no projeto gerado. Cada módulo precisa de um manifest dizendo quais arquivos e entradas de menu ele possui.
-- **Temas como arquivos CSS** (`themes/<nome>.css`) com um `theme.json` para fontes e metadados.
-- **Tema externo (opcional):** aceitar CSS colado do tweakcn/shadcn, para ter tema ilimitado sem criar um por um.
+- **Marca no config em vez de temas** (`siteConfig.brand`): poucas cores derivam a paleta inteira; fontes viram código gerado (`brand:sync`) porque o `next/font` exige chamadas estáticas.
+- **Tema externo (opcional):** variáveis coladas do tweakcn/shadcn podem entrar em `brand.overrides`.
 - **Stack do CLI:** TypeScript, `tsup`, `@clack/prompts`, `cac` (flags), `execa` (install).
 
 ## Estrutura do repositório
@@ -42,13 +42,12 @@ Um comando cria o projeto, faz o setup por perguntas e entrega um site-vitrine p
 create-vitrine/
 ├─ src/            # CLI (prompts, copy, apply, install)
 ├─ template/       # projeto Next completo e rodável
-├─ themes/         # css + theme.json por tema
 └─ test/           # gera combinações e faz build
 ```
 
 ## Testes (CI)
 
-Gerar o projeto com várias combinações de tema e módulos e rodar `tsc` e `next build` em cada uma. É a principal proteção contra o gerador quebrar.
+Gerar o projeto com várias combinações de marca e módulos e rodar `tsc` e `next build` em cada uma (o template já tem `npm run modules:check` para os módulos). É a principal proteção contra o gerador quebrar.
 
 ## Publicação
 
@@ -57,13 +56,12 @@ Gerar o projeto com várias combinações de tema e módulos e rodar `tsc` e `ne
 
 ## Ordem de trabalho
 
-1. Refatorar o template (config central, cores semânticas, temas, `CatalogItem` único, camada de dados). O CLI depende desse contrato.
+1. ~~Refatorar o template (config central, cores semânticas, marca, `CatalogItem` único, camada de dados).~~ Feito; o CLI depende desse contrato.
 2. Montar o CLI em cima do template refatorado.
 3. Testes de geração em CI e publicação.
 
 ## Em aberto
 
 - ~~Manifest de módulos~~ decidido: `modules.json` central na raiz do template, com registro de seções da home gerado (ver plano de refatoração, Fase 3)
-- Quais temas vêm de fábrica
 - ~~Estratégia de dark mode do template~~ decidido: classe + script inline próprio (ver plano de refatoração)
 - Template de backend (Neon + Clerk + API) será um projeto separado, depois do front
