@@ -11,7 +11,8 @@
     "lint": "eslint",
     "modules:sync": "node scripts/sync-modules.mjs",
     "modules:check": "node scripts/check-modules.mjs",
-    "brand:sync": "node --no-warnings scripts/sync-brand.mjs"
+    "brand:sync": "node --no-warnings scripts/sync-brand.mjs",
+    "theme:add": "node scripts/add-theme.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

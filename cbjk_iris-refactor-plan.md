@@ -101,6 +101,21 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Ao mudar a fonte com o `next dev` rodando, é preciso rodar `npm run brand:sync` (sem reiniciar); cores atualizam sozinhas
 - `tsconfig` ganhou `allowImportingTsExtensions` para o script importar `lib/brand.ts` direto pelo Node
 
+## Temas, identidade genérica e seções
+
+**Status: Parte A concluída.**
+
+**Temas + marca.** `theme.name` escolhe um arquivo em `themes/` (formato do "Copy code" do tweakcn: blocos `:root` e `.dark`). De fábrica: paletas do shadcn (`neutral`, `stone`, `zinc`, `slate`, `gray`, `taupe`) e 4 temas do tweakcn (`modern-minimal`, `ocean-breeze`, `caffeine`, `elegant-luxury`). Novos temas: `npm run theme:add -- <nome-do-tweakcn>` / `-- --shadcn <cor>`, ou colar o CSS num arquivo. O tema fornece cores, raio, sombras, `tracking-normal` e a fonte sans (vira `next/font` via `brand:sync` quando é do Google Fonts). `brand.colors` (`primary`, `cta`, `highlight`, todas opcionais) é aplicado por cima; em branco, vale o tema (CTA = primária; destaque = `destructive`). `brand.fonts` e `brand.overrides` continuam valendo por cima de tudo. O relatório de contraste agora mede o resultado final (inclusive pega temas do tweakcn com contraste baixo).
+
+**Identidade cbjk.** Logo `public/logo.svg` (limpo, `currentColor`, `viewBox` justo preservando a composição original), nome/SEO/contato genéricos, cores da marca em branco, tema `neutral`. Removidos: Mont (fonte comercial), SVGs e fotos de obras da JR; galeria com fotos CC0.
+
+**Seções.** `home.sections` e `pages[].sections` (páginas em `/<slug>` via `app/[slug]`). Núcleo: `hero` (slides com foto, texto, até 2 botões, slide inteiro clicável, alinhamento, altura, autoplay), `benefits`, `text-image`, `cta-banner`, `testimonials`, `stats`, `faq` (com JSON-LD FAQPage), `contact` (dados de `siteConfig.contact` + mapa embutido). Módulos: `products`, `services`, `gallery`. Botões usam `SiteLink` (`href` ou `whatsapp`). Rodapé configurável (`footer`, redes sociais de `contact.social`). Registro `components/sections/registry.tsx` gerado do `modules.json` (`coreSections` + seções dos módulos ativos).
+
+- Conteúdo do config não deve apontar para rotas/arquivos de módulos (o `modules:check` acusaria link morto); produtos/serviços/galeria entram pelas seções dos módulos, que têm o próprio "Ver todos"
+- Ícones de redes sociais copiados do simple-icons (CC0) em `components/icons/social-paths.ts`; LinkedIn usa ícone genérico (removido do simple-icons)
+
+**Parte B (pendente, depende de decisões e credenciais):** formulário de lead, widget do Google Places/mapa com chave, avaliações do Google, TripAdvisor e outras plataformas.
+
 ## Depois
 
 CLI de geração (`create-vitrine`, ver `create-vitrine-blueprint.md`) e, em separado, o template de backend (Neon + Clerk + API).
