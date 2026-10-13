@@ -2,7 +2,7 @@ import { services } from "@/data/services";
 import { ServiceCard } from "@/components/service-card";
 
 export const metadata = {
-  title: "Serviços | JR Acabamentos",
+  title: "Serviços",
 };
 
 export default function ServicosPage() {

@@ -24,7 +24,7 @@ type ServicoPageProps = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: ServicoPageProps) {
   const { slug } = await params;
   const service = getServiceBySlug(slug);
-  return { title: service ? `${service.name} | JR Acabamentos` : "Serviço não encontrado" };
+  return { title: service ? service.name : "Serviço não encontrado" };
 }
 
 export default async function ServicoPage({ params }: ServicoPageProps) {

@@ -1,12 +1,10 @@
 import type { Product } from "@/types/product";
 import type { Service } from "@/types/service";
-
-// TODO: substituir pelo número real da JR Acabamentos, formato internacional sem espaços/símbolos
-const WHATSAPP_PHONE = "5551999999999";
+import { siteConfig } from "@/site.config";
 
 function buildWhatsappLink(message: string): string {
   const params = new URLSearchParams({ text: message });
-  return `https://wa.me/${WHATSAPP_PHONE}?${params.toString()}`;
+  return `https://wa.me/${siteConfig.whatsapp.phone}?${params.toString()}`;
 }
 
 export function buildWhatsappUrl(product: Product): string {

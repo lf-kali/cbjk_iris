@@ -26,7 +26,7 @@ type ProdutoPageProps = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: ProdutoPageProps) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
-  return { title: product ? `${product.name} | JR Acabamentos` : "Produto não encontrado" };
+  return { title: product ? product.name : "Produto não encontrado" };
 }
 
 export default async function ProdutoPage({ params }: ProdutoPageProps) {

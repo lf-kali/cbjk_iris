@@ -2,7 +2,7 @@ import { products } from "@/data/products";
 import { ProductCard } from "@/components/product-card";
 
 export const metadata = {
-  title: "Produtos | JR Acabamentos",
+  title: "Produtos",
 };
 
 export default function ProdutosPage() {

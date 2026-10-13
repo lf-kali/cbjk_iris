@@ -33,7 +33,7 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 ## O que vai quebrar (riscos)
 
 - **Visual do JR:** trocar `emerald` por token remove o botão verde. O JR vira tema próprio (`themes/jr.css` com `--cta` verde) para não regredir.
-- **Dark mode:** hoje segue o sistema; ao unificar, a aparência do escuro muda. Escolher estratégia (class, media ou ambos).
+- **Dark mode:** ~~escolher estratégia~~ **Decidido:** classe `.dark` aplicada por script inline próprio (`lib/theme.ts`), sem `next-themes`. Primeiro acesso segue o sistema; o botão alterna sistema → claro → escuro e salva em `localStorage`. `theme.colorMode` no config fixa claro ou escuro (sem botão). O fundo escuro mantido é o do antigo bloco `@media`.
 - **Logo:** import estático não aceita config; a regra do SVGR no `next.config.ts` só permanece se algum tema usar SVG.
 - **Imagens remotas:** `next/image` exige host em `remotePatterns`. Ele precisa ler do config (`next.config.ts` pode importar TS). Migrar o `ProductMiniCard` para `next/image` falha em runtime se faltar host.
 - **Imports e rotas:** mover e renomear quebra `@/...`; `getProductBySlug` e `hrefBase` somem junto com os tipos antigos.

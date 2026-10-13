@@ -2,6 +2,10 @@ import { getGalleryPhotos } from "@/lib/gallery";
 // import { GaleriaRows } from "@/components/GaleriaRows";
 import { GaleriaColumns } from "@/components/GaleriaColumns";
 
+export const metadata = {
+  title: "Últimos Projetos",
+};
+
 export default function GaleriaPage() {
   const photos = getGalleryPhotos();
 

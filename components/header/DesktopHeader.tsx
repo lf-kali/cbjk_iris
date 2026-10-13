@@ -7,14 +7,15 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { mainMenu } from "../menu/menu.config"
+import { siteConfig } from "@/site.config"
+import { ThemeToggle } from "@/components/theme/ThemeToggle"
 import Logo from "@/public/JRiso.svg"
 import { Button } from '@/components/ui/button';
 
 function DesktopHeader() {
   return (
     
-    <header className="sticky h-25 w-full flex backdrop-blur-2xl dark:bg-black/86 not-dark:bg-white/86">
+    <header className="sticky h-25 w-full flex backdrop-blur-2xl bg-white/86 dark:bg-black/86">
       <nav className="h-full flex flex-row items-center justify-between px-5 w-full">
         <div className="flex flex-row cursor-pointer items-end mb-2 gap-1 text-foreground">
           <Logo className="h-16" />
@@ -22,7 +23,7 @@ function DesktopHeader() {
         </div>
         <NavigationMenu className="mt-6.5">
             <NavigationMenuList>
-                {mainMenu.map((item) =>
+                {siteConfig.menu.map((item) =>
                 item.children ? (
                     <NavigationMenuItem key={item.title}>
                     <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
@@ -48,9 +49,12 @@ function DesktopHeader() {
                 )}
             </NavigationMenuList>
         </NavigationMenu>
-        <Button className="mt-1.5 h-12 w-60">
-            FAÇA SEU ORÇAMENTO!
-        </Button>
+        <div className="mt-1.5 flex items-center gap-2">
+            {siteConfig.theme.colorMode === "system" && <ThemeToggle />}
+            <Button className="h-12 w-60">
+                FAÇA SEU ORÇAMENTO!
+            </Button>
+        </div>
 
       </nav>
     </header>

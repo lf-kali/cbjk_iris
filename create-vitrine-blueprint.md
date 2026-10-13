@@ -65,5 +65,5 @@ Gerar o projeto com várias combinações de tema e módulos e rodar `tsc` e `ne
 
 - Manifest de módulos: formato (json por módulo ou lista central)
 - Quais temas vêm de fábrica
-- Estratégia de dark mode do template (class, media ou ambos)
+- ~~Estratégia de dark mode do template~~ decidido: classe + script inline próprio (ver plano de refatoração)
 - Template de backend (Neon + Clerk + API) será um projeto separado, depois do front
