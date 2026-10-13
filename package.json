@@ -3,17 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node --no-warnings scripts/sync-brand.mjs",
     "dev": "next dev",
+    "prebuild": "node --no-warnings scripts/sync-brand.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "modules:sync": "node scripts/sync-modules.mjs",
-    "modules:check": "node scripts/check-modules.mjs"
+    "modules:check": "node scripts/check-modules.mjs",
+    "brand:sync": "node --no-warnings scripts/sync-brand.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "culori": "^4.0.2",
     "image-size": "^2.0.2",
     "lucide-react": "^1.27.0",
     "next": "16.2.11",
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/culori": "^4.0.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

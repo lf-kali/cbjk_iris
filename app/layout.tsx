@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { theme } from "@/theme";
+import { fontClassName } from "./fonts.generated";
 import MobileHeader from '../components/header/MobileHeader';
 import { cn } from "@/lib/utils";
 import DesktopHeader from '../components/header/DesktopHeader';
 import { siteConfig } from "@/site.config";
 import { themeInitScript } from "@/lib/theme";
+import { renderBrandCss } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: {
@@ -25,11 +26,13 @@ export default function RootLayout({
   return (
     <html
       lang={siteConfig.locale}
-      className={cn("h-full", "bg-background", "antialiased", theme.fontClassName, "font-sans", colorMode === "dark" && "dark")}
+      className={cn("h-full", "bg-background", "antialiased", fontClassName, "font-sans", colorMode === "dark" && "dark")}
       // o script do tema altera class e data-theme-pref do <html> antes da hidratação
       suppressHydrationWarning={colorMode === "system"}
     >
       <head>
+        {/* cores da marca (siteConfig.brand) viram as variáveis CSS do shadcn */}
+        <style dangerouslySetInnerHTML={{ __html: renderBrandCss(siteConfig.brand) }} />
         {colorMode === "system" && (
           <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         )}
