@@ -68,7 +68,7 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Bugs corrigidos de passagem: "Débitoou Crédito", `text-Foreground`, `<a>` dentro de `<Button>`, link dentro de link no card de produto, badges sobrepostos no mini card, dois `<h1>` por página vindos dos headers
 - Fica em código, de propósito: textos de acessibilidade (aria-label) e rótulos do botão de tema, em pt-BR
 - Corrigido depois: "Comprar agora" cortava no card estreito do mobile (agora quebra em duas linhas) e o preço "de" estourava o card em 320px; últimos projetos ganhou `<h1>` visível e a home um `<h1>` só para leitores de tela (`sr-only`), já que não tem título visível
-- Pendente: imagens de exemplo de produtos e serviços (`/products/*.jpg`, `/services/*.jpg`) não existem; aguardando liberação de rede para baixar fotos de banco de imagens
+- Imagens de exemplo: 18 fotos CC0 do StockSnap em `public/products`, `public/services` e `public/home` (origem em `CREDITS.md`); slides e produtos não dependem mais de hosts externos (`remoteHosts: []`). Limitações: só havia 960px de largura disponível (slides ficam um pouco suaves em telas grandes), a foto de gesso mostra um cômodo em reforma e a da torneira não é monocomando preta
 - `CatalogRepository` + mock; páginas e `ProductScrollList` passam a consumir o repositório
 - `CatalogCard`/`CatalogMiniCard`, `WhatsappButton`, `CatalogDetail`, `ImageGallery`
 - Textos e moeda via config; logo como componente; `remotePatterns` derivado do config
