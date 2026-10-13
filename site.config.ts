@@ -7,6 +7,27 @@ export const siteConfig: SiteConfig = {
   brand: {
     logo: { src: "/JRiso.svg", alt: "JR", width: 1500, height: 1500, monochrome: true },
     logoText: "Acabamentos",
+    colors: {
+      neutral: "taupe",
+      cta: "#009966",
+      highlight: "#e17100",
+    },
+    fonts: {
+      sans: {
+        local: [
+          { path: "fonts/mont/Mont-Light.woff2", weight: "300" },
+          { path: "fonts/mont/Mont-Regular.woff2", weight: "400" },
+          { path: "fonts/mont/Mont-Bold.woff2", weight: "700" },
+          { path: "fonts/mont/Mont-Heavy.woff2", weight: "800" },
+          { path: "fonts/mont/Mont-Black.woff2", weight: "900" },
+        ],
+      },
+    },
+    overrides: {
+      // específico do JR: fundo escuro um pouco mais claro e sem tom quente.
+      // Ao trocar as cores da marca, apague esta linha para usar o fundo derivado.
+      dark: { background: "oklch(16.376% 0 0)" },
+    },
   },
   seo: {
     title: "JR - Acabamentos de alto padrão",

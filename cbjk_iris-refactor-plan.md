@@ -89,6 +89,18 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Manifest por módulo (rotas, menu, dados) para a geração futura apagar o que for desligado
 - Placeholders garantidos para os dados de exemplo
 
+## Marca no lugar de temas
+
+**Status: concluída.** Os temas pré-definidos (`themes/`, `theme.ts`) foram substituídos por `siteConfig.brand`:
+- `brand.colors`: `neutral` (escala de cinzas do Tailwind: `taupe`, `slate`, `stone`...), `primary` (opcional; omitida = tom 900 da escala), `cta` e `highlight`, em qualquer formato CSS
+- `lib/brand.ts` deriva as ~35 variáveis do shadcn para claro e escuro (texto sobre cada cor escolhido por contraste; primária quase cinza vira o tom 200 no escuro, colorida só clareia se sumir no fundo) e o layout as injeta num `<style>`. `brand.overrides.light/dark` sobrescreve qualquer variável
+- `brand.fonts.sans/heading`: fonte do Google (nome exato) ou arquivos locais. `npm run brand:sync` (roda sozinho em `predev`/`prebuild`) gera `app/fonts.generated.ts` com as chamadas do `next/font`, valida nome e pesos contra a lista do Google e imprime aviso de contraste abaixo de 4.5:1
+- `h1`–`h3` usam a fonte de títulos por padrão
+- Esquema inicial = JR (cinzas `taupe`, CTA `#009966`, destaque `#e17100`, Mont local, fundo escuro sobrescrito); comparado pixel a pixel com o tema JR anterior: idêntico, salvo 1–2/255 no verde (hex no lugar do OKLCH exato)
+- Avisos conhecidos do JR: texto branco sobre o CTA (3.65:1) e sobre o destaque (3.20:1) fica abaixo de 4.5:1
+- Ao mudar a fonte com o `next dev` rodando, é preciso rodar `npm run brand:sync` (sem reiniciar); cores atualizam sozinhas
+- `tsconfig` ganhou `allowImportingTsExtensions` para o script importar `lib/brand.ts` direto pelo Node
+
 ## Depois
 
 CLI de geração (`create-vitrine`, ver `create-vitrine-blueprint.md`) e, em separado, o template de backend (Neon + Clerk + API).
