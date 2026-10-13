@@ -64,7 +64,7 @@ export default async function ProdutoPage({ params }: ProdutoPageProps) {
 
         <div className="flex flex-col gap-4">
           {!product.stockQty && (
-            <Badge variant="secondary" className="w-fit bg-stone-900 text-white">
+            <Badge variant="secondary" className="w-fit bg-primary text-primary-foreground">
               Sob encomenda
             </Badge>
           )}

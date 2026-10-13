@@ -37,12 +37,12 @@ export function ProductCard({ product }: { product: Product }) {
             />
           </AspectRatio>
           {!product.stockQty && (
-            <Badge variant="secondary" className="absolute left-2 top-2 bg-stone-900 text-white">
+            <Badge variant="secondary" className="absolute left-2 top-2 bg-primary text-primary-foreground">
               Sob encomenda
             </Badge>
           )}
           {onSale && (
-            <Badge className="absolute right-2 top-2 bg-amber-600 text-white hover:bg-amber-600">
+            <Badge className="absolute right-2 top-2 bg-highlight text-highlight-foreground">
               Oferta
             </Badge>
           )}
@@ -84,7 +84,8 @@ export function ProductCard({ product }: { product: Product }) {
           <Button
             onClick={handleBuyClick}
             size="sm"
-            className="w-full gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
+            variant="cta"
+            className="w-full gap-2"
           >
             <MessageCircle className="size-4" />
             Comprar agora

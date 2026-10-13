@@ -140,11 +140,11 @@ export function ProductScrollList({
           onClick={() => scrollByCards("left")}
           disabled={!canScrollLeft}
           className={cn(
-            "absolute left-0 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white p-2 shadow-md transition-opacity sm:flex",
+            "absolute left-0 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background p-2 shadow-md transition-opacity sm:flex",
             !canScrollLeft && "pointer-events-none opacity-0",
           )}
         >
-          <ChevronLeft className="h-4 w-4 text-neutral-700" />
+          <ChevronLeft className="h-4 w-4 text-foreground" />
         </button>
 
         {/* Lista scrollável */}
@@ -171,11 +171,11 @@ export function ProductScrollList({
           onClick={() => scrollByCards("right")}
           disabled={!canScrollRight}
           className={cn(
-            "absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-neutral-200 bg-white p-2 shadow-md transition-opacity sm:flex",
+            "absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-border bg-background p-2 shadow-md transition-opacity sm:flex",
             !canScrollRight && "pointer-events-none opacity-0",
           )}
         >
-          <ChevronRight className="h-4 w-4 text-neutral-700" />
+          <ChevronRight className="h-4 w-4 text-foreground" />
         </button>
       </div>
     </section>

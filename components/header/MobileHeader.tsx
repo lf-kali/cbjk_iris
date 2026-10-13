@@ -25,11 +25,11 @@ function MobileHeader() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 h-20 w-full flex bg-white/86 backdrop-blur-2xl dark:bg-black/86">
+    <header className="sticky top-0 z-50 h-20 w-full flex bg-background/86 backdrop-blur-2xl">
       <nav className="h-full flex flex-row items-center justify-between px-5 w-full">
         <div className="flex flex-row cursor-pointer items-end gap-1 text-foreground">
           <Logo className="h-14" />
-          <h1 className="font-mont font-extrabold text-xl">Acabamentos</h1>
+          <h1 className="font-heading font-extrabold text-xl">Acabamentos</h1>
         </div>
 
         <div className="flex items-center gap-1">

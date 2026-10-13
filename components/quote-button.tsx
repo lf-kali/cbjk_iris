@@ -9,7 +9,8 @@ export function QuoteButton({ service }: { service: Service }) {
   return (
     <Button
       size="lg"
-      className="w-full gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
+      variant="cta"
+      className="w-full gap-2"
     >
       <a href={buildServiceQuoteUrl(service)} className="flex gap-3 items-center" target="_blank" rel="noopener noreferrer">
         <MessageCircle className="size-5" />

@@ -10,7 +10,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-lg border border-stone-200">
+      <div className="overflow-hidden rounded-lg border border-border">
         <AspectRatio ratio={1}>
           <Image
             src={images[activeIndex]}
@@ -32,7 +32,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
               onClick={() => setActiveIndex(index)}
               className={cn(
                 "relative size-16 shrink-0 overflow-hidden rounded-md border-2 transition-colors",
-                index === activeIndex ? "border-stone-900" : "border-transparent"
+                index === activeIndex ? "border-primary" : "border-transparent"
               )}
               aria-label={`Ver imagem ${index + 1} de ${alt}`}
             >

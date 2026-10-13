@@ -56,7 +56,7 @@ export function ServiceCard({ service }: { service: Service }) {
         <p className="line-clamp-3 text-sm text-muted-foreground md:text-base">
           {service.shortDescription}
         </p>
-        <span className="mt-2 text-sm font-medium text-emerald-700 group-hover:underline">
+        <span className="mt-2 text-sm font-medium text-cta group-hover:underline">
           Ver detalhes e pedir orçamento →
         </span>
       </div>

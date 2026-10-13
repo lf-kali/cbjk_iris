@@ -23,9 +23,9 @@ export function ProductMiniCard({
   return (
     <Link
       href={`${hrefBase}/${product.slug}`}
-      className="group flex h-80 w-[168px] shrink-0 snap-start flex-col gap-2 rounded-xs border border-border bg-card p-2 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 sm:w-[188px]"
+      className="group flex h-80 w-[168px] shrink-0 snap-start flex-col gap-2 rounded-xs border border-border bg-card p-2 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-[188px]"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-xs bg-neutral-100">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xs bg-muted">
         {product.images[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -41,13 +41,13 @@ export function ProductMiniCard({
         )}
 
         {hasDiscount && (
-          <span className="absolute left-2 top-2 rounded-full bg-[#ff741d] px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-highlight px-2 py-0.5 text-[10px] font-medium text-highlight-foreground">
             Oferta
           </span>
         )}
 
         {!product.stockQty && (
-          <span className="absolute left-2 top-2 rounded-full bg-neutral-900 px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
             Sob Encomenda
           </span>
         )}

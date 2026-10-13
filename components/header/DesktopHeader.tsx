@@ -15,11 +15,11 @@ import { Button } from '@/components/ui/button';
 function DesktopHeader() {
   return (
     
-    <header className="sticky h-25 w-full flex backdrop-blur-2xl bg-white/86 dark:bg-black/86">
+    <header className="sticky h-25 w-full flex backdrop-blur-2xl bg-background/86">
       <nav className="h-full flex flex-row items-center justify-between px-5 w-full">
         <div className="flex flex-row cursor-pointer items-end mb-2 gap-1 text-foreground">
           <Logo className="h-16" />
-          <h1 className="font-mont font-extrabold text-2xl">Acabamentos</h1>
+          <h1 className="font-heading font-extrabold text-2xl">Acabamentos</h1>
         </div>
         <NavigationMenu className="mt-6.5">
             <NavigationMenuList>

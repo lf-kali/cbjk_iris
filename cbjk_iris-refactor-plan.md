@@ -43,6 +43,14 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 ## Fases
 
 ### Fase 1 — Config, cores semânticas e temas
+
+**Status: concluída.** Como ficou:
+- `site.config.ts` (tipos em `types/site-config.ts`): nome, locale, SEO com `title.template`, WhatsApp, `theme.colorMode`, menu e slides
+- Tokens `--cta`/`--highlight` (+ `-foreground`) e variante `cta` no `Button`; `stone`/`neutral` viraram `primary`, `muted`, `border`, `background`. Branco/preto sobre fotos (carrossel) continua fixo de propósito
+- Temas em `themes/<nome>/` (`theme.css` com as variáveis claro/escuro + `fonts.ts` com next/font + `index.ts`); o ativo é escolhido em `theme.ts` na raiz. `globals.css` só tem a base (imports, `@custom-variant dark`, `@theme inline`, `@layer base`). Fontes do tema entram por `--theme-font-sans`/`--theme-font-heading`
+- Temas: `jr` (visual atual) e `oceano` (exemplo, Inter + Playfair Display)
+- Mudanças visuais intencionais no JR: header escuro passou de preto para a cor de fundo; badge "Sob encomenda" no escuro ficou visível (antes sumia no card); laranja de "Oferta" unificado (`#ff741d` → amber-600); link "ver serviço" de emerald-700 para o tom do CTA
+- Limitações: o estilo `base-sera` fixa formatos nos componentes (`rounded-none` nos botões), então tema muda cor, fonte e `--radius`, não o formato; `npx shadcn add` escreve variáveis em `app/globals.css`, que agora não tem mais as cores (mover para o tema à mão)
 - Criar `site.config.ts` e mover menu, WhatsApp, slides, metadata e textos para ele
 - Introduzir tokens `--cta` e `--highlight` e substituir as cores fixas
 - Separar `themes/` (base + `jr.css` + 1 ou 2 temas de exemplo); definir estratégia de dark mode e de fontes por tema

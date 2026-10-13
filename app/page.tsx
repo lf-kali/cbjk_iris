@@ -4,7 +4,7 @@ import { siteConfig } from "@/site.config";
 
 export default function Home() {
   return (
-    <div className="flex flex-col overflow-x-hidden flex-1 items-center justify-center font-mont font-[700]">
+    <div className="flex flex-col overflow-x-hidden flex-1 items-center justify-center font-bold">
       <FadeCarousel
         slides={siteConfig.home.slides.map((slide, i) => ({
           id: i,

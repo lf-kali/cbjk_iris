@@ -9,7 +9,8 @@ export function BuyButton({ product }: { product: Product }) {
   return (
     <Button
       size="lg"
-      className="w-full gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
+      variant="cta"
+      className="w-full gap-2"
     >
       <a className="flex flex-row items-center gap-3 text-md" href={buildWhatsappUrl(product)} target="_blank" rel="noopener noreferrer">
         <MessageCircle className="size-5" />
