@@ -108,14 +108,90 @@ export function FadeCarousel({
     };
   }, []);
 
-  // Pointer Events cobrem mouse, touch e caneta com a mesma lógica —
-  // não precisa de handlers separados para touch e clique de arraste.
+  const SWIPE_THRESHOLD = 50; // px mínimos de arraste pra contar como swipe
+  const draggingRef = useRef(false);
+
+  // Fim de um arraste (mouse ou toque): decide o slide e marca o arraste para
+  // o clique seguinte não abrir links.
+  const finishDrag = useCallback(() => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    const delta = dragDeltaX.current;
+    if (delta > SWIPE_THRESHOLD) prev();
+    else if (delta < -SWIPE_THRESHOLD) next();
+    if (Math.abs(delta) > 8) draggedRef.current = true;
+    dragDeltaX.current = 0;
+    setIsDragging(false);
+  }, [next, prev]);
+
+  const finishDragRef = useRef(finishDrag);
+  useEffect(() => {
+    finishDragRef.current = finishDrag;
+  }, [finishDrag]);
+
+  // Toque: Touch Events nativos, o caminho mais confiável nos navegadores móveis
+  // (o Safari do iOS tem particularidades com captura de pointer). O eixo trava
+  // nos primeiros pixels: horizontal troca de slide e bloqueia a rolagem;
+  // vertical deixa a página rolar normalmente.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || slides.length <= 1) return;
+
+    let startX = 0;
+    let startY = 0;
+    let axis: "x" | "y" | null = null;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1 || (e.target as HTMLElement).closest("button")) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      axis = null;
+      dragDeltaX.current = 0;
+      draggedRef.current = false;
+      draggingRef.current = true;
+      setIsDragging(true);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!draggingRef.current) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (!axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (axis === "y") {
+        // gesto vertical: é rolagem da página, não swipe
+        draggingRef.current = false;
+        dragDeltaX.current = 0;
+        setIsDragging(false);
+        return;
+      }
+      if (axis === "x") {
+        e.preventDefault();
+        dragDeltaX.current = dx;
+      }
+    };
+
+    const onTouchEnd = () => finishDragRef.current();
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [slides.length]);
+
+  // Mouse e caneta: Pointer Events (o toque fica com os Touch Events acima).
   const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    // Se o toque/clique começou em um botão (setas ou dots), não inicia o
-    // drag nem captura o pointer — do contrário o container "rouba" o
-    // pointerup do botão e o evento click nunca chega a disparar.
+    if (e.pointerType === "touch") return;
+    // Se o clique começou em um botão (setas ou dots), não inicia o drag nem
+    // captura o pointer — senão o container "rouba" o pointerup e o click do botão não dispara.
     if ((e.target as HTMLElement).closest("button")) return;
 
+    draggingRef.current = true;
     setIsDragging(true);
     dragStartX.current = e.clientX;
     dragDeltaX.current = 0;
@@ -125,18 +201,13 @@ export function FadeCarousel({
   };
 
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
+    if (e.pointerType === "touch" || !draggingRef.current) return;
     dragDeltaX.current = e.clientX - dragStartX.current;
   };
 
-  const handlePointerUp = () => {
-    if (!isDragging) return;
-    const threshold = 50; // px mínimos de arraste pra contar como swipe
-    if (dragDeltaX.current > threshold) prev();
-    else if (dragDeltaX.current < -threshold) next();
-    if (Math.abs(dragDeltaX.current) > 8) draggedRef.current = true;
-    setIsDragging(false);
-    dragDeltaX.current = 0;
+  const handlePointerUp = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "touch") return;
+    finishDrag();
   };
 
   return (
