@@ -32,6 +32,14 @@
     "contact": {
       "from": "@/components/sections/ContactSection",
       "export": "ContactSection"
+    },
+    "lead-form": {
+      "from": "@/components/sections/LeadFormSection",
+      "export": "LeadFormSection"
+    },
+    "widget": {
+      "from": "@/components/sections/WidgetSection",
+      "export": "WidgetSection"
     }
   },
   "modules": [
