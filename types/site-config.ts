@@ -11,6 +11,15 @@ export interface HomeSlide {
   subtitle?: string;
 }
 
+// Seções da home, renderizadas na ordem da lista. Cada tipo é fornecido por um
+// módulo (ver modules.json); um tipo novo entra nesta união.
+export type HomeSection = {
+  type: "products";
+  title?: string;
+  category?: string;
+  limit?: number;
+};
+
 // "system": começa pelo tema do sistema e mostra o botão de troca.
 // "light" | "dark": tema fixo, sem botão.
 export type ColorMode = "system" | "light" | "dark";
@@ -60,6 +69,8 @@ export interface SiteTexts {
   };
   gallery: {
     title: string;
+    /** exibido quando não há fotos */
+    empty: string;
   };
 }
 
@@ -98,6 +109,7 @@ export interface SiteConfig {
   menu: MenuItem[];
   home: {
     slides: HomeSlide[];
+    sections: HomeSection[];
   };
   texts: SiteTexts;
 }

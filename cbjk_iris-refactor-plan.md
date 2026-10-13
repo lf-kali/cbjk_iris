@@ -74,6 +74,16 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Textos e moeda via config; logo como componente; `remotePatterns` derivado do config
 
 ### Fase 3 — Bugs e módulos com manifest
+
+**Status: concluída.** Como ficou:
+- Código separado por módulo: `components/products`, `components/services`, `components/gallery`; repositórios em `lib/catalog/products.ts` e `lib/catalog/services.ts`. Núcleo compartilhado em `components/catalog` (`CatalogDetail`, `ImageGallery`, `WhatsappButton`)
+- `CatalogDetail` genérico: badge, preço, botão e aviso chegam por props, então não depende de nenhum módulo
+- Seções da home no config (`home.sections`, tipo `HomeSection`); cada tipo vem de um módulo. O registro `components/home/sections.tsx` é gerado a partir do `modules.json` (`npm run modules:sync`); seção no config sem módulo ativo falha o build com mensagem clara
+- `modules.json` central (decisão: lista central, não um JSON por módulo, porque os arquivos de cada módulo ficam espalhados por `app/`, `components/`, `lib/`, `data/` e `public/`): `paths` (o primeiro é a rota principal e define se o módulo está ativo), `menu`, `homeSections`, `dependencies`
+- `npm run modules:check`: copia o projeto, remove cada módulo (e todos juntos), regenera o registro, roda `tsc` e `next build` e procura links para rotas removidas no HTML gerado. Testado com sabotagens (import cruzado, link morto, dependência usada fora do módulo): as três são pegas
+- Galeria tolera pasta ausente ou vazia (mensagem `texts.gallery.empty`)
+- Bugs herdados do item 9: todos corrigidos nas fases anteriores; placeholders de imagem garantidos (fotos CC0)
+- Fora do escopo, ainda: desinstalar `dependencies` de verdade (o check só garante que nada mais as importa) e escrever o `site.config.ts` do zero, que é trabalho do CLI
 - Corrigir os bugs herdados (item 9)
 - Galeria tolerante a pasta ausente
 - Manifest por módulo (rotas, menu, dados) para a geração futura apagar o que for desligado
