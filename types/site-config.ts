@@ -88,6 +88,23 @@ export interface ContactInfo {
   social?: Partial<Record<SocialNetwork, string>>;
 }
 
+/**
+ * Para onde vão os dados do formulário de lead:
+ * - "whatsapp": abre uma conversa com os dados preenchidos (não precisa de conta)
+ * - "endpoint": POST em JSON para um serviço de formulários (Formspree, Web3Forms...)
+ * - "backend": reservado para o template de backend (ainda não implementado)
+ */
+export type LeadsConfig =
+  | { provider: "whatsapp"; intro?: string }
+  | {
+      provider: "endpoint";
+      /** URL que recebe o POST, ex.: "https://formspree.io/f/abcd1234" */
+      endpoint: string;
+      /** campos fixos enviados junto (ex.: access_key do Web3Forms, que é pública por design) */
+      extraFields?: Record<string, string>;
+    }
+  | { provider: "backend" };
+
 export interface FooterConfig {
   /** frase curta abaixo do logo */
   text?: string;
@@ -152,6 +169,19 @@ export interface SiteTexts {
       mapTitle: string;
     };
   };
+  leadForm: {
+    name: string;
+    phone: string;
+    email: string;
+    message: string;
+    submit: string;
+    sending: string;
+    /** confirmação após enviar para um endpoint */
+    success: string;
+    error: string;
+    /** linha de abertura da mensagem quando o destino é o WhatsApp */
+    whatsappIntro: string;
+  };
   footer: {
     menu: string;
     contact: string;
@@ -194,6 +224,8 @@ export interface SiteConfig {
   /** dados de contato usados pela seção "contact" e pelo rodapé */
   contact?: ContactInfo;
   footer?: FooterConfig;
+  /** destino do formulário de lead (seção "lead-form") */
+  leads?: LeadsConfig;
   home: {
     sections: Section[];
   };

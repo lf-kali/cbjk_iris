@@ -90,6 +90,29 @@ export type ContactSection = SectionBase & {
   showMap?: boolean;
 };
 
+export type LeadField = "name" | "phone" | "email" | "message";
+
+/** Formulário de contato. O destino dos dados vem de siteConfig.leads. */
+export type LeadFormSection = SectionBase & {
+  type: "lead-form";
+  /** campos, na ordem; em branco = nome, telefone e mensagem */
+  fields?: LeadField[];
+  submitLabel?: string;
+  /** texto de consentimento (LGPD) exibido com uma caixa de seleção obrigatória */
+  consentText?: string;
+};
+
+/**
+ * Código de widget colado (avaliações do TripAdvisor, Reclame Aqui, Trustpilot,
+ * Elfsight...). Os <script> do código são executados no navegador.
+ */
+export type WidgetSection = SectionBase & {
+  type: "widget";
+  html: string;
+  /** altura mínima reservada enquanto o widget carrega, ex.: "320px" */
+  minHeight?: string;
+};
+
 // Seções dos módulos: somem junto com o módulo (ver modules.json).
 export type ProductsSection = SectionBase & { type: "products"; category?: string; limit?: number };
 export type ServicesSection = SectionBase & { type: "services"; limit?: number };
@@ -104,6 +127,8 @@ export type Section =
   | StatsSection
   | FaqSection
   | ContactSection
+  | LeadFormSection
+  | WidgetSection
   | ProductsSection
   | ServicesSection
   | GallerySection;

@@ -9,6 +9,8 @@ import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import { LeadFormSection } from "@/components/sections/LeadFormSection";
+import { WidgetSection } from "@/components/sections/WidgetSection";
 import { ProductsSection } from "@/components/products/ProductsSection";
 import { ServicesSection } from "@/components/services/ServicesSection";
 import { GallerySection } from "@/components/gallery/GallerySection";
@@ -22,6 +24,8 @@ export const sectionRegistry: SectionRegistry = {
   "stats": StatsSection,
   "faq": FaqSection,
   "contact": ContactSection,
+  "lead-form": LeadFormSection,
+  "widget": WidgetSection,
   "products": ProductsSection,
   "services": ServicesSection,
   "gallery": GallerySection,

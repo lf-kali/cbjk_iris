@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node --no-warnings scripts/sync-brand.mjs",
+    "predev": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
     "dev": "next dev",
-    "prebuild": "node --no-warnings scripts/sync-brand.mjs",
+    "prebuild": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "modules:sync": "node scripts/sync-modules.mjs",
     "modules:check": "node scripts/check-modules.mjs",
-    "brand:sync": "node --no-warnings scripts/sync-brand.mjs",
+    "brand:sync": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
     "theme:add": "node scripts/add-theme.mjs"
   },
   "dependencies": {

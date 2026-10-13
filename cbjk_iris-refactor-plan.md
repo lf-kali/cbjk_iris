@@ -114,7 +114,10 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 - Conteúdo do config não deve apontar para rotas/arquivos de módulos (o `modules:check` acusaria link morto); produtos/serviços/galeria entram pelas seções dos módulos, que têm o próprio "Ver todos"
 - Ícones de redes sociais copiados do simple-icons (CC0) em `components/icons/social-paths.ts`; LinkedIn usa ícone genérico (removido do simple-icons)
 
-**Parte B (pendente, depende de decisões e credenciais):** formulário de lead, widget do Google Places/mapa com chave, avaliações do Google, TripAdvisor e outras plataformas.
+**Parte B (concluída):**
+- Seção `lead-form` + `siteConfig.leads`: `provider: "whatsapp"` (abre conversa com os dados, padrão), `"endpoint"` (POST em JSON para Formspree/Web3Forms, com `extraFields`) ou `"backend"` (reservado; falha o build até ser implementado em `lib/leads.ts`). Campo anti-spam escondido e consentimento (LGPD) opcional
+- Seção `widget`: HTML colado com os `<script>` reexecutados no navegador (TripAdvisor, Reclame Aqui, Trustpilot, Elfsight...)
+- Mapa: segue o embed simples do Google, sem chave
 
 ## Depois
 

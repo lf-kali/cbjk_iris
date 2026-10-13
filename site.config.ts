@@ -49,6 +49,10 @@ export const siteConfig: SiteConfig = {
   footer: {
     text: "Produtos e serviços para construir, reformar e cuidar da sua casa.",
   },
+  // destino do formulário de lead. Para um serviço de formulários:
+  // leads: { provider: "endpoint", endpoint: "https://formspree.io/f/SEU_ID" },
+  // Web3Forms: { provider: "endpoint", endpoint: "https://api.web3forms.com/submit", extraFields: { access_key: "SUA_CHAVE" } }
+  leads: { provider: "whatsapp" },
   menu: [
     { title: "Início", path: "/" },
     { title: "Produtos", path: "/produtos" },
@@ -155,6 +159,8 @@ export const siteConfig: SiteConfig = {
             { question: "Quais as formas de pagamento?", answer: "Pix, débito, crédito em até 10x e boleto para empresas." },
           ],
         },
+        // Avaliações de outras plataformas: cole o código oficial do widget, ex.:
+        // { type: "widget", title: "Avaliações no TripAdvisor", html: `<div id="TA_..."></div><script src="https://www.jscache.com/..."></script>`, minHeight: "320px" },
       ],
     },
     {
@@ -163,6 +169,13 @@ export const siteConfig: SiteConfig = {
       description: "Endereço, horário de atendimento e WhatsApp da cbjk.",
       sections: [
         { type: "contact", title: "Fale com a gente", subtitle: "Atendimento rápido pelo WhatsApp.", showMap: true },
+        {
+          type: "lead-form",
+          title: "Peça seu orçamento",
+          subtitle: "Preencha os dados e continue a conversa pelo WhatsApp.",
+          fields: ["name", "phone", "email", "message"],
+          consentText: "Concordo em ser contatado pela cbjk sobre este pedido.",
+        },
       ],
     },
   ],
@@ -208,6 +221,17 @@ export const siteConfig: SiteConfig = {
         whatsapp: "Falar no WhatsApp",
         mapTitle: "Mapa com a nossa localização",
       },
+    },
+    leadForm: {
+      name: "Nome",
+      phone: "Telefone / WhatsApp",
+      email: "E-mail",
+      message: "Mensagem",
+      submit: "Enviar",
+      sending: "Enviando...",
+      success: "Recebemos sua mensagem! Entraremos em contato em breve.",
+      error: "Não foi possível enviar agora. Tente de novo ou fale com a gente pelo WhatsApp.",
+      whatsappIntro: "Olá! Vim pelo site e gostaria de um orçamento.",
     },
     footer: {
       menu: "Navegação",
