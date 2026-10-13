@@ -1,7 +1,7 @@
-import { catalog } from "@/lib/catalog";
+import { serviceCatalog } from "@/lib/catalog/services";
 import { siteConfig } from "@/site.config";
 import { fillTemplate } from "@/lib/format";
-import { ServiceCard } from "@/components/catalog/ServiceCard";
+import { ServiceCard } from "@/components/services/ServiceCard";
 
 const texts = siteConfig.texts.services;
 
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ServicosPage() {
-  const services = await catalog.listServices();
+  const services = await serviceCatalog.list();
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">

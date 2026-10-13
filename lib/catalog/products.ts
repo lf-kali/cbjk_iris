@@ -1,13 +1,20 @@
 import { products } from "@/data/products";
-import { services } from "@/data/services";
-import type { CatalogRepository } from "./repository";
+import type { Product, ProductFilter } from "@/types/catalog";
+
+// Contrato da fonte de produtos. As páginas só conhecem esta interface;
+// para usar uma API ou banco, implemente-a e troque `productCatalog`.
+export interface ProductRepository {
+  list(filter?: ProductFilter): Promise<Product[]>;
+  get(slug: string): Promise<Product | undefined>;
+  categories(): Promise<string[]>;
+}
 
 function normalize(value: string) {
   return value.trim().toLowerCase();
 }
 
-export const mockCatalog: CatalogRepository = {
-  async listProducts(filter = {}) {
+const mockProducts: ProductRepository = {
+  async list(filter = {}) {
     let result = products;
 
     if (filter.category) {
@@ -24,19 +31,13 @@ export const mockCatalog: CatalogRepository = {
     return result;
   },
 
-  async getProduct(slug) {
+  async get(slug) {
     return products.find((product) => product.slug === slug);
   },
 
-  async listProductCategories() {
+  async categories() {
     return [...new Set(products.map((product) => product.category))];
   },
-
-  async listServices() {
-    return services;
-  },
-
-  async getService(slug) {
-    return services.find((service) => service.slug === slug);
-  },
 };
+
+export const productCatalog: ProductRepository = mockProducts;

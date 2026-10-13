@@ -1,11 +1,8 @@
 import { FadeCarousel } from '../components/FadeCarousel';
-import { ProductScrollList } from "@/components/catalog/ProductScrollList"
-import { catalog } from "@/lib/catalog";
 import { siteConfig } from "@/site.config";
+import { homeSections } from "@/components/home/sections";
 
 export default async function Home() {
-  const products = await catalog.listProducts();
-
   return (
     <div className="flex flex-col overflow-x-hidden flex-1 items-center justify-center font-bold">
       <h1 className="sr-only">{siteConfig.seo.title}</h1>
@@ -23,7 +20,16 @@ export default async function Home() {
         }))}
       />
 
-      <ProductScrollList products={products} className="p-4.5"/>
+      {siteConfig.home.sections.map((section, i) => {
+        const Section = homeSections[section.type];
+        if (!Section) {
+          throw new Error(
+            `Seção "${section.type}" está em siteConfig.home.sections, mas nenhum módulo ativo a fornece. ` +
+              `Remova-a do config ou rode "npm run modules:sync".`,
+          );
+        }
+        return <Section key={i} section={section} />;
+      })}
     </div>
   );
 }

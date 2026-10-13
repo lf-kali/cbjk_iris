@@ -9,7 +9,7 @@ import { itemHref } from "@/lib/routes";
 import { whatsappUrlFor } from "@/lib/whatsapp";
 import { PriceBlock } from "./PriceBlock";
 import { ProductBadges } from "./ProductBadges";
-import { WhatsappButton } from "./WhatsappButton";
+import { WhatsappButton } from "@/components/catalog/WhatsappButton";
 
 // Card da grade de produtos. O botão do WhatsApp fica fora do <Link>
 // (link dentro de link não é HTML válido).
