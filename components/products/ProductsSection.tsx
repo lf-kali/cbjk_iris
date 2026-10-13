@@ -1,9 +1,24 @@
-import type { HomeSection } from "@/types/site-config";
+import Link from "next/link";
+import type { ProductsSection as ProductsSectionConfig } from "@/types/sections";
+import { siteConfig } from "@/site.config";
 import { productCatalog } from "@/lib/catalog/products";
+import { routes } from "@/lib/routes";
+import { SectionShell } from "@/components/sections/SectionShell";
 import { ProductScrollList } from "./ProductScrollList";
 
-// Seção "products" da home: lista horizontal de produtos.
-export async function ProductsSection({ section }: { section: Extract<HomeSection, { type: "products" }> }) {
+// Seção "products": lista horizontal de produtos, com link para o catálogo.
+export async function ProductsSection({ section }: { section: ProductsSectionConfig }) {
   const products = await productCatalog.list({ category: section.category, limit: section.limit });
-  return <ProductScrollList products={products} title={section.title} className="p-4.5" />;
+  if (products.length === 0) return null;
+
+  return (
+    <SectionShell
+      id={section.id}
+      title={section.title}
+      subtitle={section.subtitle}
+      action={<Link href={routes.products} className="text-sm font-medium text-primary hover:underline">{siteConfig.texts.sections.seeAll} →</Link>}
+    >
+      <ProductScrollList products={products} />
+    </SectionShell>
+  );
 }

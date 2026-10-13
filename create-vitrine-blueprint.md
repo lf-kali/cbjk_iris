@@ -23,7 +23,7 @@ Um comando cria o projeto, faz o setup por perguntas e entrega um site-vitrine p
 
 - Nome do projeto, nome do negócio e WhatsApp
 - Módulos: produtos, serviços, últimos projetos (galeria)
-- Marca: cores (cinzas, principal, CTA, destaque) e fontes (Google ou arquivo local)
+- Tema (lista de `themes/` ou um do tweakcn) e marca: cores (principal, CTA, destaque, opcionais) e fontes (Google ou arquivo local)
 - Modo escuro: sistema, só claro ou só escuro
 - Origem das imagens: locais ou ImageKit
 - Gerenciador de pacotes, instalar dependências, iniciar git
@@ -32,8 +32,8 @@ Um comando cria o projeto, faz o setup por perguntas e entrega um site-vitrine p
 
 - **Template como projeto rodável.** Desenvolvido e testado com `npm run dev` dentro do repo do CLI. O CLI não faz string-replace em código: só escreve `site.config.ts`, apaga caminhos de módulos e roda os scripts de sync.
 - **Módulos desligados são apagados na geração** (rotas, itens de menu, dados), como o `create-next-app` faz. Sem flags mortas no projeto gerado. Cada módulo precisa de um manifest dizendo quais arquivos e entradas de menu ele possui.
-- **Marca no config em vez de temas** (`siteConfig.brand`): poucas cores derivam a paleta inteira; fontes viram código gerado (`brand:sync`) porque o `next/font` exige chamadas estáticas.
-- **Tema externo (opcional):** variáveis coladas do tweakcn/shadcn podem entrar em `brand.overrides`.
+- **Tema + marca:** `theme.name` escolhe um arquivo em `themes/` (shadcn/tweakcn, ou baixado com `npm run theme:add`); `brand.colors` é aplicado por cima. Fontes viram código gerado (`brand:sync`) porque o `next/font` exige chamadas estáticas.
+- **Home e páginas por seções** no config: o CLI pode oferecer modelos de home (ex.: loja, serviços, institucional) que são só listas de seções.
 - **Stack do CLI:** TypeScript, `tsup`, `@clack/prompts`, `cac` (flags), `execa` (install).
 
 ## Estrutura do repositório

@@ -57,7 +57,7 @@ function removeModules(dir, mods) {
     for (const route of mod.menu) {
       config = config.replace(new RegExp(`^.*path: "${route}".*\\n`, "m"), "");
     }
-    for (const type of Object.keys(mod.homeSections)) {
+    for (const type of Object.keys(mod.sections)) {
       config = config.replace(new RegExp(`\\{\\s*type: "${type}"[^}]*\\},?\\s*`, "g"), "");
     }
   }
@@ -123,7 +123,7 @@ function checkScenario(mods) {
 const modules = loadManifest(ROOT);
 
 if (!syncRegistry(ROOT, { check: true })) {
-  console.error("components/home/sections.tsx está desatualizado. Rode: npm run modules:sync");
+  console.error("components/sections/registry.tsx está desatualizado. Rode: npm run modules:sync");
   process.exit(1);
 }
 for (const mod of modules) {
