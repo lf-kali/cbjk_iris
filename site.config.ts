@@ -8,7 +8,7 @@ export const siteConfig: SiteConfig = {
   theme: {
     // arquivo em themes/: neutral, stone, zinc, slate, gray, taupe (shadcn),
     // modern-minimal, ocean-breeze, caffeine, elegant-luxury (tweakcn) ou um colado à mão
-    name: "neutral",
+    name: "taupe",
     colorMode: "system",
   },
   brand: {

@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       hostname,
     })),
   },
+  allowedDevOrigins: [process.env.TAILNET_ADDRESS as string]
 };
 
 export default nextConfig;
