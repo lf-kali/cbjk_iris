@@ -121,4 +121,4 @@ Base: projeto `jr_acabamentos` (clone raso no commit `3578df5`). Leitura estáti
 
 ## Depois
 
-CLI de geração (`create-vitrine`, ver `create-vitrine-blueprint.md`) e, em separado, o template de backend (Neon + Clerk + API).
+CLI de geração (`create-vitrine`, ver `create-vitrine-plan.md`) e, em separado, o template de backend (Neon + Clerk + API).
