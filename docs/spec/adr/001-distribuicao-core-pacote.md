@@ -1,6 +1,6 @@
 # ADR 001: Core como pacote no npm
 
-- **Status:** Proposto. Aguarda o dono ([Q-01](../OPEN-QUESTIONS.md#q-01-core-como-pacote-ou-template-copiado-decisão-do-dono)).
+- **Status:** Aceito pelo dono em 2026-10-20 ([Q-01](../OPEN-QUESTIONS.md#q-01-core-como-pacote-ou-template-copiado-decisão-do-dono)), na org `@cbjk_iris`.
 - **Data:** 2026-10-19
 - **Spec:** [§4 a](../SPEC.md#a-template-copiado-ou-core-como-pacote-decisão-do-dono)
 
@@ -18,18 +18,16 @@ Fatos que pesam (verificados, ver [§3 da spec](../SPEC.md#3-fatos-verificados-q
 
 ## Decisão
 
-Proposta: **opção A**. O núcleo vira o pacote `@iris-vitrine/core` (componentes, seções e rotas, como TSX fonte), apoiado em `@iris-vitrine/schema` e `@iris-vitrine/engine` (JS compilado). O projeto do cliente tem config, conteúdo, temas próprios, `public/` e rotas finas geradas.
+**Opção A**. O núcleo vira o pacote `@cbjk_iris/core` (componentes, seções e rotas, como TSX fonte), apoiado em `@cbjk_iris/schema` e `@cbjk_iris/engine` (JS compilado). O projeto do cliente tem config, conteúdo, temas próprios, `public/` e rotas finas geradas.
 
-- O core lê o config e o registro de seções pelos aliases `@iris-vitrine/site-config` e `@iris-vitrine/site-registry`, configurados pelo `withIris()` (de `@iris-vitrine/engine/next`, JS compilado) no Turbopack e pelo `tsconfig.json` no tsc. As fontes chegam por prop, do `app/layout.tsx` gerado.
+- O core lê o config e o registro de seções pelos aliases `@cbjk_iris/site-config` e `@cbjk_iris/site-registry`, configurados pelo `withIris()` (de `@cbjk_iris/engine/next`, JS compilado) no Turbopack e pelo `tsconfig.json` no tsc. As fontes chegam por prop, do `app/layout.tsx` gerado.
 - Módulo ativo passa a ser o que está em `siteConfig.modules`. O `iris module remove` apaga as rotas finas, os itens de menu e as seções do módulo.
 - O manifesto de módulos vai para o `schema`. O `modules:check` vira teste de matriz na CI do monorepo.
-
-A estrutura do monorepo é a mesma na opção B. Nela, o `create-iris-site` copia `packages/core/src` para `iris/` dentro do projeto, e os aliases apontam para lá.
 
 ## Consequências
 
 - **Bom:** uma correção chega a todos os sites com `npm update`. O cliente vê um projeto pequeno, com só o que é dele.
 - **Ruim:** customizar o JSX de um componente deixa de ser editar um arquivo. Fica para o `iris eject` (backlog).
 - **Ruim:** campo obrigatório novo no config quebra todos os clientes. Regra: campo novo é opcional com padrão, ou é versão major. `texts` passa a ser parcial.
-- **Risco:** 6 pontos técnicos a provar num spike antes da migração (spec [§6.1](../SPEC.md#61-iris-architect-arquitetura-e-contratos)). Se algum falhar, um ADR novo revê esta decisão.
-- **Se o dono escolher B:** o spike e a migração para o monorepo seguem iguais. Mudam o `create` (copia o código), o critério de módulo ativo (volta a ser por arquivo) e o backlog (sai o `iris upgrade`).
+- **Risco:** 7 pontos técnicos a provar num spike antes da migração (spec [§6.1](../SPEC.md#61-iris-architect-arquitetura-e-contratos)). Se algum falhar, um ADR novo revê esta decisão.
+- **Alternativa rejeitada (B, template copiado):** o cliente receberia todo o código, sem caminho de atualização. Foi rejeitada porque o objetivo é gerenciar sites, não só criá-los.

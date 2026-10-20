@@ -1,9 +1,10 @@
 # Iris: spec do framework
 
-> **Status dos contratos: RASCUNHO.** Nada aqui está congelado. As frentes paralelas só começam quando esta linha mudar para `CONGELADO em <data> (tag contracts-v1)`, depois de o dono responder às perguntas bloqueantes de [`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md).
+> **Decisões do dono: respondidas em 2026-10-20** ([`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md)).
+> **Status dos contratos: RASCUNHO.** O `iris-architect` já pode começar. As frentes paralelas só começam quando esta linha mudar para `CONGELADO em <data> (tag contracts-v1)`.
 
 Documentos relacionados:
-- [`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md): o que precisa de resposta do dono.
+- [`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md): as perguntas ao dono e as respostas.
 - [`adr/`](./adr/): uma decisão por arquivo.
 
 **Precedência:** esta spec prevalece sobre `instructions/02-*.md` a `06-*.md`, que foram escritas antes dela e usam caminhos e nomes antigos. A tradução está em [§6.6](#66-mapeamento-para-as-instruções-02-a-06).
@@ -46,7 +47,7 @@ Princípios que valem para todas as frentes:
 
 ## 2. Ponto de partida: o que existe hoje
 
-Lido do código em 2026-10-19 (`main`, commit `ff50368`).
+Lido do código em 2026-10-19 (`main`, commit `ff50368`). O commit seguinte, `07b91c7`, só limpou o diretório de trabalho ([Q-13](./OPEN-QUESTIONS.md#q-13-pendências-no-diretório-de-trabalho)).
 
 | Peça | Onde | Observação para a migração |
 |---|---|---|
@@ -57,12 +58,12 @@ Lido do código em 2026-10-19 (`main`, commit `ff50368`).
 | Estilo dos componentes | `components/ui/*` no estilo shadcn `base-sera` | Forma fixa no código: `rounded-none` (12 ocorrências), `shadow-md` (13), `uppercase` e `tracking-*` em botão, badge, breadcrumb, tabs e rótulos de categoria, `ring-1 ring-foreground/5` no Card, `backdrop-blur-2xl` e `bg-background/86` no header, `bg-black/20 backdrop-blur-sm` no fundo do Sheet |
 | Módulos | `modules.json` (products, services, gallery). Um módulo está ativo quando o primeiro `path` existe | O critério de "ativo" muda ([ADR 001](./adr/001-distribuicao-core-pacote.md)) |
 | Arquivos gerados | `app/fonts.generated.ts` (`brand:sync`), `components/sections/registry.tsx` (`modules:sync`) | Continuam gerados, com nomes novos ([§5.1](#51-estrutura-do-monorepo)) |
-| Scripts | `brand:sync`, `theme:add`, `modules:sync`, `modules:check` | Viram funções do `@iris-vitrine/engine`, chamadas por scripts e depois pela CLI |
+| Scripts | `brand:sync`, `theme:add`, `modules:sync`, `modules:check` | Viram funções do `@cbjk_iris/engine`, chamadas por scripts e depois pela CLI |
 | Acoplamento | 17 arquivos de `components/` e `lib/` importam `@/site.config` direto. `RenderSections` importa `./registry`, e o layout importa `./fonts.generated` | No pacote, cada um desses imports precisa de um mecanismo ([§5.1](#51-estrutura-do-monorepo)) |
 | Testes | Não há vitest nem Playwright no `package.json` | O arquiteto instala ([§6.1](#61-iris-architect-arquitetura-e-contratos)) |
 | Licença | Não há `LICENSE`, e o `package.json` não tem `license` | Bloqueia a publicação ([Q-04](./OPEN-QUESTIONS.md#q-04-licença)) |
 
-Pendências no diretório de trabalho que não devem chegar ao starter estão em [Q-13](./OPEN-QUESTIONS.md#q-13-pendências-no-diretório-de-trabalho).
+As pendências do diretório de trabalho foram resolvidas no commit `07b91c7` ([Q-13](./OPEN-QUESTIONS.md#q-13-pendências-no-diretório-de-trabalho)).
 
 ---
 
@@ -74,17 +75,17 @@ Conferidos nesta sessão, com comando. O context7 não estava disponível; usei 
 |---|---|---|
 | `create-iris-project` já existe no npm (v1.0.1, de outro dono, "Create and set up a new Iris app project") | `npm view create-iris-project` | O comando pedido pelo dono não pode ser publicado com esse nome ([ADR 006](./adr/006-nomes-e-distribuicao-npm.md)) |
 | O escopo `@iris` tem dono (`@iris/cli` publicado por outra pessoa) | `npm view @iris/cli` | `@iris/core` não está disponível para nós |
-| Livres em 2026-10-19: `create-iris-site`, `@iris-vitrine/*`, `@lf-kali/*` (como pacotes; a disponibilidade da org só se confirma em npmjs.com) | `npm view` com 404 | Nomes provisórios desta spec |
+| Livres em 2026-10-20: `create-iris-site` e `@cbjk_iris/*`. Os nomes passam no `validate-npm-package-name`. A org só se confirma ao criá-la em npmjs.com | `npm view` com 404 e `validate-npm-package-name` 8.0 | Nomes escolhidos pelo dono ([Q-02](./OPEN-QUESTIONS.md#q-02-nomes-no-npm-decisão-do-dono)) |
 | `npx iris` fora de um projeto baixa o pacote `iris` (uma lib de XHR de 2022) | `npm view iris` | Nos docs, a CLI roda por `npx iris` só dentro do projeto (bin local) ou por `npm run iris --` |
 | O Node se recusa a remover tipos de `.ts` dentro de `node_modules` (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`) | Teste local no Node 24.18 | Tudo o que o Node executa direto (CLI, `next.config.ts` → `withIris`, motor de tema, geradores) vai publicado como JS compilado |
 | O Next 16 usa Turbopack por padrão e **falha o build** se encontrar uma chave `webpack` no config | `docs/01-app/02-guides/upgrading/version-16.md` | O `withIris()` só pode usar `turbopack.resolveAlias` e `transpilePackages` |
-| O Next não compila TS de `node_modules`, a não ser que o pacote esteja em `transpilePackages`. Workspaces são compilados sozinhos | `docs/.../transpilePackages.md` | O `@iris-vitrine/core` pode ir como TSX fonte, desde que o `withIris()` o adicione ali |
+| O Next não compila TS de `node_modules`, a não ser que o pacote esteja em `transpilePackages`. Workspaces são compilados sozinhos | `docs/.../transpilePackages.md` | O `@cbjk_iris/core` pode ir como TSX fonte, desde que o `withIris()` o adicione ali |
 | zod 4.4 está instalado (dependência indireta): tem `.meta()` e `z.toJSONSchema()` | Teste com `node -e` | Base do schema por seção ([ADR 002](./adr/002-schema-por-secao.md)) |
 | `.strict()` rejeita a chave `$schema`, e `z.toJSONSchema` no modo padrão (`io: "output"`) marca campos com `.default()` como obrigatórios | Teste local (revisão adversarial) | Loader remove `$schema` antes de validar; JSON Schema gerado com `io: "input"` ([§5.3](#53-config-e-conteúdo)) |
 | commander 15 e vitest 5 exigem Node `>=22.12`; tsdown exige `^22.18` | `npm view <pkg> engines` | O README diz Node 22.6+. O mínimo passa a ser **22.18** ([Q-05](./OPEN-QUESTIONS.md#q-05-node-mínimo-decisão-do-dono)) |
 | std-env 4.3 exporta `isCI`, `hasTTY`, `isAgent` e `agent` (detecta `CLAUDECODE`, `CODEX_*`, `CURSOR_AGENT`, `AI_AGENT`) | Leitura do `.d.mts` do pacote | A detecção de agente não precisa de código próprio |
 | @clack/prompts 1.8: `text`, `select`, `multiselect`, `confirm`, `group`, `isCancel`, `cancel`, `spinner` | Leitura do `.d.mts` | API das perguntas |
-| simple-icons 16.35 tem **Shopee**, mas **não tem** Mercado Livre nem Amazon (só Mercado Pago) | Busca no `data/simple-icons.json` | Ícones de ML e Amazon precisam de outra origem ([Q-08](./OPEN-QUESTIONS.md#q-08-ícones-do-mercado-livre-e-da-amazon)) |
+| simple-icons 16.35 tem **Shopee**, mas **não tem** Mercado Livre nem Amazon (só Mercado Pago) | Busca no `data/simple-icons.json` | Os três ícones de marketplace vêm do kit de marca oficial de cada empresa ([Q-08](./OPEN-QUESTIONS.md#q-08-ícones-do-mercado-livre-e-da-amazon)) |
 
 ### Armadilhas conhecidas (do blind-spot pass)
 
@@ -114,18 +115,18 @@ ADR: [`001-distribuicao-core-pacote.md`](./adr/001-distribuicao-core-pacote.md).
 | | A. Core como pacote no npm (recomendada) | B. Template copiado (estilo shadcn) |
 |---|---|---|
 | O que o cliente recebe | Config, conteúdo, temas próprios, `public/` e arquivos finos gerados | O código inteiro |
-| `iris upgrade` | Possível: `npm update @iris-vitrine/core` | Impossível sem um sistema de patches |
+| `iris upgrade` | Possível: `npm update @cbjk_iris/core` | Impossível sem um sistema de patches |
 | Customizar um componente | Só por props, tokens e estilos. Mudança de JSX exige "ejetar" (backlog) | Livre, edita o arquivo |
 | Correção de bug para 20 clientes | Uma publicação | 20 PRs à mão |
 | Custo de engenharia | Alto: aliases, `transpilePackages`, `@source`, rotas finas, semver | Baixo: o que já existe hoje |
 | `modules.json` e `modules:check` | O manifesto vai para o pacote. Módulo ativo = listado em `siteConfig.modules`. O check vira teste de matriz na CI do monorepo | Continua como hoje: apagar `paths` desliga o módulo |
-| Risco técnico | Médio. 6 pontos a provar num spike antes de tudo ([§6.1](#61-iris-architect-arquitetura-e-contratos)) | Baixo |
+| Risco técnico | Médio. 7 pontos a provar num spike antes de tudo ([§6.1](#61-iris-architect-arquitetura-e-contratos)) | Baixo |
 
-**Recomendação: A.** A ferramenta serve para *gerenciar* sites, não só criar. Sem pacote, cada site gerado vira um fork que nunca mais recebe correção. O custo da opção A é real, mas é pago uma vez, e quase todo ele é a mesma refatoração que a opção B também pede (separar o núcleo em `packages/core`).
+**Decisão do dono (2026-10-20): A**, na org `@cbjk_iris`. A ferramenta serve para *gerenciar* sites, não só criar. Sem pacote, cada site gerado vira um fork que nunca mais recebe correção. O custo da opção A é real, mas é pago uma vez, e quase todo ele é a mesma refatoração que a opção B também pede (separar o núcleo em `packages/core`).
 
-**O que muda no código:** os 17 imports de `@/site.config` passam para o alias `@iris-vitrine/site-config`; `components/`, `lib/` e as rotas vão para `packages/core/src`; `modules.json` vira `packages/schema/src/modules.ts`; o `app/` do projeto fica só com arquivos finos gerados.
+**O que muda no código:** os 17 imports de `@/site.config` passam a importar `packages/core/src/lib/config.ts`, o único arquivo que lê o alias `@cbjk_iris/site-config` ([§5.3](#53-config-e-conteúdo)); `components/`, `lib/` e as rotas vão para `packages/core/src`; `modules.json` vira `packages/schema/src/modules.ts`; o `app/` do projeto fica só com arquivos finos gerados.
 
-O que **não** depende da resposta: a estrutura do monorepo ([§5.1](#51-estrutura-do-monorepo)) é a mesma nas duas opções. Na opção B, o `create-iris-site` copia `packages/core/src` para dentro do projeto (pasta `iris/`) e os aliases apontam para lá, em vez de para `node_modules`. Por isso o spike e a migração para o monorepo podem começar antes da resposta. Os contratos de módulo e de arquivos finos, não.
+A opção B fica registrada no [ADR 001](./adr/001-distribuicao-core-pacote.md) como alternativa rejeitada.
 
 ### b) Schema por seção como fonte única
 
@@ -176,7 +177,7 @@ ADR: [`004-conteudo-em-json.md`](./adr/004-conteudo-em-json.md). Pergunta: [Q-03
 | **Conteúdo em JSON validado por zod, config em `.ts` (recomendada)** | Edição trivial e segura, um arquivo por item, validação sem executar código, pronto para Keystatic, Puck e import de CSV | JSON não aceita comentário. Iniciante troca vírgula e aspas por outro erro de sintaxe |
 | Tudo em JSON, inclusive o config | Uma regra só | Perde o tipo e o comentário de `brand`, `texts` e `seo`, que o iniciante mais lê |
 
-**Recomendação: conteúdo em JSON, config em `.ts`.**
+**Decisão do dono (2026-10-20): conteúdo em JSON, config em `.ts`.**
 - Produtos, serviços, páginas e a home vão para `content/`, um arquivo JSON por item, com `$schema` apontando para o JSON Schema gerado. O VS Code dá autocomplete e erro sublinhado, como hoje no `.ts`.
 - O `site.config.ts` fica para configuração. A CLI edita nele só os caminhos listados em [§5.7](#edição-do-siteconfigts), com magicast. Se o valor não for literal, a CLI para com código 7 e mostra a linha a mudar à mão.
 - magicast em vez de ts-morph: ele edita o objeto como um objeto JS e preserva a formatação. O ts-morph é mais poderoso, mas pesa mais e é verboso para esse uso.
@@ -208,7 +209,7 @@ O ponto central: todas as perguntas passam por uma única função `ask()`, que 
 
 Contratos são de posse exclusiva do `iris-architect`. Depois de congelados, qualquer mudança exige um ADR novo. Acrescentar um valor a uma lista de dados (um host de marketplace, um ícone de seção) não é mudança de contrato: basta um PR revisado pelo arquiteto.
 
-Nomes de pacote nesta seção são provisórios até [Q-02](./OPEN-QUESTIONS.md#q-02-nomes-no-npm-decisão-do-dono). Trocar o escopo é um find/replace de `@iris-vitrine/`.
+Nomes de pacote decididos pelo dono ([Q-02](./OPEN-QUESTIONS.md#q-02-nomes-no-npm-decisão-do-dono)): o comando `create-iris-site` e a org `@cbjk_iris`.
 
 ### 5.1 Estrutura do monorepo
 
@@ -222,10 +223,10 @@ cbjk_iris/                         ← raiz, "private": true
 ├─ LICENSE, NOTICE
 ├─ docs/spec/                      ← esta spec (iris-architect)
 ├─ packages/
-│  ├─ schema/   @iris-vitrine/schema    contratos: schemas zod, tipos, constantes. JS compilado
-│  ├─ engine/   @iris-vitrine/engine    lógica de Node: tema, fontes, codegen, módulos, conteúdo, withIris. JS compilado
-│  ├─ core/     @iris-vitrine/core      componentes React, seções e páginas. TSX fonte
-│  ├─ cli/      @iris-vitrine/cli       bin "iris". JS compilado
+│  ├─ schema/   @cbjk_iris/schema    contratos: schemas zod, tipos, constantes. JS compilado
+│  ├─ engine/   @cbjk_iris/engine    lógica de Node: tema, fontes, codegen, módulos, conteúdo, withIris. JS compilado
+│  ├─ core/     @cbjk_iris/core      componentes React, seções e páginas. TSX fonte
+│  ├─ cli/      @cbjk_iris/cli       bin "iris". JS compilado
 │  └─ create/   create-iris-site        bin "create-iris-site", leva o starter. JS compilado
 └─ apps/
    └─ site/                        ← "private": true. O site cbjk de hoje e a fonte do starter
@@ -290,6 +291,8 @@ meu-site/
 ├─ next.config.ts            ← export default withIris({ ... })
 ├─ tsconfig.json             ← paths dos aliases
 ├─ AGENTS.md, CLAUDE.md      ← escritos pelo iris-docs
+├─ .gitignore                ← node_modules, .next, .env*, next-env.d.ts
+├─ iris-example.json         ← lista dos arquivos de exemplo (ver §5.1.4)
 └─ package.json              ← "predev"/"prebuild": "iris sync"
 ```
 
@@ -297,20 +300,20 @@ meu-site/
 
 | O core precisa de | Mecanismo | Assinatura exigida no arquivo do projeto |
 |---|---|---|
-| Config | Alias `@iris-vitrine/site-config` → `./site.config.ts` | `export const siteConfig: SiteConfig` |
-| Registro de seções | Alias `@iris-vitrine/site-registry` → `./app/iris.registry.generated.tsx` | `export const sectionRegistry: SectionRegistry` |
+| Config | Alias `@cbjk_iris/site-config` → `./site.config.ts` | `export const siteConfig: SiteConfig` |
+| Registro de seções | Alias `@cbjk_iris/site-registry` → `./app/iris.registry.generated.tsx` | `export const sectionRegistry: SectionRegistry` |
 | Fontes | Prop: o `app/layout.tsx` gerado importa `./fonts.generated` e passa para o `IrisRootLayout` | `export const fontClassName: string` |
 | Conteúdo | Loaders do `engine` leem `content/` a partir de `process.cwd()` | — |
 
 Os aliases são configurados em dois lugares, sempre juntos:
-- `withIris()` (de `@iris-vitrine/engine/next`) em `turbopack.resolveAlias`, para o build;
+- `withIris()` (de `@cbjk_iris/engine/next`) em `turbopack.resolveAlias`, para o build;
 - `tsconfig.json` do projeto em `compilerOptions.paths`, para o `tsc` e o editor.
 
-Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@iris-vitrine/core` em `transpilePackages`, os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Nunca define `webpack`.
+Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@cbjk_iris/core` em `transpilePackages`, os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Nunca define `webpack`.
 
 **Imports internos do core:** sempre relativos (`../lib/config`). Nada de `@/`, que no projeto do cliente resolveria para o `tsconfig` dele.
 
-**Temas:** os embutidos ficam em `@iris-vitrine/engine/themes/*.css`. Um tema em `themes/` do projeto com o mesmo nome tem prioridade.
+**Temas:** os embutidos ficam em `@cbjk_iris/engine/themes/*.css`. Um tema em `themes/` do projeto com o mesmo nome tem prioridade.
 
 Arquivos gerados pelo sync, todos com o cabeçalho "Gerado por iris sync. Não edite à mão":
 
@@ -318,10 +321,10 @@ Arquivos gerados pelo sync, todos com o cabeçalho "Gerado por iris sync. Não e
 |---|---|
 | `app/layout.tsx` | `export { irisMetadata as metadata }` + `RootLayout` que renderiza `<IrisRootLayout fontClassName={fontClassName}>` |
 | `app/(iris)/<rota>/page.tsx` | Reexporta `default`, `generateStaticParams` e `generateMetadata` da página do core. Config de segmento (`dynamicParams = false`) escrito literal, porque a doc do Next só garante exports diretos |
-| `app/iris.registry.generated.tsx` | Seções `module: "core"` e as dos módulos em `siteConfig.modules`, importadas de `@iris-vitrine/core/sections/<type>` |
+| `app/iris.registry.generated.tsx` | Seções `module: "core"` e as dos módulos em `siteConfig.modules`, importadas de `@cbjk_iris/core/sections/<type>` |
 | `app/fonts.generated.ts` | Igual ao de hoje |
 
-O `app/globals.css` é gerado só na criação do projeto: `@import "@iris-vitrine/core/styles/iris.css";` e `@source "../node_modules/@iris-vitrine/core/src";`. O cliente pode acrescentar CSS depois dessas linhas.
+O `app/globals.css` é gerado só na criação do projeto: `@import "@cbjk_iris/core/styles/iris.css";` e `@source "../node_modules/@cbjk_iris/core/src";`. O cliente pode acrescentar CSS depois dessas linhas.
 
 #### 5.1.4 De `apps/site` para o starter
 
@@ -329,16 +332,30 @@ O `app/globals.css` é gerado só na criação do projeto: `@import "@iris-vitri
 
 | Arquivo | Em `apps/site` | No starter |
 |---|---|---|
-| `package.json` | `"@iris-vitrine/core": "*"` (workspace) | Versão exata do lockstep. `"private"` e `"name"` removidos |
-| `app/globals.css` | `@source "../../../packages/core/src";` | `@source "../node_modules/@iris-vitrine/core/src";` |
-| `content/**/*.json` | `"$schema": "<n níveis>/packages/schema/json/<tipo>.schema.json"` | `"$schema": "<n níveis>/node_modules/@iris-vitrine/schema/json/<tipo>.schema.json"` |
+| `package.json` | `@cbjk_iris/core`, `@cbjk_iris/engine` e `@cbjk_iris/schema` em `dependencies`, e `@cbjk_iris/cli` em `devDependencies`, todos com `"*"` (o npm workspaces resolve pelo monorepo) | As mesmas quatro, com a versão exata do lockstep. `"private"` e `"name"` removidos |
+| `.gitignore` | `apps/site/.gitignore` (o arquiteto cria; hoje só existe o da raiz) | Guardado no tarball como `template/gitignore`, sem ponto, porque o `npm pack` descarta `.gitignore`. O `create` renomeia ao copiar |
+| `app/globals.css` | `@source "../../../packages/core/src";` | `@source "../node_modules/@cbjk_iris/core/src";` |
+| `content/**/*.json` | `"$schema": "<n níveis>/packages/schema/json/<tipo>.schema.json"` | `"$schema": "<n níveis>/node_modules/@cbjk_iris/schema/json/<tipo>.schema.json"` |
 | `tsconfig.json` | `"extends": "../../tsconfig.base.json"` | Opções do base copiadas para dentro, sem `extends` |
+| `next.config.ts` | `withIris(siteConfig, process.env.TAILNET_ADDRESS ? { allowedDevOrigins: [process.env.TAILNET_ADDRESS] } : {})` | `export default withIris(siteConfig)`, sem `allowedDevOrigins` |
 | `eslint.config.mjs`, `postcss.config.mjs` | iguais | iguais (sem caminho para fora do projeto) |
 | Excluídos | `e2e/`, `.next/`, `node_modules/`, `test-results/` | — |
 
-Um teste do `create` confere que o `template/` não contém `workspace:`, `packages/`, `tsconfig.base` nem `allowedDevOrigins`.
+Um teste do `create` confere que o `template/` não contém `"*"` como versão de `@cbjk_iris/*`, nem `workspace:`, `packages/`, `tsconfig.base` ou `allowedDevOrigins`. Também confere que `template/gitignore` existe.
 
-Quando a CLI cria um JSON, o `$schema` é calculado: caminho relativo do arquivo novo até `createRequire(root).resolve("@iris-vitrine/schema/json/<tipo>.schema.json")`. Assim vale dentro e fora do monorepo.
+**Conteúdo de exemplo no projeto gerado:**
+
+| O que | O `create` faz |
+|---|---|
+| `name`, `seo.*`, `whatsapp.phone` | Escreve com as respostas (`seo.title` = nome, `seo.titleTemplate` = `%s \| <nome>`, `seo.description` = frase genérica com o nome) |
+| `whatsapp.messages`, `footer.text` | Troca por textos genéricos com `{name}`, sem falar de celulares |
+| `contact` | Remove `address`, `email`, `hours` e `mapEmbedUrl`. Mantém só `phone`, derivado do WhatsApp |
+| `content/home.json` | Escreve a partir do modelo `--home` |
+| Produtos, serviços, páginas e fotos da cbjk | Mantidos como exemplo, listados em `iris-example.json`. Com `--no-example-content`, o `create` apaga todos e deixa `content/products/` e `content/services/` vazios |
+
+No fim, o `create` imprime a lista do que o cliente precisa trocar. O `iris check` dá um aviso enquanto algum arquivo de `iris-example.json` existir com o hash original.
+
+Quando a CLI cria um JSON, o `$schema` é calculado: caminho relativo do arquivo novo até `createRequire(root).resolve("@cbjk_iris/schema/json/<tipo>.schema.json")`. Assim vale dentro e fora do monorepo.
 
 **Ordem num clone novo do monorepo:** `npm install` → `npm run build:packages` (tsdown dos 4 pacotes compilados) → `npm run dev` (na raiz: `tsdown --watch` nos pacotes e `next dev` no `apps/site`). O `predev` do `apps/site` chama o bin compilado, então falha com mensagem clara se os pacotes não foram compilados.
 
@@ -366,7 +383,9 @@ export const productSchema = catalogItemBase.extend({
 }).strict();
 ```
 
-`catalogItemBase` mantém os campos de hoje: `slug`, `name`, `shortDescription`, `description`, `images` (mín. 1), `specs?`. `Service` não ganha os campos novos nesta rodada.
+`catalogItemBase` mantém os campos de hoje: `slug`, `name`, `shortDescription`, `description`, `images` (mín. 1), `specs?`. Ganha um campo novo, comum a produtos e serviços: `order: z.number().int().nonnegative().optional()`. `Service` não ganha os campos de compra nesta rodada.
+
+**Ordem dos itens:** com um JSON por item, a ordem do array de `data/*.ts` deixa de existir. Os loaders (`loadProducts`, `loadServices`) ordenam por `order` crescente; quem não tem `order` vai para o fim; o empate se resolve por slug. Na migração, o arquiteto grava `order` de 10 em 10, na ordem atual do array, para a lista e o `limit` dos destaques não mudarem. O `iris product add` e o `iris service add` gravam `order` = maior existente + 10 (fim da lista), a menos que venha `--order`.
 
 | Campo | Regra | Mensagem de erro |
 |---|---|---|
@@ -396,9 +415,14 @@ Tipos no `schema` (`catalog.ts`). Implementação no core (`catalog/purchase.ts`
 ```ts
 export type PurchasePlatform = "whatsapp" | "mercadoLivre" | "shopee" | "amazon" | "external";
 
+export const DEFAULT_BUTTON_ORDER: readonly PurchasePlatform[] =
+  ["whatsapp", "mercadoLivre", "shopee", "amazon", "external"];
+
 export interface PurchaseContext {
   /** URL do WhatsApp já montada para este produto (lib/whatsapp); null = sem WhatsApp no site */
   whatsappUrl: string | null;
+  /** siteConfig.commerce.buttonOrder já resolvido: as 5 plataformas, cada uma uma vez */
+  order: readonly PurchasePlatform[];
   /** siteConfig.texts.products.buttons, já resolvido por resolveTexts */
   texts: PurchaseButtonTexts;
 }
@@ -420,16 +444,22 @@ export type ResolvePurchaseButtons = (product: Product, ctx: PurchaseContext) =>
 
 A função é pura: recebe tudo o que precisa e não lê o config. Assim o teste unitário não precisa de mock do alias.
 
+Regras de `commerce.buttonOrder` (validadas no `siteConfigSchema`):
+- cada plataforma aparece no máximo uma vez; repetida é erro de validação;
+- a plataforma que faltar na lista vai para o fim, na ordem de `DEFAULT_BUTTON_ORDER`. Por isso `ctx.order` sempre tem as 5;
+- a ordem não esconde botão. Quem decide se um botão aparece é o produto (o link ou o `whatsappButton`).
+
 | Regra | Valor |
 |---|---|
-| Ordem padrão | `whatsapp`, `mercadoLivre`, `shopee`, `amazon`, `external` ([Q-07](./OPEN-QUESTIONS.md#q-07-ordem-padrão-dos-botões)) |
+| Ordem | `ctx.order`, que vem de `siteConfig.commerce.buttonOrder`. Vale para o site inteiro: não há ordem por produto ([Q-07](./OPEN-QUESTIONS.md#q-07-ordem-padrão-dos-botões)). Ausente = `DEFAULT_BUTTON_ORDER` |
 | Quem aparece | WhatsApp quando `whatsappButton !== false` e `ctx.whatsappUrl` não é nulo; cada marketplace quando o link existe |
 | Ênfase e variante | O primeiro da lista é `primary`: variante `cta` se for o WhatsApp, `default` se for outro. Os demais são `secondary`, variante `outline` |
 | Nenhum botão | Permitido. O detalhe não mostra ação nem o aviso do WhatsApp. O `iris check` dá um aviso, não um erro ([Q-06](./OPEN-QUESTIONS.md#q-06-produto-sem-nenhum-botão)) |
 | Card da grade | Mostra só o botão `primary`, com o rótulo curto `texts.products.buy` ("Comprar agora") e o ícone da plataforma. O detalhe mostra todos, com o rótulo longo |
+| Nome do card | Texto visível + texto só para leitor de tela: `fillTemplate(texts.products.cardLabel, { buy, platform })`, com `cardLabel` = `"{buy} ({platform})"` e `platform` vindo de `texts.products.platforms.<plataforma>`. Resultado: "Comprar agora (Shopee)". O nome acessível começa pelo texto visível (WCAG 2.5.3) |
 | `rel` | `noopener noreferrer` em todos. `sponsored` fica para o item de afiliados do backlog |
-| Nome acessível | No detalhe, o texto visível já diz a plataforma. No card, `aria-label` com o rótulo longo. Ícone com `aria-hidden` |
-| Ícones | WhatsApp: o de hoje. Shopee: simple-icons. Mercado Livre e Amazon: [Q-08](./OPEN-QUESTIONS.md#q-08-ícones-do-mercado-livre-e-da-amazon). Externo: `ShoppingBag` do lucide |
+| Nome acessível | No detalhe, o texto visível já diz a plataforma. No card, ver a linha acima. Ícone com `aria-hidden` |
+| Ícones | WhatsApp: o de hoje. Mercado Livre, Shopee e Amazon: SVG oficial do kit de marca de cada empresa, com as regras de uso registradas no `CREDITS.md` ([Q-08](./OPEN-QUESTIONS.md#q-08-ícones-do-mercado-livre-e-da-amazon)). Se uma regra proibir o uso por lojistas, a frente para e avisa o dono. Os ícones de marketplace mantêm as cores oficiais, como as regras de marca costumam exigir; é a única exceção à regra "cores sempre por token" do README, e fica registrada em `docs/spec/style-inventory.json`. Externo: `ShoppingBag` do lucide |
 
 Textos (`SiteTexts.products`):
 
@@ -442,6 +472,8 @@ Textos (`SiteTexts.products`):
 | `buttons.shopee` | Nova | "Comprar na Shopee" |
 | `buttons.amazon` | Nova | "Comprar na Amazon" |
 | `buttons.external` | Nova | "Comprar no site" |
+| `cardLabel` | Nova | "{buy} ({platform})" |
+| `platforms.{whatsapp,mercadoLivre,shopee,amazon,external}` | Nova | "WhatsApp", "Mercado Livre", "Shopee", "Amazon", "site" |
 
 ### 5.3 Config e conteúdo
 
@@ -462,11 +494,12 @@ Mudanças no `SiteConfig`:
 | `home` | `{ sections }` | Removido (vai para `content/home.json`) |
 | `pages` | `PageConfig[]` | Removido (vai para `content/pages/`) |
 | `modules` | Não existia | `("products" \| "services" \| "gallery")[]`. Fonte de verdade do que está ativo |
-| `theme.style` | Não existia | `StyleId` opcional (`z.enum(STYLE_IDS)`). Ausente = o `--iris-style` do tema, ou `sera` |
+| `theme.style` | Não existia | `StyleId` opcional (`z.enum(STYLE_IDS)`). Ausente = o `--iris-style` do tema, ou `sera`. A CLI valida `--style` contra `STYLE_IDS`, nunca contra `ListStyles` |
 | `brand.shape` | Não existia | `Partial<ShapeTokens>`: sobrescreve tokens de forma |
 | `brand.radius` | `string` | Mantido, como atalho de `brand.shape.radius` |
 | `texts` | `SiteTexts` obrigatório e completo | `DeepPartial<SiteTexts>`, mesclado com `DEFAULT_TEXTS` (pt-BR) de `packages/schema/src/texts.ts` |
 | `modules` ausente | — | Vale `["products", "services", "gallery"]` (o comportamento de hoje) |
+| `commerce.buttonOrder` | Não existia | `PurchasePlatform[]` opcional, global. Ausente = `DEFAULT_BUTTON_ORDER` |
 
 **Config de entrada e config resolvido:**
 
@@ -481,7 +514,7 @@ export type PurchaseButtonTexts = SiteTexts["products"]["buttons"];
 
 - O `site.config.ts` do projeto exporta `siteConfig` com `satisfies SiteConfigInput`.
 - `resolveTexts` faz o merge profundo com `DEFAULT_TEXTS` e aplica o fallback: se o cliente definiu `products.buyOnWhatsapp` e não `products.buttons.whatsapp`, o primeiro vale como o segundo.
-- **No core, ninguém importa o alias direto.** Só `packages/core/src/lib/config.ts` importa `@iris-vitrine/site-config` e exporta `export const siteConfig: SiteConfig = resolveSiteConfig(raw)`. Os 53 acessos de hoje a `siteConfig.texts.*` continuam iguais; muda só o import, que o arquiteto troca na migração.
+- **No core, ninguém importa o alias direto.** Só `packages/core/src/lib/config.ts` importa `@cbjk_iris/site-config` e exporta `export const siteConfig: SiteConfig = resolveSiteConfig(raw)`. Os 53 acessos de hoje a `siteConfig.texts.*` continuam iguais; muda só o import, que o arquiteto troca na migração.
 
 Regras de conteúdo:
 - **Slug:** `^[a-z0-9]+(?:-[a-z0-9]+)*$`, até 80 caracteres. O nome do arquivo é o slug, o que impede caminho com `..` ou `/`.
@@ -516,7 +549,7 @@ Os padrões do `sera` foram tirados do código de hoje, para reproduzir o visual
 | `--header-alpha` | porcentagem, 0–100% | `86%` | `bg-background/86` | header fixo |
 | `--header-blur` | comprimento, 0–40px | `40px` | `backdrop-blur-2xl` | header fixo |
 | `--overlay-alpha` | porcentagem, 0–100% | `20%` | `bg-black/20` | fundo escurecido do Sheet |
-| `--overlay-blur` | comprimento, 0–24px | `4px` | `backdrop-blur-sm` | fundo escurecido do Sheet |
+| `--overlay-blur` | comprimento, 0–24px | `8px` | `backdrop-blur-sm` (`--blur-sm: 8px` no Tailwind 4.3) | fundo escurecido do Sheet |
 | `--density` | número, 0.75–1.25 | `1` | `py-12 md:py-16` | padding vertical do `SectionShell`, espaçamento do Card, gaps de grade |
 | `--control-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | Button, Badge |
 | `--control-tracking` | comprimento em `em`, 0–0.2em | `0.1em` | `tracking-widest` | Button |
@@ -647,7 +680,7 @@ Regras:
 - `.meta()` vem por último, depois de `.optional()` e `.default()`, porque o zod guarda o metadado na instância.
 - A união é `z.discriminatedUnion("type", definitions.map((d) => d.schema))`. `Section` e `SectionOf<T>` saem dela por `z.infer`.
 - O `schema` publica `json/section.schema.json`, `page.schema.json`, `home.schema.json`, `product.schema.json` e `service.schema.json`, gerados no build ([§5.3](#53-config-e-conteúdo)).
-- O `core` exporta um componente por `type` em `@iris-vitrine/core/sections/<type>`. Um teste **do core** (`packages/core/test/sections.test.ts`) falha se houver definição sem componente, ou o contrário.
+- O `core` exporta um componente por `type` em `@cbjk_iris/core/sections/<type>`. Um teste **do core** (`packages/core/test/sections.test.ts`) falha se houver definição sem componente, ou o contrário.
 - `syncRegistry()` gera `app/iris.registry.generated.tsx` com as seções `module: "core"` e as dos módulos em `siteConfig.modules`. É o `modules:sync` de hoje, com outra fonte.
 
 O manifesto de módulos sai do `modules.json` e vai para `packages/schema/src/modules.ts`:
@@ -655,15 +688,17 @@ O manifesto de módulos sai do `modules.json` e vai para `packages/schema/src/mo
 ```ts
 export const MODULES = [
   { id: "products", name: "Produtos", routes: ["produtos", "produto/[slug]"], menu: ["/produtos"],
-    contentDir: "content/products", dependencies: [] },
+    contentDir: "content/products" },
   { id: "services", name: "Serviços", routes: ["servicos", "servico/[slug]"], menu: ["/servicos"],
-    contentDir: "content/services", dependencies: [] },
+    contentDir: "content/services" },
   { id: "gallery", name: "Últimos projetos", routes: ["ultimos-projetos"], menu: ["/ultimos-projetos"],
-    contentDir: "public/ultimos_projetos", dependencies: ["image-size", "react-photo-album"] },
+    contentDir: "public/ultimos_projetos" },
 ] as const;
 ```
 
-As seções de cada módulo vêm de `definition.module`, não do manifesto. Assim não há duas listas.
+As seções de cada módulo vêm de `definition.module`, não do manifesto. Assim não há duas listas. O campo `dependencies` do `modules.json` some: com o core como pacote, `image-size` e `react-photo-album` passam a ser dependências do `@cbjk_iris/core`, e desligar a galeria não pede `npm uninstall`.
+
+**Arquivos de seção do core:** o arquiteto cria, antes da tag, os 13 arquivos `packages/core/src/sections/<type>.tsx`, cada um só com `export { XxxSection as default } from "<caminho do componente>"`. Os das seções de módulo apontam para `products/`, `services/` e `gallery/`. Esses 13 arquivos de reexport são do arquiteto ([§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)); os componentes para onde apontam são das frentes. O subpath `./sections/*` do `exports` aponta para `./src/sections/*.tsx`, e o registro gerado faz `import Xxx from "@cbjk_iris/core/sections/<type>"`.
 
 ### 5.6 API do `engine` usada pela CLI
 
@@ -704,7 +739,7 @@ export type RemoveModuleContent = (root: string, id: ModuleId) => { changes: Fil
 
 `SyncBrand` resolve o `font-data.json` do Next com `createRequire(root).resolve("next/dist/compiled/@next/font/dist/google/font-data.json")`, nunca com caminho fixo de `node_modules`, porque no monorepo ele fica na raiz.
 
-**Implementação mínima do arquiteto:** antes do congelamento, o arquiteto entrega todas as funções desta seção, inclusive as de tema: `ListThemes`, `ValidateTheme` (só parse e faixas), `ListStyles` (devolve só `sera`), `SyncBrand` e `ImportTheme` (já com as regras de segurança: só `https:`, e só variáveis CSS dentro de `:root` e `.dark`, o resto descartado). Depois da tag, o `iris-theme` evolui as de tema sem mudar a assinatura. Assim a CLI nunca espera o tema.
+**Implementação mínima do arquiteto:** antes do congelamento, o arquiteto entrega todas as funções desta seção, inclusive as de tema: `ListThemes`, `ValidateTheme` (só parse e faixas), `ListStyles` (devolve os 4 ids de `STYLE_IDS`; enquanto o preset de um estilo não existe, o sync usa os valores do `sera`, emite o `data-style` pedido e dá um aviso), `SyncBrand` e `ImportTheme` (já com as regras de segurança: só `https:`, e só variáveis CSS dentro de `:root` e `.dark`, o resto descartado). Depois da tag, o `iris-theme` evolui as de tema sem mudar a assinatura. Assim a CLI nunca espera o tema.
 
 Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funções (um `.mjs` de uma linha). É isso que `npm run sync:check` roda.
 
@@ -722,10 +757,10 @@ Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funç�
 
 | Comando | Argumentos e flags próprias | O que faz |
 |---|---|---|
-| `create-iris-site [dir]` | `--name`, `--whatsapp`, `--modules <lista>`, `--theme`, `--style`, `--color-mode`, `--home <loja\|servicos\|institucional\|em-branco>`, `--pm <npm\|pnpm\|yarn\|bun>`, `--no-install`, `--no-git` | Copia o starter, aplica as respostas, roda o sync, instala e faz o primeiro commit |
+| `create-iris-site [dir]` | `--name`, `--whatsapp`, `--no-example-content`, `--modules <lista>`, `--theme`, `--style`, `--color-mode`, `--home <loja\|servicos\|institucional\|em-branco>`, `--pm <npm\|pnpm\|yarn\|bun>`, `--no-install`, `--no-git` | Copia o starter, aplica as respostas, roda o sync, instala e faz o primeiro commit |
 | `iris page add [slug]` | `--title`, `--description`, `--sections <tipo,...>`, `--menu`, `--menu-title` | Cria `content/pages/<slug>.json` e, com `--menu`, o item de menu |
 | `iris page list` / `iris page remove <slug>` | | Lista e remove (e tira do menu) |
-| `iris section add <página\|home> <tipo>` | `--preset <id>`, `--at <índice>`, `--set <caminho>=<valor>` (repetível) | Acrescenta uma seção validada |
+| `iris section add <página\|home> <tipo>` | `--preset <id>`, `--at <índice>`, `--set <caminho>=<valor>` (repetível), `--from-json <arquivo\|->` | Acrescenta uma seção validada |
 | `iris product add [slug]` | uma flag por campo do schema ([regra de nomes](#nomes-das-flags-de-campo)) | Cria `content/products/<slug>.json` |
 | `iris product list` / `iris product remove <slug>` | `--category` no list | |
 | `iris service add [slug]` / `list` / `remove <slug>` | idem | |
@@ -743,7 +778,7 @@ Campos obrigatórios no modo não interativo:
 
 | Comando | Obrigatórios | Padrões |
 |---|---|---|
-| `create-iris-site` | `[dir]`, `--name`, `--whatsapp` | `--modules` = os três; `--home` = `loja` com products, `servicos` com services sem products, senão `institucional`; `--theme neutral`; `--style sera`; `--color-mode system`; `--pm` detectado |
+| `create-iris-site` | `[dir]`, `--name`, `--whatsapp` | `--no-example-content` desligado; `--modules` = os três; `--home` = `loja` com products, `servicos` com services sem products, senão `institucional`; `--theme neutral`; `--style sera`; `--color-mode system`; `--pm` detectado |
 | `page add` | `[slug]`, `--title` | sem seções, fora do menu |
 | `section add` | `<página>`, `<tipo>` e os campos `ask: "always"` da seção (ou `--preset`) | posição no fim |
 | `product add`, `service add` | `[slug]` e os campos obrigatórios do schema | os `.default()` do schema |
@@ -773,6 +808,13 @@ Geradas do schema, nunca escritas à mão: kebab-case do nome do campo de primei
 | `whatsappButton` | `--whatsapp-button` e `--no-whatsapp-button` |
 | `images` (array de texto) | `--images`, repetível |
 | `installment.count` (aninhado) | `--set installment.count=10` |
+| `items` (lista de objetos) | `--set items[0].question=Prazo? --set items[0].answer="2 dias"`, ou `--from-json` |
+
+**Gramática de `--set`:** `<caminho>=<valor>`. O caminho é `campo(.campo|[n]|[])*`: `.` entra num objeto, `[n]` num índice, `[]` acrescenta um item no fim. O valor é convertido pelo tipo do campo no schema: texto fica como veio; número passa por `Number()`; booleano aceita `true` ou `false`; objeto e lista passam por `JSON.parse`. Valor que não converte → saída 2, com o caminho e o tipo esperado.
+
+**`--from-json <arquivo|->`** (em `section add`, `product add`, `service add` e `page add`): lê o objeto inteiro de um arquivo, ou do stdin com `-`. As flags de campo e os `--set` são aplicados por cima, nessa ordem. É o caminho recomendado para agentes.
+
+**Listas no modo interativo:** a CLI pergunta um item por vez e, depois de cada um, "Adicionar outro?", respeitando o `min` e o `max` do schema. No modo não interativo, um campo de lista obrigatório precisa vir por `--set`, `--from-json` ou `--preset`. Sem isso, saída 3.
 
 Valores de campo com `input: "image"` (como cada item de `images`):
 - começa com `/` → caminho em `public/`, precisa existir;
@@ -836,7 +878,7 @@ Em sucesso, `ok: true`, `error` ausente, `data` com o item criado e `changes` co
 | Quem | Caminhos que pode mudar com magicast |
 |---|---|
 | `iris` | `theme.name`, `theme.style`, `theme.colorMode`, `menu`, `modules` |
-| `create-iris-site` (só no starter recém-copiado, que é todo literal) | os de cima, mais `name`, `seo.title`, `seo.titleTemplate`, `whatsapp.phone`, `brand.colors`, `brand.fonts`, `brand.logo`, `leads` |
+| `create-iris-site` (só no starter recém-copiado, que é todo literal) | os de cima, mais `name`, `seo`, `whatsapp.phone`, `whatsapp.messages`, `contact`, `footer.text`, `brand.colors`, `brand.fonts`, `brand.logo`, `leads` |
 
 Valor não literal num desses caminhos → saída 7, nada escrito.
 
@@ -859,13 +901,15 @@ Valor não literal num desses caminhos → saída 7, nada escrito.
 | textos fixos de `site.config.ts` | `packages/schema/src/texts.ts` (`SiteTexts`, `DEFAULT_TEXTS`) |
 | — | `packages/schema/src/{theme/tokens.ts,cli.ts,page.ts,engine-api.ts}` |
 | `scripts/modules.mjs`, `sync-modules.mjs`, `check-modules.mjs` | `packages/engine/src/{codegen,modules,content}/**`, `packages/engine/src/next.ts` (`withIris`) |
-| `package.json` raiz | `package.json` raiz, `tsconfig.base.json`, `.changeset/`, `packages/*/package.json` (campos `name`, `version`, `exports`), `.github/workflows/ci.yml`, `.gitignore` |
-| — | `LICENSE`, `NOTICE`, `docs/spec/**` (inclui `style-inventory.json`), `scripts/style-inventory.mjs`, `apps/site/e2e/baseline/*.spec.ts`, `packages/core/src/lib/config.ts` |
+| `package.json` raiz | `package.json` raiz, `tsconfig.base.json`, `.changeset/`, `packages/*/package.json` (campos `name`, `version`, `exports`), `.github/workflows/{ci,release}.yml`, `.gitignore` |
+| — | `LICENSE`, `NOTICE`, `docs/spec/**` (inclui `style-inventory.json`), `scripts/style-inventory.mjs`, `scripts/check-credits.mjs`, `apps/site/e2e/baseline/*.spec.ts`, `packages/core/src/lib/config.ts` |
 | `eslint.config.mjs`, `postcss.config.mjs`, `app/favicon.ico` | `apps/site/` (mesmos nomes) |
+
+Também do arquiteto: os 13 arquivos de reexport `packages/core/src/sections/<type>.tsx`, `apps/site/.gitignore` e `apps/site/playwright.config.ts`.
 
 Cada frente pode acrescentar `dependencies` e `devDependencies` no `package.json` do pacote que é dela. `components.json` (config do shadcn) vai para `packages/core/components.json`, do `iris-theme`.
 
-**Linha de base visual:** os testes em `apps/site/e2e/baseline/` são do arquiteto. As imagens em `__screenshots__/` só são geradas dentro do container `mcr.microsoft.com/playwright` da versão instalada (`npm run e2e:docker -- baseline --update-snapshots`), para não depender da máquina. Uma frente que muda o visual de propósito (ex.: o `iris-commerce` no card) regenera as imagens no próprio PR, e o arquiteto revisa as diferenças.
+**Linha de base visual:** os testes em `apps/site/e2e/baseline/` são do arquiteto. As imagens em `__screenshots__/` só são geradas dentro do container `mcr.microsoft.com/playwright` da versão instalada (`npm run e2e:docker -- baseline --update-snapshots`), para não depender da máquina. Uma frente que muda o visual de propósito (ex.: o `iris-commerce` no card) regenera as imagens no próprio PR, e o arquiteto revisa as diferenças. Só um PR por vez pode mexer em `__screenshots__/`: quem chegar depois faz rebase e regenera. O `iris-theme` não regenera a linha de base, porque o `sera` não pode mudar.
 
 Acréscimo de chave em `DEFAULT_TEXTS` pedido por uma frente (ex.: rótulo novo) é PR revisado pelo arquiteto, sem ADR.
 
@@ -881,18 +925,20 @@ O arquiteto cria estes scripts na raiz, com as dependências de teste (vitest, P
 
 | Script na raiz | Faz |
 |---|---|
-| `npm run typecheck` | `tsc --noEmit` em todos os workspaces |
+| `npm run typecheck` | `build:packages` e depois `tsc --noEmit` em todos os workspaces (os pacotes compilados precisam do `dist/` para os tipos) |
 | `npm run lint` | ESLint em todos os workspaces |
-| `npm test` | vitest em todos os pacotes (`npm test -w <pacote>` para um só) |
+| `npm test` | `build:packages` e depois vitest em todos os pacotes (`npm test -w <pacote>` para um só) |
 | `npm run build` | build dos pacotes e `next build` do `apps/site` |
-| `npm run sync:check` | `Sync(root, { check: true })` no `apps/site` |
-| `npm run modules:check` | Matriz de módulos: gera cópias do `apps/site` em `<raiz>/.tmp/modules-check/<cenário>/` (dentro do monorepo, para enxergar o `node_modules` da raiz; `.tmp/` no `.gitignore`), com cada módulo desligado, um de cada vez, e com todos desligados, e roda `tsc` e `next build` em cada uma |
+| `npm run sync:check` | Roda `npm run sync:check -w apps/site`. O script do `apps/site` chama `Sync(root, { check: true })`; quando o `iris-cli` o trocar por `iris sync --check`, o nome do script continua o mesmo |
+| `npm run modules:check` | Matriz de módulos: gera cópias do `apps/site` em `<raiz>/apps/.modules-check-<cenário>/` (mesma profundidade do `apps/site`, então os caminhos relativos de `tsconfig` e `@source` continuam valendo; o padrão `apps/.*` vai no `.gitignore`), com cada módulo desligado, um de cada vez, e com todos desligados, e roda `tsc` e `next build` em cada uma |
 | `npm run e2e -- <pasta>` | Playwright em `apps/site/e2e/<pasta>`, contra o `next start` do `apps/site` |
 | `npm run e2e:docker -- <pasta>` | O mesmo, dentro do container oficial do Playwright (usado para gerar e conferir capturas) |
 | `npm run build:packages` | tsdown de `schema`, `engine`, `cli` e `create` |
-| `npm run lighthouse` | `lhci autorun` com o `lighthouserc.json` da raiz (dono: `iris-theme`) |
+| `npm run lighthouse` | `lhci autorun` com o `lighthouserc.json` da raiz (dono: `iris-theme`), contra a variante `glass` |
+| `npm run variant -- --style <id>` | Copia o `apps/site` para `apps/.variant-<id>/` com `theme.style` trocado (magicast), e faz o build. Usado pelo E2E de estilos e pelo Lighthouse, sem mexer no `sera` do `apps/site` (dono: `iris-theme`, em `scripts/variant.mjs`) |
+| `npm run registry:local` | Sobe um Verdaccio e publica nele os 5 pacotes compilados (dono: `iris-cli`, em `scripts/local-registry.mjs`). Usado pelo E2E da CLI e pela verificação da doc |
 
-Cada frente tem a sua pasta de E2E (`apps/site/e2e/{baseline,theme,commerce}`) e o seu workflow (`.github/workflows/{theme,commerce,cli,docs}.yml`). Gates de agente (`security-reviewer`, `adversarial-reviewer`) são registrados no PR, com o veredito copiado.
+Cada frente tem a sua pasta de E2E (`apps/site/e2e/{baseline,theme,commerce}`) e o seu workflow (`.github/workflows/{theme,commerce,cli,docs}.yml`). O `apps/site/playwright.config.ts` é do arquiteto. Gates de agente (`security-reviewer`, `adversarial-reviewer`) são registrados no PR, com o veredito copiado.
 
 ### Ordem e dependências
 
@@ -909,20 +955,23 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 **Ordem:** primeira, sozinha.
 
 **Escopo:**
-0. **Arrumar a base:** resolver [Q-13](./OPEN-QUESTIONS.md#q-13-pendências-no-diretório-de-trabalho) antes de capturar a linha de base.
-1. **Spike** (descartável, num branch): provar os 6 pontos abaixo num projeto mínimo, fora do monorepo, que instala `schema`, `engine` e `core` por `npm pack`, não por workspace. Se algum falhar, abrir ADR antes de seguir.
-   1. O `next.config.ts` importa `withIris` de `@iris-vitrine/engine/next` instalado e o `next build` passa.
+0. **Base:** o Q-13 já está resolvido (commit `07b91c7`). Criar `LICENSE` (MIT, titular a confirmar com o dono no PR) e `NOTICE` (temas do tweakcn, Apache-2.0, com a lista de arquivos), e pôr `"license": "MIT"` em todos os `package.json`.
+1. **Spike** (descartável, num branch): provar os 7 pontos abaixo num projeto mínimo, fora do monorepo, que instala `schema`, `engine` e `core` por `npm pack`, não por workspace. Se algum falhar, abrir ADR antes de seguir.
+   1. O `next.config.ts` importa `withIris` de `@cbjk_iris/engine/next` instalado e o `next build` passa.
    2. TSX de `node_modules` compila com `transpilePackages`, com componentes `"use client"` funcionando.
-   3. Os aliases `@iris-vitrine/site-config` e `@iris-vitrine/site-registry` resolvem no `next build` (Turbopack) e no `tsc`.
+   3. Os aliases `@cbjk_iris/site-config` e `@cbjk_iris/site-registry` resolvem no `next build` (Turbopack) e no `tsc`.
    4. O `@source` faz o Tailwind gerar as classes usadas só dentro do core.
    5. Uma rota fina que reexporta `default` e `generateStaticParams` do core gera páginas estáticas, com `dynamicParams = false` literal no arquivo.
    6. O hover do VS Code mostra a descrição de um campo de tipo inferido por `z.infer` (se não mostrar, registrar no ADR 002 e seguir).
+   7. No `next build`, o layout lê um tema embutido de `@cbjk_iris/engine/themes/` instalado. Mecanismo a provar: o `withIris` põe `@cbjk_iris/engine` em `serverExternalPackages` (o engine roda como Node puro, sem Turbopack), e o engine acha a pasta por `fileURLToPath(new URL("../themes/", import.meta.url))`.
 2. Capturar a linha de base visual **antes** de mover qualquer arquivo. Depois montar o monorepo de [§5.1](#51-estrutura-do-monorepo), com os scripts de verificação e as dependências de teste, e mover o site atual conforme [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo), sem mudança visual. Trocar todos os imports `@/` do core por relativos e os de `@/site.config` por `lib/config.ts`.
 3. Fazer o inventário de estilo de [§5.4](#54-tokens-de-forma-e-estilos) e completar `SHAPE_TOKENS` e os utilitários com o que faltar.
 4. Escrever os schemas e tipos de [§5.2](#52-tipo-product-e-botões-de-compra), [§5.3](#53-config-e-conteúdo), [§5.4](#54-tokens-de-forma-e-estilos) (só a lista), [§5.5](#55-formato-do-schema-de-seção), [§5.6](#56-api-do-engine-usada-pela-cli) e [§5.7](#57-interface-pública-da-cli) (`CliResult`).
 5. Migrar o conteúdo de `apps/site` para `content/*.json` e escrever os loaders e `resolveSiteConfig`.
 6. Implementar toda a API de [§5.6](#56-api-do-engine-usada-pela-cli): `LoadSiteConfig`, `SyncRegistry`, `SyncRoutes`, `Sync`, `CheckContent`, `RemoveModuleContent`, `withIris`, e a versão mínima de `ListThemes`, `ListStyles`, `ValidateTheme`, `SyncBrand` (o `brand:sync` de hoje, com o `font-data.json` por `createRequire`) e `ImportTheme` (o `theme:add` de hoje, com as regras de segurança de [§5.6](#56-api-do-engine-usada-pela-cli)).
-7. Congelar: mudar a linha de status desta spec e criar a tag `contracts-v1`.
+7. Trocar o conteúdo de exemplo de reformas para assistência técnica de celulares ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)) e capturar a **linha de base v1**. Ela é a referência de todas as frentes.
+8. Criar `.github/workflows/release.yml`: changesets, `npm publish --provenance` com trusted publishing (`permissions: id-token: write`), disparado só por `workflow_dispatch`. Todos os `package.json` publicáveis levam `"publishConfig": { "access": "public" }`, porque pacote com escopo sai privado por padrão. Nenhuma publicação acontece nesta frente. O primeiro lançamento segue o roteiro de [Ações do dono](./OPEN-QUESTIONS.md#ações-do-dono-fora-do-código).
+9. Congelar: mudar a linha de status desta spec e criar a tag `contracts-v1`.
 
 **Pode tocar:** tudo, até `contracts-v1`, com uma restrição: em `packages/core`, só mover arquivos e corrigir imports, sem mudar JSX nem classes. Em `packages/engine/src/theme`, só mover e acrescentar o mínimo do passo 6.
 
@@ -931,19 +980,42 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 **Passagem de posse:** na tag, os caminhos de [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo) passam aos donos indicados, e o arquiteto fica só com [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect).
 
 **Pronto quando:**
-- [ ] `docs/spec/spike-001.md` existe, com os 6 pontos e a evidência (comando e saída) de cada um.
+- [ ] `docs/spec/spike-001.md` existe, com os 7 pontos e a evidência (comando e saída) de cada um.
 - [ ] `npm run typecheck && npm run lint && npm test && npm run build && npm run sync:check` passa na raiz.
 - [ ] `npm run modules:check` passa nos 4 cenários (cada módulo desligado, um de cada vez, e todos desligados).
-- [ ] `npm run e2e -- baseline` passa: capturas da home, de `/produtos`, de `/produto/<slug>` e de `/sobre`, em claro e escuro, iguais às de `apps/site/e2e/baseline/__screenshots__/` tiradas antes da migração (`toHaveScreenshot`, `maxDiffPixelRatio: 0.001`).
+- [ ] **Migração sem mudança visual:** antes da troca de conteúdo, `npm run e2e -- baseline` passou contra a linha de base v0, tirada antes de mover qualquer arquivo. Capturas da home, de `/produtos`, de `/produto/<slug>` e de `/sobre`, em claro e escuro, com `toHaveScreenshot` e `maxDiffPixelRatio: 0.001`. O comando e a saída ficam registrados em `docs/spec/migration-001.md`.
+- [ ] **Linha de base v1:** `apps/site/e2e/baseline/__screenshots__/` contém as capturas com o conteúdo de celulares, geradas por `npm run e2e:docker -- baseline --update-snapshots`, e `npm run e2e -- baseline` passa.
+- [ ] Nenhum resto de reformas: `grep -riE "porcelanato|reforma|drywall|gesso|hidr[aá]ulic|el[eé]tric|acabamento|torneira|lumin[aá]ria|rodap[eé]" apps/site/content apps/site/site.config.ts` não encontra nada.
+- [ ] Toda imagem de exemplo tem crédito: `node scripts/check-credits.mjs` sai com 0. Ele confere que cada arquivo em `apps/site/public/{home,products,services,ultimos_projetos}` aparece no `CREDITS.md`, e que cada linha da seção de fotos do `CREDITS.md` aponta para um arquivo que existe. A seção de ícones de marca fica fora dessa conferência.
+- [ ] `test -f LICENSE && test -f NOTICE` passa, e `grep -L '"license": "MIT"' packages/*/package.json` não lista nada.
+- [ ] `.github/workflows/release.yml` existe, só com o gatilho `workflow_dispatch`, com `id-token: write` e `--provenance`, e `grep -L '"access": "public"' packages/*/package.json` não lista nada.
+- [ ] `apps/site/.gitignore` existe e tem `node_modules` e `.next`.
 - [ ] `grep -rn 'from "@/' packages/core/src` não encontra nada.
-- [ ] `grep -rln '@iris-vitrine/site-config' packages/core/src` lista só `lib/config.ts`.
+- [ ] `grep -rln '@cbjk_iris/site-config' packages/core/src` lista só `lib/config.ts`.
 - [ ] `node scripts/style-inventory.mjs --check` sai com 0.
-- [ ] `npm test -w @iris-vitrine/engine` cobre a API mínima: cada função de [§5.6](#56-api-do-engine-usada-pela-cli) tem pelo menos um teste, e `ImportTheme` rejeita `http:` e descarta `@import` e `url()`.
-- [ ] `npm test -w @iris-vitrine/schema` cobre `resolveTexts` (merge profundo e fallback de `buyOnWhatsapp`).
-- [ ] `npm test -w @iris-vitrine/schema` cobre: campo perguntado sem `label` falha; cada JSON de `apps/site/content` valida; `$schema` é aceito pelo loader; o JSON Schema gerado não exige `whatsappButton`.
-- [ ] `npm test -w @iris-vitrine/core` tem o teste "toda seção tem componente, e vice-versa".
-- [ ] `node --input-type=module -e "import('@iris-vitrine/schema').then(m => console.log(Object.keys(m).length))"`, rodado em `apps/site`, imprime um número no Node 22.18 sem flag.
+- [ ] `npm test -w @cbjk_iris/engine` cobre a API mínima: cada função de [§5.6](#56-api-do-engine-usada-pela-cli) tem pelo menos um teste, e `ImportTheme` rejeita `http:` e descarta `@import` e `url()`.
+- [ ] `npm test -w @cbjk_iris/schema` cobre `resolveTexts` (merge profundo e fallback de `buyOnWhatsapp`).
+- [ ] `npm test -w @cbjk_iris/schema` cobre: campo perguntado sem `label` falha; cada JSON de `apps/site/content` valida; `$schema` é aceito pelo loader; o JSON Schema gerado não exige `whatsappButton`.
+- [ ] `npm test -w @cbjk_iris/core` tem o teste "toda seção tem componente, e vice-versa".
+- [ ] `node --input-type=module -e "import('@cbjk_iris/schema').then(m => console.log(Object.keys(m).length))"`, rodado em `apps/site`, imprime um número no Node 22.18 sem flag.
 - [ ] A linha de status desta spec diz CONGELADO, e `git tag --list contracts-v1` mostra a tag.
+
+### 6.1.1 Conteúdo de exemplo: assistência técnica de celulares
+
+Decisão do dono ([Q-12](./OPEN-QUESTIONS.md#q-12-conteúdo-de-exemplo-do-starter)): a marca continua **cbjk**, mas o negócio passa a ser uma assistência técnica de celulares. A troca é do arquiteto, no passo 7 do [§6.1](#61-iris-architect-arquitetura-e-contratos). Ela acontece depois da migração provada contra a v0 e antes da tag, para que todas as frentes comparem contra a mesma linha de base v1.
+
+| O que muda | Como fica |
+|---|---|
+| `site.config.ts` | `name: "cbjk"` mantido. `seo`, `whatsapp.messages`, `contact`, `footer.text` e os títulos do `menu` falam de conserto de celular. O item de menu da galeria passa a ser "Reparos recentes" (a rota `/ultimos-projetos` não muda) |
+| `content/home.json`, `content/pages/*.json` | Mesmos tipos de seção de hoje, com textos de assistência técnica: hero, benefícios (garantia, orçamento na hora, peças de qualidade), números, depoimentos, FAQ (prazo, garantia, backup dos dados), contato |
+| `content/services/*.json` | Pelo menos 4: troca de tela, troca de bateria, conector de carga, recuperação após contato com líquido |
+| `content/products/*.json` | Pelo menos 4 acessórios (capa, película, carregador, cabo ou fone), cobrindo as combinações de botões: só WhatsApp, só marketplaces, todos os botões e nenhum botão |
+| Links de marketplace de exemplo | Páginas de busca reais dos hosts permitidos (ex.: `https://lista.mercadolivre.com.br/capinha-iphone-15`), nunca um anúncio inventado |
+| Fotos em `public/{home,products,services,ultimos_projetos}/` | Trocadas por fotos CC0 de celulares, bancada de reparo e acessórios (StockSnap, Unsplash com licença verificada, ou equivalente). Cada uma com origem no `CREDITS.md`. Até ~300KB por arquivo |
+| `public/logo.svg`, `public/cbjk_logo.svg` | Mantidos. Se os dois ficam, o arquiteto confirma no PR qual o `brand.logo` usa |
+| Seções `products`, `services`, `gallery` e o comportamento dos módulos | Sem mudança |
+
+Na tag, **todo o conteúdo de exemplo** passa para o `iris-commerce`: `apps/site/content/**`, `apps/site/public/{home,products,services,ultimos_projetos}/**` e as chaves de `apps/site/site.config.ts` que não são `theme`, `brand.shape` nem `modules` (essas ficam com o `iris-theme` e o arquiteto). Os modelos de home do `create` (`loja`, `servicos`, `institucional`, `em-branco`) continuam com textos genéricos e `{name}`, sem depender do ramo de celulares.
 
 ### 6.2 `iris-theme`: sistema de temas
 
@@ -951,18 +1023,18 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 
 **Escopo:** o motor de tema no `engine` (camadas, presets, validação de tokens, contraste com alpha, `ListThemes`, `ListStyles`, `ValidateTheme`, `SyncBrand`, `ImportTheme`), o `iris.css` do core (`@theme inline`, utilitários e variantes congelados), os 4 estilos embutidos, o `data-style` no layout, e a troca de toda classe de forma fixa nos componentes por utilitário ou variante.
 
-**Pode tocar:** `packages/engine/src/theme/**`, `packages/engine/themes/**`, `packages/core/styles/**`, `packages/core/components.json`, os caminhos de `packages/core/src` marcados `iris-theme` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo), só as classes de estilo nos caminhos marcados `iris-commerce`, `apps/site/themes/**` (temas próprios do site de exemplo, se houver), as chaves `theme` e `brand.shape` de `apps/site/site.config.ts`, `apps/site/e2e/theme/**`, `lighthouserc.json`, `.github/workflows/theme.yml`.
+**Pode tocar:** `packages/engine/src/theme/**`, `packages/engine/themes/**`, `packages/core/styles/**`, `packages/core/components.json`, os caminhos de `packages/core/src` marcados `iris-theme` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo), só as classes de estilo nos caminhos marcados `iris-commerce`, `apps/site/themes/**` (temas próprios do site de exemplo, se houver), as chaves `theme` e `brand.shape` de `apps/site/site.config.ts`, `apps/site/e2e/theme/**`, `lighthouserc.json`, `scripts/variant.mjs`, `.github/workflows/theme.yml`.
 
 **Proibido:** `packages/schema/**` (token novo = pedido ao arquiteto), lógica e JSX estrutural de catálogo e botões, `packages/cli/**`, README.
 
 **Depende de:** `SHAPE_TOKENS`, `STYLE_IDS`, os utilitários de [§5.4](#54-tokens-de-forma-e-estilos) e os tipos de [§5.6](#56-api-do-engine-usada-pela-cli).
 
 **Pronto quando:**
-- [ ] `npm test -w @iris-vitrine/engine` cobre: ordem das camadas, tema sem tokens de forma, token fora da faixa (erro com arquivo e token), `theme.style` sobrepondo `--iris-style`, contraste com `--surface-alpha` abaixo de 100%, `ImportTheme` continuando a descartar `@import` e `url()`. Cobertura do diretório `theme/` ≥ 80%.
+- [ ] `npm test -w @cbjk_iris/engine` cobre: ordem das camadas, tema sem tokens de forma, token fora da faixa (erro com arquivo e token), `theme.style` sobrepondo `--iris-style`, contraste com `--surface-alpha` abaixo de 100%, `ImportTheme` continuando a descartar `@import` e `url()`. Cobertura do diretório `theme/` ≥ 80%.
 - [ ] `node scripts/style-inventory.mjs --after` sai com 0: só sobram ocorrências marcadas como exceção.
 - [ ] Um teste do `engine` roda `ValidateTheme` nos 10 temas embutidos, sem mudança nos arquivos, e não há erro.
 - [ ] No estilo `sera`, `npm run e2e -- baseline` continua passando.
-- [ ] `npm run e2e -- theme` captura home e `/produto/<slug>` nos 4 estilos, em claro e escuro, e confere que `border-radius` e `box-shadow` do card diferem entre `sera`, `soft` e `glass`.
+- [ ] `npm run e2e -- theme` captura home e `/produto/<slug>` nos 4 estilos (cada um numa variante gerada por `npm run variant -- --style <id>`), em claro e escuro, e confere que `border-radius` e `box-shadow` do card diferem entre `sera`, `soft` e `glass`.
 - [ ] `npm run e2e -- theme` tem um teste que roda `next dev`, troca `theme.style` no `site.config.ts` e confere, sem reiniciar o servidor, que o `data-style` do `<html>` mudou depois de recarregar a página.
 - [ ] `npm run lighthouse` passa com as asserções do `lighthouserc.json`: Performance ≥ 0,9 e CLS < 0,1, mobile, home no estilo `glass`.
 - [ ] Com `prefers-reduced-transparency: reduce` emulado, o card do `glass` tem fundo opaco. O Playwright não tem essa opção em `emulateMedia`: o teste usa CDP no Chromium (`Emulation.setEmulatedMedia` com `features: [{ name: "prefers-reduced-transparency", value: "reduce" }]`).
@@ -973,20 +1045,21 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 
 **Escopo:** `resolvePurchaseButtons`, os botões no card e no detalhe, ícones das plataformas, conteúdo de exemplo cobrindo as combinações, créditos dos ícones.
 
-**Pode tocar:** os caminhos de `packages/core/src` marcados `iris-commerce` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo) (JSX e lógica, usando só os utilitários de forma congelados), `apps/site/content/{products,services}/**`, `apps/site/public/{products,services}/**`, `apps/site/e2e/commerce/**`, `apps/site/e2e/baseline/__screenshots__/**` (só pelo protocolo de [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), `CREDITS.md`, `.github/workflows/commerce.yml`.
+**Pode tocar:** os caminhos de `packages/core/src` marcados `iris-commerce` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo) (JSX e lógica, usando só os utilitários de forma congelados), `apps/site/content/**`, `apps/site/public/{home,products,services,ultimos_projetos}/**`, as chaves de conteúdo de `apps/site/site.config.ts` ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)), `apps/site/e2e/commerce/**`, `apps/site/e2e/baseline/__screenshots__/**` (só pelo protocolo de [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), `CREDITS.md`, `.github/workflows/commerce.yml`.
 
 **Proibido:** `packages/schema/**` (inclusive `PLATFORM_HOSTS` e `DEFAULT_TEXTS`, que mudam por PR ao arquiteto), `packages/engine/**`, `packages/core/src/ui/**` e tokens, `packages/cli/**`, README.
 
 **Depende de:** `productSchema`, `PurchaseContext`, `PurchaseButton`, `ResolvePurchaseButtons` e as chaves de `texts.products`.
 
 **Pronto quando:**
-- [ ] `npm test -w @iris-vitrine/core` cobre `resolvePurchaseButtons`: ordem padrão, `whatsappButton: false`, `whatsappUrl: null`, só marketplaces, todos, nenhum, variante do primeiro (WhatsApp e não WhatsApp). Cobertura ≥ 80% de `catalog/purchase.ts`.
-- [ ] `apps/site/content/products/` tem pelo menos 4 produtos: só WhatsApp, só marketplaces, todos os botões, nenhum botão. `npm test -w @iris-vitrine/schema` (validação de conteúdo) passa.
+- [ ] `npm test -w @cbjk_iris/core` cobre `resolvePurchaseButtons`: ordem nativa, `ctx.order` personalizado (ex.: Shopee primeiro vira o `primary`), `whatsappButton: false`, `whatsappUrl: null`, só marketplaces, todos, nenhum, variante do primeiro (WhatsApp e não WhatsApp). Cobertura ≥ 80% de `catalog/purchase.ts`.
+- [ ] Um teste do core confere que o card e o detalhe passam `siteConfig.commerce.buttonOrder` resolvido para o `ctx.order`. Com a ordem trocada num config de teste, o card mostra a plataforma nova como primária.
+- [ ] Os produtos de exemplo de [§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares) continuam cobrindo as 4 combinações de botões, e `npm test -w @cbjk_iris/schema` (validação de conteúdo) passa.
 - [ ] `npm run e2e -- commerce`: em cada produto de exemplo, aparecem exatamente os botões esperados, cada um com `target="_blank"`, `rel="noopener noreferrer"` e o `href` do JSON. O card mostra só o primeiro.
-- [ ] No mesmo E2E, cada botão do detalhe é achado por nome acessível com a plataforma (`getByRole("link", { name: "Comprar na Shopee" })`), e o botão único do card é achado pelo rótulo longo da sua plataforma.
+- [ ] No mesmo E2E, cada botão do detalhe é achado por nome acessível com a plataforma (`getByRole("link", { name: "Comprar na Shopee" })`), e o botão único do card é achado pelo nome "Comprar agora (<plataforma>)".
 - [ ] Os rótulos vêm de `texts`: um teste do core renderiza os botões com `texts.products.buttons` trocados por valores de teste e confere que aparecem esses valores.
 - [ ] `npm run modules:check` continua passando.
-- [ ] `CREDITS.md` lista a origem e a licença de cada ícone de plataforma.
+- [ ] `CREDITS.md` tem, para cada ícone de marketplace, a URL do kit de marca oficial, a data do download e um resumo das regras de uso (cor, área de respiro, uso por lojistas). Se alguma regra proibir o uso, o PR para e o dono é avisado.
 - [ ] Gate de agente: `security-reviewer` sem achado CRITICAL ou HIGH sobre links externos e URLs vindas do conteúdo.
 
 ### 6.4 `iris-cli`: `create-iris-site` e CLI `iris`
@@ -995,20 +1068,24 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 
 **Escopo:** os pacotes `cli` e `create`, as perguntas e flags geradas do schema, a edição do `site.config.ts` com magicast, o starter dentro do `create` com as reescritas de [§5.1.4](#514-de-appssite-para-o-starter), os modelos de home do `create`, e a troca dos scripts do `apps/site` pela CLI.
 
-**Pode tocar:** `packages/cli/**`, `packages/create/**`, os scripts de `apps/site/package.json`, os arquivos gerados em `apps/site/app/` (só rodando o sync), `.github/workflows/cli.yml`.
+**Pode tocar:** `packages/cli/**`, `packages/create/**`, os scripts de `apps/site/package.json` (mantendo o nome `sync:check`), os arquivos gerados em `apps/site/app/` (só rodando o sync), `scripts/local-registry.mjs`, `.github/workflows/cli.yml`.
 
 **Proibido:** `packages/schema/**` e o formato de qualquer arquivo de conteúdo, `packages/core/**`, `packages/engine/**` (chama, não altera), README.
 
 **Depende de:** [§5.3](#53-config-e-conteúdo), [§5.5](#55-formato-do-schema-de-seção), [§5.6](#56-api-do-engine-usada-pela-cli) e [§5.7](#57-interface-pública-da-cli).
 
 **Pronto quando:**
-- [ ] `npm test -w @iris-vitrine/cli` tem, para cada comando, um caso interativo (prompts simulados) e um não interativo. Cobertura ≥ 80%.
+- [ ] `npm test -w @cbjk_iris/cli` tem, para cada comando, um caso interativo (prompts simulados) e um não interativo. Cobertura ≥ 80%.
 - [ ] Teste de não travamento: cada comando que pode perguntar (`create-iris-site`, `page add`, `section add`, `product add`, `service add`, `theme set`, `style set`, `module add`, `module remove`, `page remove`, `product remove`, `service remove`), rodado com um obrigatório ou confirmação faltando, `stdin` fechado (`</dev/null`) e `CLAUDECODE=1`, termina em menos de 5s com saída 3 e envelope válido contra `CliResult`.
 - [ ] Um teste confere que as flags de `iris product add --help` saem do `productSchema`: um campo novo num schema de teste aparece no help sem mudança na CLI.
 - [ ] Conteúdo inválido nunca é escrito: `iris product add x ... --price -1 --yes` sai com 4, e o diretório fica igual (comparado por hash).
 - [ ] `iris theme set` num config cujo `theme.name` é uma variável sai com 7 e não altera o arquivo. Num config literal, o `git diff` mostra só a linha mudada.
-- [ ] Um teste do `create` confere que `template/` não contém `workspace:`, `packages/` nem `allowedDevOrigins`.
-- [ ] E2E na CI (`.github/workflows/cli.yml`): sobe um Verdaccio local, publica os 5 pacotes nele, roda `npm_config_registry=http://localhost:4873 npx create-iris-site@<versão> /tmp/x --yes --name Teste --whatsapp 5511999999999 ...` para as 4 combinações de [§6.4.1](#641-matriz-do-create), e em cada projeto `npm run build && npm run lint` passa.
+- [ ] Um teste do `create` confere as regras do `template/` de [§5.1.4](#514-de-appssite-para-o-starter).
+- [ ] No projeto gerado pelo E2E, `.gitignore` existe com `node_modules` e `.next`, e `git ls-files | grep -cE '^(node_modules|\.next)/'` dá 0 depois do primeiro commit.
+- [ ] Com `--no-example-content`, `content/products/` e `content/services/` ficam vazios, e `npm run build` passa. Sem a flag, `iris check` termina com 0 e lista os avisos de conteúdo de exemplo.
+- [ ] `iris section add home faq --yes` sem itens sai com 3. Com `--set items[0].question=A --set items[0].answer=B`, ou com `--from-json` do mesmo objeto, sai com 0 e grava a seção. `--set items[0].question` sem `=` sai com 2.
+- [ ] Um teste confere que `iris product add` sem `--order` grava `order` = maior + 10.
+- [ ] E2E na CI (`.github/workflows/cli.yml`): `npm run registry:local` sobe o Verdaccio e publica os 5 pacotes, roda `npm_config_registry=http://localhost:4873 npx create-iris-site@<versão> /tmp/x --yes --name Teste --whatsapp 5511999999999 ...` para as 4 combinações de [§6.4.1](#641-matriz-do-create), e em cada projeto `npm run build && npm run lint` passa.
 - [ ] `iris theme add` com um `ImportTheme` falso (injetado no teste) grava o CSS devolvido em `themes/<nome>.css`, recusa nome de arquivo fora do padrão de slug, e propaga um erro do `ImportTheme` como saída 6 ou 4. A regra de segurança do download é testada no `engine`, não aqui.
 - [ ] Gate de agente: `security-reviewer` sem achado CRITICAL ou HIGH sobre caminhos vindos de argumentos, nome do projeto, comandos externos e conteúdo baixado.
 
@@ -1036,7 +1113,7 @@ A matriz não baixa temas da rede, para a CI não depender do tweakcn. `iris the
 **Pronto quando:**
 - [ ] `node scripts/docs-check/cli.mjs` sai com 0: compara `iris --help --json` com os comandos e flags citados nos guias, nos dois sentidos.
 - [ ] `node scripts/docs-check/schema.mjs` sai com 0: cada campo de `productSchema`, cada `type` de seção e cada token de `SHAPE_TOKENS` aparece na doc de usuário.
-- [ ] `node scripts/docs-check/run-snippets.mjs` sai com 0: extrai os blocos `bash` dos guias e roda cada um num projeto gerado pelo `create`.
+- [ ] `node scripts/docs-check/run-snippets.mjs` sai com 0: sobe o registro local com `npm run registry:local`, gera um projeto com o `create` e roda nele cada bloco `bash` dos guias. Blocos marcados como ` ```bash no-run ` (ex.: `npx create-iris-site@latest`, que depende do npm público) não rodam, e o script lista quantos pulou.
 - [ ] `wc -l < apps/site/AGENTS.md` dá no máximo 80, e o arquivo cita as regras de ouro e os comandos de verificação.
 - [ ] `grep -c "Dicas para quem está começando" apps/site/README.md` dá 1 ou mais.
 - [ ] Gate de agente: `adversarial-reviewer` responde APPROVE para "um iniciante consegue criar um site, um produto e trocar o tema sem abrir um componente?".
@@ -1047,14 +1124,16 @@ As sessões que criam os agentes devem usar os caminhos e nomes desta spec. Onde
 
 | Nas instruções | Nesta spec |
 |---|---|
-| `npx create-iris-project` | `npx create-iris-site` (até [Q-02](./OPEN-QUESTIONS.md#q-02-nomes-no-npm-decisão-do-dono)) |
-| `@iris/core` | `@iris-vitrine/core` |
+| `npx create-iris-project` | `npx create-iris-site` ([Q-02](./OPEN-QUESTIONS.md#q-02-nomes-no-npm-decisão-do-dono)) |
+| `@iris/core` | `@cbjk_iris/core` |
 | `types/site-config.ts`, `types/sections.ts`, `types/catalog.ts` | `packages/schema/src/{site-config.ts,sections/**,catalog.ts}` |
 | `modules.json`, `scripts/modules-*` | `packages/schema/src/modules.ts`, `packages/engine/src/{codegen,modules}/**` |
 | `components/ui/`, `components/sections/`, `components/header/`... | `packages/core/src/{ui,sections,header,...}/**` ([§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo)) |
 | `lib/brand.ts`, `lib/theme-file.ts` | `packages/engine/src/theme/**` |
 | `themes/`, `app/globals.css` | `packages/engine/themes/`, `packages/core/styles/iris.css` |
 | `data/products.ts`, `data/services.ts` | `apps/site/content/{products,services}/*.json` |
+| Conteúdo de exemplo de reformas | Assistência técnica de celulares ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)) |
+| "Ordem de botões configurável" no backlog | Entra nesta rodada, só global (`commerce.buttonOrder`) |
 | `npm run modules:sync -- --check`, `sync-brand.mjs --check` | `npm run sync:check` |
 | `npx tsc --noEmit` | `npm run typecheck` |
 | `iris-commerce` pode tocar `lib/whatsapp*` | Pode, em `packages/core/src/lib/whatsapp.ts` |
@@ -1071,7 +1150,7 @@ Sem detalhe de implementação, para o dono priorizar.
 | Alta | Orçamento com vários produtos numa única mensagem de WhatsApp |
 | Alta | Rastreamento de cliques por canal (GA4, Pixel ou Umami), com consentimento LGPD |
 | Alta | SEO local: JSON-LD `LocalBusiness` e `Product`, sitemap, OG por produto |
-| Alta | Tag de afiliado global, com `rel="sponsored noopener"` e ordem de botões configurável |
+| Alta | Tag de afiliado global, com `rel="sponsored noopener"` (a ordem global dos botões já entra nesta rodada) |
 | Alta | Promoções com data de início e fim |
 | Média | `iris product import <csv>` |
 | Média | Feed para Google Merchant Center e Meta |
@@ -1091,8 +1170,8 @@ Sem detalhe de implementação, para o dono priorizar.
 
 | Termo | Significado |
 |---|---|
-| Core | O pacote `@iris-vitrine/core`, com os componentes e as páginas |
-| Engine | O pacote `@iris-vitrine/engine`: tema, sync, loaders, `withIris` |
+| Core | O pacote `@cbjk_iris/core`, com os componentes e as páginas |
+| Engine | O pacote `@cbjk_iris/engine`: tema, sync, loaders, `withIris` |
 | Starter | O projeto que o `create-iris-site` copia. Vem do `apps/site` |
 | Rota fina | Arquivo em `app/(iris)/` que só reexporta a página do core |
 | Sync | `Sync()` do engine: fontes, registro e rotas. Chamado por `iris sync` e, antes da CLI, por `npm run sync:check` |

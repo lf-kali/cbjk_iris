@@ -1,6 +1,6 @@
 # ADR 003: Tokens de forma e estilos por `data-style`
 
-- **Status:** Proposto
+- **Status:** Proposto. Vira Aceito no congelamento dos contratos (tag `contracts-v1`).
 - **Data:** 2026-10-19
 - **Spec:** [§4 c](../SPEC.md#c-como-os-temas-mudam-os-componentes), [§5.4](../SPEC.md#54-tokens-de-forma-e-estilos)
 

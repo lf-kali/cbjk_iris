@@ -1,6 +1,6 @@
 # ADR 002: Schema zod por seção como fonte única
 
-- **Status:** Proposto
+- **Status:** Proposto. Vira Aceito no congelamento dos contratos (tag `contracts-v1`).
 - **Data:** 2026-10-19
 - **Spec:** [§4 b](../SPEC.md#b-schema-por-seção-como-fonte-única), [§5.5](../SPEC.md#55-formato-do-schema-de-seção)
 
@@ -18,7 +18,7 @@ Saem do schema:
 - o tipo TS (`z.infer`), inclusive `Section` e `SectionOf<T>`;
 - a validação do build (loaders do `engine`);
 - as perguntas e as flags da CLI;
-- o JSON Schema de `content/*.json` (publicado em `@iris-vitrine/schema/json/`);
+- o JSON Schema de `content/*.json` (publicado em `@cbjk_iris/schema/json/`);
 - o registro de seções (`syncRegistry()` do `engine`, chamado por `iris sync`), a partir de `definition.module` e `siteConfig.modules`.
 
 `coreSections` e `modules[].sections` do `modules.json` deixam de existir.
