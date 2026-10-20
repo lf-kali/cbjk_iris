@@ -1,6 +1,6 @@
 # Plano: Frente 1 (iris-architect, arquitetura e contratos)
 
-- **STATUS: DRAFT**
+- **STATUS: APPROVED** pelo dono em 2026-10-20. Respostas: D-1 Docker instalado (29.9.1); D-2 `main` sincronizado com `origin/main`; D-3 titular do LICENSE = `lf-kali`; D-4 fotos CC0 escolhidas pela sessão principal; D-5 `brand.logo` = `cbjk_logo.svg`.
 - **Data:** 2026-10-20
 - **Executor:** `iris-architect` (subagente, worktree isolada). Revisores, commits e PRs ficam com a sessão principal.
 - **Fonte:** [SPEC §6.1](../SPEC.md#61-iris-architect-arquitetura-e-contratos), [§6.1.1](../SPEC.md#611-conteúdo-de-exemplo-assistência-técnica-de-celulares), contratos do §5, ADRs 001–006.
@@ -47,7 +47,7 @@ Aprovar este plano autoriza a **ordem e o escopo** das etapas. Nas etapas que es
   1. `next build` com `withIris` importado de `@cbjk_iris/engine/next` instalado.
   2. Componente `"use client"` do core (TSX fonte) funcionando com `transpilePackages`.
   3. Aliases `@cbjk_iris/site-config` / `site-registry` resolvendo no `next build` (Turbopack) e no `tsc --noEmit`.
-  4. Classe usada só no core aparece no CSS gerado (`grep` no `.next/static/css`).
+  4. Classe usada só no core aparece no CSS gerado (`grep` em `.next/static/chunks/*.css`; no Next 16 o CSS não sai em `.next/static/css`).
   5. Rota fina reexportando `default` + `generateStaticParams`, com `dynamicParams = false` literal: páginas aparecem como estáticas (`●`/SSG) no output do build.
   6. Hover de campo `z.infer`: medir pelo tsserver (`quickinfo` via script), não "olhando o VS Code". Se não mostrar a descrição, registrar no ADR 002 e seguir (a spec já prevê).
   7. Layout lê tema de `@cbjk_iris/engine/themes/` com `serverExternalPackages` e `fileURLToPath(new URL("../themes/", import.meta.url))`.

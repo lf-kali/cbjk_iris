@@ -28,6 +28,7 @@ Saem do schema:
 - **Bom:** acrescentar uma seção é um arquivo de schema e um componente. Um teste garante que os dois existem.
 - **Bom:** o JSON do conteúdo ganha autocomplete e descrição no VS Code, pelo `$schema`.
 - **Ruim:** tipos inferidos podem perder os comentários JSDoc no hover do `site.config.ts`. O spike verifica. Se perderem, a descrição vai no `.meta({ description })` e aparece no JSON Schema, e o `site.config.ts` fica com os comentários escritos no próprio arquivo.
+  - **Resultado do spike (2026-10-20, [`spike-001.md`](../spike-001.md#6-hover-de-campo-de-tipo-zinfer-mostra-a-descrição--não-mostra-registrado-no-adr-002)):** perdem. Com o `@cbjk_iris/schema` instalado, o quickinfo do language service mostra `(property) name: string` sem documentação, no `site.config.ts` e em tipos `z.infer`. O JSDoc escrito no campo do schema sobrevive ao `z.infer` quando o tipo vem do fonte, mas some no `.d.mts` emitido pelo tsdown. O `.meta({ description })` nunca aparece no hover. Vale o plano acima: descrição no `.meta()` (JSON Schema e CLI) e comentários no próprio `site.config.ts` do starter. Não bloqueia a migração.
 - **Regra:** `.meta()` vem por último na cadeia (depois de `.optional()` e `.default()`).
 - **Regra:** os schemas são `.strict()`. O loader remove a chave `$schema` dos JSON antes de validar, e o JSON Schema publicado é gerado com `io: "input"`, para campos com `.default()` não aparecerem como obrigatórios.
 - **Dependência nova direta:** `zod@^4` no `schema`.
