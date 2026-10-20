@@ -2,6 +2,7 @@
   "name": "jr_acabamentos",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "predev": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
     "dev": "next dev",
