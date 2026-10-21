@@ -1,0 +1,4 @@
+/* classes de forma em @apply também contam */
+.caixa {
+  @apply rounded-md shadow-lg;
+}

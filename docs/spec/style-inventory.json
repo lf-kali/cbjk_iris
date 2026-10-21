@@ -1,0 +1,1151 @@
+{
+  "$comment": "Inventário das classes de forma fixas de packages/core/src (SPEC §5.4). Dono: iris-architect. Conferido por `node scripts/style-inventory.mjs --check`; o iris-theme usa `--after`. Cada entrada casa por arquivo e classe exata (com variantes); `near` desempata pelo texto da linha; `to` é um utilitário congelado (o iris-theme mantém os prefixos de variante, ex.: hover:) ou `exception:<id>`; `note` é justificativa da entrada e o script não a lê. Entrada obsoleta faz o --check e o --after falharem: quem troca uma classe atualiza este arquivo no mesmo PR.",
+  "utilities": [
+    "rounded-control",
+    "rounded-card",
+    "rounded-media",
+    "rounded-surface",
+    "rounded-surface-lg",
+    "rounded-field",
+    "rounded-card-compact",
+    "shadow-card",
+    "shadow-card-hover",
+    "shadow-overlay",
+    "shadow-control",
+    "surface-card",
+    "surface-popover",
+    "surface-header",
+    "surface-overlay",
+    "border-control",
+    "border-surface",
+    "border-selected",
+    "divider-t",
+    "divider-b",
+    "divider-l",
+    "divider-r",
+    "divider-between-y",
+    "ring-focus",
+    "py-section",
+    "p-card",
+    "gap-density",
+    "weight-control",
+    "case-control",
+    "case-control-compact",
+    "case-title",
+    "case-label"
+  ],
+  "exceptions": {
+    "round": "rounded-full em avatar, indicador do carrossel, botão redondo do carrossel e da lista de rolagem, e botão de ícone de rede social: são círculos em todo estilo",
+    "photo": "blur, escurecimento e transparência sobre foto no HeroSection e no FadeCarousel (texto e controles brancos sobre imagem, regra de cores do README)",
+    "state-color": "cor de estado (hover, ativo, aberto, inválido, variante destructive) com opacidade: é cor do tema, não forma nem superfície translúcida",
+    "tint": "tom de cor com opacidade sobre fundo opaco (faixa de seção, rodapé, quadro de ícone, avatar sem foto): não há conteúdo atrás, então não é superfície translúcida",
+    "text-weight": "peso de fonte em texto que não é controle (títulos, links de texto, rótulos de formulário e de dados, preço, logo em texto): tipografia, fora dos tokens de forma. Inclui o gatilho do menu de navegação, cujo peso de hoje (500) difere do --control-weight do sera (600)",
+    "carousel-focus": "foco das setas do FadeCarousel (outline sólido de 2px com afastamento de 2px, sobre foto): mantido como hoje para preservar o visual do sera; não vira ring-focus (decisão do dono, 2026-10-21)",
+    "reset": "zera uma largura herdada do componente base (border-0 no Badge, ring-0 no foco de link dentro do menu): não desenha forma"
+  },
+  "occurrences": [
+    {
+      "file": "app/gallery/page.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "app/products/list.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "app/services/list.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "brand/SiteLogo.tsx",
+      "class": "font-extrabold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "bg-black/30",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "rounded-full",
+      "count": 3,
+      "to": "exception:round"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "bg-background/80",
+      "count": 2,
+      "to": "exception:photo"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "backdrop-blur",
+      "count": 2,
+      "to": "exception:photo"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "focus-visible:outline",
+      "count": 2,
+      "to": "exception:carousel-focus"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "focus-visible:outline-2",
+      "count": 2,
+      "to": "exception:carousel-focus"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "focus-visible:outline-offset-2",
+      "count": 2,
+      "to": "exception:carousel-focus"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "bg-white/50",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "carousel/FadeCarousel.tsx",
+      "class": "hover:bg-white/80",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "catalog/CatalogDetail.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "catalog/CatalogDetail.tsx",
+      "class": "divide-y",
+      "count": 1,
+      "to": "divider-between-y"
+    },
+    {
+      "file": "catalog/CatalogDetail.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "catalog/ImageGallery.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "catalog/ImageGallery.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "catalog/ImageGallery.tsx",
+      "class": "rounded-md",
+      "count": 1,
+      "to": "rounded-field"
+    },
+    {
+      "file": "catalog/ImageGallery.tsx",
+      "class": "border-2",
+      "count": 1,
+      "to": "border-selected"
+    },
+    {
+      "file": "footer/SiteFooter.tsx",
+      "class": "border-t",
+      "count": 2,
+      "to": "divider-t"
+    },
+    {
+      "file": "footer/SiteFooter.tsx",
+      "class": "bg-muted/30",
+      "count": 1,
+      "to": "exception:tint"
+    },
+    {
+      "file": "footer/SiteFooter.tsx",
+      "class": "rounded-full",
+      "count": 1,
+      "to": "exception:round"
+    },
+    {
+      "file": "footer/SiteFooter.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "footer/SiteFooter.tsx",
+      "class": "font-semibold",
+      "count": 2,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "gallery/GallerySection.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "gallery/GallerySection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "header/DesktopHeader.tsx",
+      "class": "backdrop-blur-2xl",
+      "count": 1,
+      "to": "surface-header"
+    },
+    {
+      "file": "header/DesktopHeader.tsx",
+      "class": "bg-background/86",
+      "count": 1,
+      "to": "surface-header"
+    },
+    {
+      "file": "header/MobileHeader.tsx",
+      "class": "bg-background/86",
+      "count": 1,
+      "to": "surface-header"
+    },
+    {
+      "file": "header/MobileHeader.tsx",
+      "class": "backdrop-blur-2xl",
+      "count": 1,
+      "to": "surface-header"
+    },
+    {
+      "file": "header/MobileHeader.tsx",
+      "class": "border-b",
+      "count": 1,
+      "to": "divider-b"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "hover:shadow-md",
+      "count": 1,
+      "to": "shadow-card-hover"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "tracking-wide",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "tracking-wider",
+      "count": 1,
+      "to": "case-control-compact"
+    },
+    {
+      "file": "products/CatalogCard.tsx",
+      "class": "sm:tracking-widest",
+      "count": 1,
+      "to": "case-control"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "rounded-xs",
+      "count": 2,
+      "to": "rounded-card-compact"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "hover:shadow-md",
+      "count": 1,
+      "to": "shadow-card-hover"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "focus-visible:ring-2",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "tracking-wide",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "products/CatalogMiniCard.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "products/PriceBlock.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "products/ProductScrollList.tsx",
+      "class": "font-semibold",
+      "count": 2,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "products/ProductScrollList.tsx",
+      "class": "rounded-full",
+      "count": 2,
+      "to": "exception:round"
+    },
+    {
+      "file": "products/ProductScrollList.tsx",
+      "class": "border",
+      "count": 2,
+      "to": "border-control"
+    },
+    {
+      "file": "products/ProductScrollList.tsx",
+      "class": "shadow-md",
+      "count": 2,
+      "to": "shadow-overlay"
+    },
+    {
+      "file": "products/ProductsSection.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/BenefitsSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/BenefitsSection.tsx",
+      "class": "bg-primary/10",
+      "count": 1,
+      "to": "exception:tint"
+    },
+    {
+      "file": "sections/BenefitsSection.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/ContactSection.tsx",
+      "class": "font-semibold",
+      "count": 4,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/ContactSection.tsx",
+      "class": "rounded-full",
+      "count": 1,
+      "to": "exception:round"
+    },
+    {
+      "file": "sections/ContactSection.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "sections/ContactSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/ContactSection.tsx",
+      "class": "border",
+      "near": "min-h-80",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "sections/CtaBannerSection.tsx",
+      "class": "rounded-xl",
+      "count": 1,
+      "to": "rounded-surface-lg"
+    },
+    {
+      "file": "sections/CtaBannerSection.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/FaqSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/FaqSection.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "sections/HeroSection.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/HeroSection.tsx",
+      "class": "bg-white/10",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "sections/HeroSection.tsx",
+      "class": "backdrop-blur",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "sections/HeroSection.tsx",
+      "class": "hover:bg-white/20",
+      "count": 1,
+      "to": "exception:photo"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "rounded-md",
+      "count": 1,
+      "to": "rounded-field"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "border",
+      "near": "border-input",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "shadow-xs",
+      "count": 1,
+      "to": "shadow-control"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "focus-visible:ring-2",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "focus-visible:ring-ring/30",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "rounded-lg",
+      "count": 2,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "border",
+      "count": 2,
+      "to": "border-surface"
+    },
+    {
+      "file": "sections/LeadForm.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/SectionShell.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/StatsSection.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "bg-muted/40",
+      "count": 1,
+      "to": "exception:tint"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "shadow-sm",
+      "count": 1,
+      "to": "shadow-card"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "rounded-full",
+      "count": 2,
+      "to": "exception:round"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "bg-primary/10",
+      "count": 1,
+      "to": "exception:tint"
+    },
+    {
+      "file": "sections/TestimonialsSection.tsx",
+      "class": "font-semibold",
+      "count": 2,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/TextImageSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "sections/TextImageSection.tsx",
+      "class": "font-bold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "sections/TextImageSection.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "services/ServiceCard.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "services/ServiceCard.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "services/ServiceCard.tsx",
+      "class": "hover:shadow-md",
+      "count": 1,
+      "to": "shadow-card-hover"
+    },
+    {
+      "file": "services/ServiceCard.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "services/ServiceCard.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "services/ServicesSection.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "services/ServicesSection.tsx",
+      "class": "rounded-lg",
+      "count": 1,
+      "to": "rounded-surface"
+    },
+    {
+      "file": "services/ServicesSection.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-surface"
+    },
+    {
+      "file": "services/ServicesSection.tsx",
+      "class": "hover:shadow-md",
+      "count": 1,
+      "to": "shadow-card-hover"
+    },
+    {
+      "file": "services/ServicesSection.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "not-last:border-b",
+      "count": 1,
+      "to": "divider-b"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "rounded-none",
+      "count": 1,
+      "to": "rounded-control"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "weight-control"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "focus-visible:ring-2",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/accordion.tsx",
+      "class": "focus-visible:ring-ring/30",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "rounded-none",
+      "count": 1,
+      "to": "rounded-control"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "border-0",
+      "count": 1,
+      "to": "exception:reset"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "weight-control"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "tracking-widest",
+      "count": 1,
+      "to": "case-control"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-control"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "focus-visible:ring-[3px]",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "focus-visible:ring-ring/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "aria-invalid:ring-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "dark:aria-invalid:ring-destructive/40",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "focus-visible:ring-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/badge.tsx",
+      "class": "dark:focus-visible:ring-destructive/40",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/breadcrumb.tsx",
+      "class": "tracking-wide",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "ui/breadcrumb.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-label"
+    },
+    {
+      "file": "ui/breadcrumb.tsx",
+      "class": "font-normal",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "rounded-none",
+      "count": 1,
+      "to": "rounded-control"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "weight-control"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "tracking-widest",
+      "count": 1,
+      "to": "case-control"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-control"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "focus-visible:ring-2",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "focus-visible:ring-ring/30",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "aria-invalid:ring-2",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "aria-invalid:ring-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:aria-invalid:ring-destructive/40",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "hover:bg-primary/80",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "hover:bg-cta/85",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:hover:bg-input/30",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:hover:bg-muted/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "bg-destructive/10",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "hover:bg-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "focus-visible:ring-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:bg-destructive/20",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:hover:bg-destructive/30",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/button.tsx",
+      "class": "dark:focus-visible:ring-destructive/40",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "shadow-sm",
+      "count": 1,
+      "to": "shadow-card"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "ring-1",
+      "count": 1,
+      "to": "surface-card"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "ring-foreground/5",
+      "count": 1,
+      "to": "surface-card"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "*:[img:first-child]:rounded-none",
+      "count": 1,
+      "to": "rounded-media"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "*:[img:last-child]:rounded-none",
+      "count": 1,
+      "to": "rounded-media"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "rounded-none",
+      "count": 1,
+      "to": "rounded-card"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "tracking-wider",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/card.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "rounded-none",
+      "count": 2,
+      "to": "rounded-control"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "font-medium",
+      "count": 1,
+      "to": "exception:text-weight",
+      "note": "gatilho do menu de navegação: é controle, mas o peso de hoje (500) difere do --control-weight do sera (600); fica como texto para não mudar o visual"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "focus-visible:ring-2",
+      "count": 2,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "focus-visible:ring-ring/30",
+      "count": 2,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "focus-visible:outline-1",
+      "count": 2,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "data-popup-open:bg-muted/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "data-open:bg-muted/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "group-data-[viewport=false]/navigation-menu:rounded-none",
+      "count": 1,
+      "to": "rounded-card"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "group-data-[viewport=false]/navigation-menu:shadow-md",
+      "count": 1,
+      "to": "shadow-overlay"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "group-data-[viewport=false]/navigation-menu:ring-1",
+      "count": 1,
+      "to": "surface-popover"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "group-data-[viewport=false]/navigation-menu:ring-foreground/10",
+      "count": 1,
+      "to": "surface-popover"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "**:data-[slot=navigation-menu-link]:focus:ring-0",
+      "count": 1,
+      "to": "exception:reset"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "rounded-none",
+      "near": "NavigationMenuPrimitive.Popup",
+      "count": 1,
+      "to": "rounded-card"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "shadow-md",
+      "count": 2,
+      "to": "shadow-overlay"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "ring-1",
+      "count": 1,
+      "to": "surface-popover"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "ring-foreground/10",
+      "count": 1,
+      "to": "surface-popover"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "in-data-[slot=navigation-menu-content]:rounded-none",
+      "count": 1,
+      "to": "rounded-control"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "data-[active=true]:bg-muted/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/navigation-menu.tsx",
+      "class": "rounded-none",
+      "near": "rotate-45",
+      "count": 1,
+      "to": "rounded-card"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "bg-black/20",
+      "count": 1,
+      "to": "surface-overlay"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "supports-backdrop-filter:backdrop-blur-sm",
+      "count": 1,
+      "to": "surface-overlay"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "shadow-md",
+      "count": 1,
+      "to": "shadow-overlay"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "data-[side=bottom]:border-t",
+      "count": 1,
+      "to": "divider-t"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "data-[side=left]:border-r",
+      "count": 1,
+      "to": "divider-r"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "data-[side=right]:border-l",
+      "count": 1,
+      "to": "divider-l"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "data-[side=top]:border-b",
+      "count": 1,
+      "to": "divider-b"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "exception:text-weight"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "tracking-wider",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/sheet.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "border",
+      "count": 1,
+      "to": "border-control"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "font-semibold",
+      "count": 1,
+      "to": "weight-control"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "tracking-wider",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "uppercase",
+      "count": 1,
+      "to": "case-title"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "focus-visible:ring-[3px]",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "focus-visible:ring-ring/50",
+      "count": 1,
+      "to": "exception:state-color"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "focus-visible:outline-1",
+      "count": 1,
+      "to": "ring-focus"
+    },
+    {
+      "file": "ui/tabs.tsx",
+      "class": "dark:data-active:bg-input/30",
+      "count": 1,
+      "to": "exception:state-color"
+    }
+  ]
+}

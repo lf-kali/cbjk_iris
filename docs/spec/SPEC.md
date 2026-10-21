@@ -529,20 +529,25 @@ Regras de conteúdo:
 
 Fonte da lista: `packages/schema/src/theme/tokens.ts` (`SHAPE_TOKENS`, com nome, tipo, faixa e padrão do `sera`) e `STYLE_IDS`. Os valores de cada preset são do `iris-theme`, em `packages/engine/src/theme/styles.ts`.
 
-Os padrões do `sera` foram tirados do código de hoje, para reproduzir o visual atual.
+Os padrões do `sera` foram tirados do código de hoje, para reproduzir o visual atual. A coluna "Consumido por" diz onde cada token entra; o destino de cada classe, ocorrência por ocorrência, está em [`style-inventory.json`](./style-inventory.json).
 
 | Token | Tipo e faixa | Padrão no `sera` | Reproduz hoje | Consumido por |
 |---|---|---|---|---|
 | `--radius` | comprimento, 0–2rem | o do tema, ou `0.625rem` | `--radius` | escala `rounded-sm`…`rounded-4xl` (já existe) |
-| `--radius-control` | comprimento, 0–9999px | `0px` | `rounded-none` | Button, Badge, campos, TabsTrigger |
-| `--radius-card` | comprimento, 0–3rem | `0px` | `rounded-none` | Card, Sheet, Accordion, menu |
-| `--radius-media` | comprimento, 0–3rem | `0px` | `*:[img]:rounded-none` | imagens de card, ImageGallery, galeria, TextImage |
-| `--border-width` | comprimento, 0–4px | `1px` | `border` | campos, botão `outline`, separadores |
-| `--card-ring-width` | comprimento, 0–4px | `1px` | `ring-1` | contorno do Card |
-| `--card-ring-color` | cor CSS | `color-mix(in oklch, var(--foreground) 5%, transparent)` | `ring-foreground/5` | contorno do Card |
+| `--radius-control` | comprimento, 0–9999px | `0px` | `rounded-none` | Button, Badge, TabsTrigger, gatilho do Accordion, gatilho e itens do menu de navegação |
+| `--radius-card` | comprimento, 0–3rem | `0px` | `rounded-none` | Card e cabeçalho do Card, Sheet, popup e seta do menu de navegação |
+| `--radius-media` | comprimento, 0–3rem | `0px` | `*:[img]:rounded-none` | imagens do Card (primeira e última) |
+| `--radius-surface` | comprimento, 0–3rem | `var(--radius)` | `rounded-lg` | blocos das seções: cards de serviço, galeria, TextImage, FAQ, LeadForm, depoimentos, mapa do contato, quadro de ícone dos benefícios, imagem principal da ImageGallery; CtaBanner por `rounded-surface-lg` (× 1.4, hoje `rounded-xl`) |
+| `--radius-field` | comprimento, 0–9999px | `calc(var(--radius) * 0.8)` | `rounded-md` | campos do LeadForm, miniaturas da ImageGallery |
+| `--radius-card-compact` | comprimento, 0–3rem | `0.125rem` | `rounded-xs` (`--radius-xs` do Tailwind 4.3) | CatalogMiniCard e a imagem dele |
+| `--border-width` | comprimento, 0–4px | `1px` | `border` | controles (`border-control`: Button, campos, gatilhos do Accordion e das Tabs, botões redondos) e separadores (`divider-*`, inclusive `divider-between-y` na lista de especificações do produto, hoje `divide-y`) |
+| `--surface-border-width` | comprimento, 0–4px | `1px` | `border` | contorno dos blocos com borda (`border-surface`): cards de serviço, CatalogMiniCard, FAQ, LeadForm, depoimentos, mapa do contato, imagem principal da ImageGallery |
+| `--card-ring-width` | comprimento, 0–4px | `1px` | `ring-1` | contorno do Card e do popup do menu de navegação |
+| `--card-ring-color` | cor CSS | `color-mix(in oklab, var(--foreground) 5%, transparent)` | `ring-foreground/5` | contorno do Card |
+| `--popover-ring-color` | cor CSS | `color-mix(in oklab, var(--foreground) 10%, transparent)` | `ring-foreground/10` | contorno do popup do menu de navegação (`surface-popover`) |
 | `--shadow-card` | sombra CSS ou `none` | `var(--shadow-sm)` | `shadow-sm` | Card em repouso, depoimentos |
 | `--shadow-card-hover` | sombra CSS ou `none` | `var(--shadow-md)` | `hover:shadow-md` | Card de produto e serviço em hover, listas de rolagem |
-| `--shadow-overlay` | sombra CSS ou `none` | `var(--shadow-md)` | `shadow-md` | Sheet, menu de navegação, popovers |
+| `--shadow-overlay` | sombra CSS ou `none` | `var(--shadow-md)` | `shadow-md` | Sheet, menu de navegação, popovers, botões de rolagem da lista de produtos |
 | `--shadow-control` | sombra CSS ou `none` | `var(--shadow-xs)` | `shadow-xs` (LeadForm) | campos e botões |
 | `--surface-alpha` | porcentagem, 0–100% | `100%` | fundo opaco | Card, Sheet, popovers |
 | `--blur` | comprimento, 0–24px | `0px` | sem blur | superfícies (só tem efeito com alpha < 100%) |
@@ -552,41 +557,48 @@ Os padrões do `sera` foram tirados do código de hoje, para reproduzir o visual
 | `--overlay-blur` | comprimento, 0–24px | `8px` | `backdrop-blur-sm` (`--blur-sm: 8px` no Tailwind 4.3) | fundo escurecido do Sheet |
 | `--density` | número, 0.75–1.25 | `1` | `py-12 md:py-16` | padding vertical do `SectionShell`, espaçamento do Card, gaps de grade |
 | `--control-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | Button, Badge |
-| `--control-tracking` | comprimento em `em`, 0–0.2em | `0.1em` | `tracking-widest` | Button |
-| `--control-weight` | 400–800 | `600` | `font-semibold` | Button |
-| `--title-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | CardTitle |
-| `--title-tracking` | comprimento em `em`, 0–0.2em | `0.05em` | `tracking-wider` | CardTitle |
-| `--label-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | breadcrumb, rótulo de categoria, TabsTrigger, título do Sheet |
+| `--control-tracking` | comprimento em `em`, 0–0.2em | `0.1em` | `tracking-widest` | Button, Badge; × 0.5 em `case-control-compact` (botão do CatalogCard em tela estreita, hoje `tracking-wider`) |
+| `--control-weight` | 400–800 | `600` | `font-semibold` | Button, Badge, TabsTrigger, gatilho do Accordion |
+| `--title-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | CardTitle, título do Sheet, TabsTrigger |
+| `--title-tracking` | comprimento em `em`, 0–0.2em | `0.05em` | `tracking-wider` | idem |
+| `--label-case` | `uppercase` ou `none` | `uppercase` | `uppercase` | breadcrumb, rótulo de categoria (CatalogCard, CatalogMiniCard) |
 | `--label-tracking` | comprimento em `em`, 0–0.2em | `0.025em` | `tracking-wide` | idem |
-| `--ring-width` | comprimento, 1–4px | `2px` | `ring-2` | foco visível de todos os controles |
+| `--ring-width` | comprimento, 1–4px | `2px` | `ring-2` | foco visível de todos os controles; borda da miniatura escolhida da ImageGallery (`border-selected`, hoje `border-2`) |
 
 Mais o identificador `--iris-style` (no `:root` do tema), que diz o estilo preferido do tema.
 
-Mudança aceita no `sera`: hoje badge e tabs usam foco de 3px e o botão, de 2px. Todos passam a usar `--ring-width` (2px). O foco não aparece nas capturas de linha de base.
+Mudança aceita no `sera`: hoje badge e tabs usam foco de 3px e o botão, de 2px. Todos passam a usar `--ring-width` (2px). O `outline-1` que tabs e menu de navegação desenham junto com o anel no foco também sai: o foco de todo controle passa a ser só `ring-focus`. As setas do `FadeCarousel` ficam fora desta mudança: o foco delas (outline de 2px com afastamento de 2px) continua igual, como `exception:carousel-focus`. O foco não aparece nas capturas de linha de base.
 
 **Utilitários congelados**, definidos no `iris.css` do core. Os componentes usam estes nomes e nada fixo:
 
 | Utilitário | Faz |
 |---|---|
-| `rounded-control`, `rounded-card`, `rounded-media` | `border-radius` pelo token |
+| `rounded-control`, `rounded-card`, `rounded-media`, `rounded-surface`, `rounded-field`, `rounded-card-compact` | `border-radius` pelo token |
+| `rounded-surface-lg` | `border-radius: calc(var(--radius-surface) * 1.4)` (CtaBanner) |
 | `shadow-card`, `shadow-card-hover`, `shadow-overlay`, `shadow-control` | `box-shadow` pelo token |
 | `surface-card` | fundo `--card` com `--surface-alpha`, `backdrop-filter: blur(var(--blur))`, contorno com `--card-ring-width` e `--card-ring-color` |
+| `surface-popover` | fundo `--popover` com `--surface-alpha` e `--blur`, contorno com `--card-ring-width` e `--popover-ring-color` |
 | `surface-header` | fundo `--background` com `--header-alpha` e `--header-blur` |
 | `surface-overlay` | fundo preto com `--overlay-alpha` e `--overlay-blur` |
-| `border-control` | borda com `--border-width` na cor `--border` |
-| `ring-focus` | anel de foco com `--ring-width` |
+| `border-control` | borda sólida com `--border-width` (a cor continua na classe de cor do componente, ex.: `border-input`) |
+| `border-surface` | borda sólida com `--surface-border-width` (cor idem) |
+| `border-selected` | borda sólida com `--ring-width` (cor idem) |
+| `divider-t`, `divider-b`, `divider-l`, `divider-r` | borda de um lado só, com `--border-width` (separadores) |
+| `divider-between-y` | borda entre filhos empilhados (como `divide-y`), com `--border-width` |
+| `ring-focus` | anel de foco com `--ring-width` (só a largura: a cor do anel é do tema e continua no componente) |
 | `py-section` | padding vertical da seção multiplicado por `--density` |
 | `p-card`, `gap-density` | espaçamento interno do Card e gap de grade multiplicados por `--density` |
 | `weight-control` | `font-weight` pelo `--control-weight` |
 | `case-control`, `case-title`, `case-label` | `text-transform` e `letter-spacing` pelos tokens |
+| `case-control-compact` | como `case-control`, com `letter-spacing: calc(var(--control-tracking) * 0.5)` |
 
-**Esta tabela é a lista inicial, não a final.** Ela foi escrita à mão e, nas duas revisões, sempre sobrou alguma classe sem destino (ex.: `rounded-lg` em 11 seções, `rounded-xl` no CtaBanner, `rounded-md` e `rounded-xs` em LeadForm, ImageGallery e CatalogMiniCard, `border-2` na miniatura da galeria). Por isso o inventário completo é uma etapa do arquiteto antes do congelamento ([§6.1](#61-iris-architect-arquitetura-e-contratos), passo 3):
+**Estas tabelas saíram do inventário.** A primeira versão foi escrita à mão e, nas duas revisões, sempre sobrou alguma classe sem destino (ex.: `rounded-lg` em 11 seções, `rounded-xl` no CtaBanner, `rounded-md` e `rounded-xs` em LeadForm, ImageGallery e CatalogMiniCard, `border-2` na miniatura da galeria). O inventário por script ([§6.1](#61-iris-architect-arquitetura-e-contratos), passo 3, feito em 2026-10-20) acrescentou 5 tokens (`--radius-surface`, `--radius-field`, `--radius-card-compact`, `--surface-border-width`, `--popover-ring-color`) e os utilitários que os consomem. O processo continua valendo:
 
-1. `scripts/style-inventory.mjs` lista cada ocorrência de classe de forma fixa em `packages/core/src` (`rounded-*`, `shadow-*`, `backdrop-blur*`, `ring-<n>`, `border-<n>`, `uppercase`, `tracking-*`, `font-(medium|semibold|bold)` em controles, `bg-*/<n>` em superfícies), com arquivo e linha.
-2. O arquiteto grava em `docs/spec/style-inventory.json` o destino de cada ocorrência: um utilitário congelado ou uma exceção justificada. Token que faltar entra em `SHAPE_TOKENS` antes da tag, com o padrão do `sera` igual ao valor de hoje (ex.: `--radius-surface: var(--radius)` para os `rounded-lg` das seções).
-3. `node scripts/style-inventory.mjs --check` sai com 0 só se toda ocorrência tiver destino.
+1. `scripts/style-inventory.mjs` lista cada ocorrência de classe de forma fixa em `packages/core/src` (`rounded-*`, `shadow-*`, `backdrop-blur*`, `ring-<n>`, `border-<n>`, `uppercase`, `tracking-*`, `font-(medium|semibold|bold)` em controles, `bg-*/<n>` em superfícies), com arquivo e linha. Ele lê toda string do código pelo parser do TypeScript (atributos de JSX, argumentos do `cn()`, base e variantes do `cva`, objetos, template literals) e o `@apply` de `.css`; comentários e texto de JSX não contam, nem strings que com certeza não são lista de classes (tipo literal, atributo JSX cujo nome não contém `class`, valor das chaves `variant` e `size`, operando de `===`/`!==` e rótulo de `case`; assim o nome de variante `variant="outline"` não vira ocorrência). Para não deixar nada de fora, também lista `border` e `border-<lado>` sem número (largura de 1px implícita), `divide-x`/`divide-y` (com ou sem número) e cor de `divide` com opacidade, `blur-*`, `ring-offset-<n>`, cor de anel e de outline com opacidade, `outline` com ou sem número, `outline-offset-<n>`, as outras classes de caixa e todos os pesos `font-*`; a decisão "é controle", "é superfície" fica no JSON. Não contam os utilitários congelados nem classes sob variante `style-<id>:`.
+2. O arquiteto grava em `docs/spec/style-inventory.json` o destino de cada ocorrência: um utilitário congelado ou uma exceção justificada. Cada entrada casa por arquivo e classe exata (com as variantes, ex.: `hover:shadow-md`), com `count`, e `near` (trecho da linha) quando a mesma classe do mesmo arquivo tem destinos diferentes. O iris-theme mantém os prefixos de variante ao trocar (`hover:shadow-md` → `hover:shadow-card-hover`). Token que faltar entra em `SHAPE_TOKENS` antes da tag, com o padrão do `sera` igual ao valor de hoje (ex.: `--radius-surface: var(--radius)` para os `rounded-lg` das seções).
+3. `node scripts/style-inventory.mjs --check` sai com 0 só se toda ocorrência tiver destino e nenhuma entrada do JSON estiver obsoleta (entrada que acha menos ocorrências que o `count`). Entrada obsoleta é erro, não aviso: quem troca ou apaga uma classe atualiza o JSON no mesmo PR, revisado pelo arquiteto.
 
-Depois da tag, o mesmo script, com `--after`, é o teste do `iris-theme`: nenhuma ocorrência que não seja exceção pode sobrar.
+Depois da tag, o mesmo script, com `--after`, é o teste do `iris-theme`: nenhuma ocorrência que não seja exceção pode sobrar, e vale a mesma regra de entrada obsoleta.
 
 **Estilos embutidos** (`STYLE_IDS`, [Q-09](./OPEN-QUESTIONS.md#q-09-estilos-embutidos)):
 
@@ -602,7 +614,14 @@ Depois da tag, o mesmo script, com `--after`, é o teste do `iris-theme`: nenhum
 - Use variante só para o que token não resolve (ex.: brilho interno no `glass`, gradiente). No máximo 3 classes `style-*` por elemento. Mais que isso indica que falta um token.
 - O `cva` fica para `variant` e `size`. Ele não escolhe estilo.
 - **Proibido em componentes do core** (o teste é o grep do [§6.2](#62-iris-theme-sistema-de-temas)): `rounded-*` com valor fixo, `shadow-*` fixo, `backdrop-blur*` fixo, `ring-<n>` de superfície, `uppercase` e `tracking-*` fixos.
-- **Exceções permitidas**, marcadas como exceção em `docs/spec/style-inventory.json`: `rounded-full` em avatar, indicador e botão redondo do carrossel; blur e escurecimento sobre foto no `HeroSection` e no `FadeCarousel` (texto branco sobre imagem, como a regra de cores do README). Exceção nova é PR ao arquiteto.
+- **Exceções permitidas**, marcadas em `docs/spec/style-inventory.json` com `"to": "exception:<id>"`. Exceção nova é PR ao arquiteto.
+  - `exception:round`: `rounded-full` em avatar, indicador e botão redondo do carrossel (inclusive os botões de rolagem da lista de produtos) e botão de ícone de rede social.
+  - `exception:photo`: blur, escurecimento e transparência sobre foto no `HeroSection` e no `FadeCarousel` (texto branco sobre imagem, como a regra de cores do README).
+  - `exception:state-color`: cor de estado com opacidade (hover, ativo, aberto, inválido, variante `destructive`), inclusive a cor do anel de foco. É cor do tema, não forma.
+  - `exception:tint`: tom de cor com opacidade sobre fundo opaco (faixa de seção, rodapé, quadro de ícone, avatar sem foto). Não há conteúdo atrás, então não é superfície translúcida.
+  - `exception:text-weight`: peso de fonte em texto que não é controle (títulos, links de texto, rótulos, preço, logo em texto). Só o peso dos controles é token (`--control-weight`). Também fica aqui o gatilho do menu de navegação: é controle, mas o peso de hoje (`font-medium`, 500) difere do `--control-weight` do `sera` (600), e trocá-lo mudaria o visual.
+  - `exception:carousel-focus`: foco das setas do `FadeCarousel` (`outline`, `outline-2`, `outline-offset-2`), mantido como hoje para preservar o visual do `sera`.
+  - `exception:reset`: classe que zera uma largura herdada (`border-0` no Badge, `ring-0` no foco do link dentro do menu).
 
 **Ordem das camadas** (cada uma sobrescreve a anterior):
 
