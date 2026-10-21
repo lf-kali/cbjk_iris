@@ -1,0 +1,33 @@
+{
+  "name": "create-iris-site",
+  "version": "0.0.0",
+  "description": "Cria um site Iris: npx create-iris-site@latest. Implementação: frente iris-cli.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "template"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@cbjk_iris/cli": "0.0.0"
+  }
+}

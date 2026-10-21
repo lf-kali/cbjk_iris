@@ -1,0 +1,20 @@
+# dependências e build
+node_modules
+.next
+out
+
+# testes
+test-results
+playwright-report
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# variáveis de ambiente
+.env*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

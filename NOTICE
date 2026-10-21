@@ -12,13 +12,12 @@ Os arquivos abaixo foram gerados a partir dos temas do tweakcn
 (https://tweakcn.com, código-fonte em https://github.com/jnsahaj/tweakcn),
 licenciados sob a Apache License, Version 2.0:
 
-  themes/caffeine.css        (https://tweakcn.com/r/themes/caffeine.json)
-  themes/elegant-luxury.css  (https://tweakcn.com/r/themes/elegant-luxury.json)
-  themes/modern-minimal.css  (https://tweakcn.com/r/themes/modern-minimal.json)
-  themes/ocean-breeze.css    (https://tweakcn.com/r/themes/ocean-breeze.json)
+  packages/engine/themes/caffeine.css        (https://tweakcn.com/r/themes/caffeine.json)
+  packages/engine/themes/elegant-luxury.css  (https://tweakcn.com/r/themes/elegant-luxury.json)
+  packages/engine/themes/modern-minimal.css  (https://tweakcn.com/r/themes/modern-minimal.json)
+  packages/engine/themes/ocean-breeze.css    (https://tweakcn.com/r/themes/ocean-breeze.json)
 
-Depois da migração para o monorepo, esses arquivos ficam em
-packages/engine/themes/, com os mesmos nomes.
+No pacote publicado @cbjk_iris/engine, os mesmos arquivos ficam em themes/.
 
 Modificação feita: os valores do JSON do registro do tweakcn foram convertidos
 para CSS (blocos :root e .dark) pelo script de importação de temas do Iris, com
@@ -35,6 +34,6 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
-Os outros 6 temas de themes/ (gray, neutral, slate, stone, taupe, zinc) são
+Os outros 6 temas de packages/engine/themes/ (gray, neutral, slate, stone, taupe, zinc) são
 paletas do shadcn/ui (https://ui.shadcn.com), sob a MIT License, e não entram
 neste aviso.

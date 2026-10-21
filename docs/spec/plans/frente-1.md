@@ -162,7 +162,24 @@ E3 pode trocar de lugar com E4, mas antes da E4 é melhor: `SHAPE_TOKENS` já sa
 
 Classes e JSX de componentes, valores dos presets de estilo, comandos da CLI, README e guias, publicação no npm, criação da tag pelo agente.
 
-## 6. Fatos conferidos para este plano
+## 6. Pendências registradas pelas revisões
+
+Achados das revisões já mergeadas, distribuídos pela etapa que vai tocar no arquivo. Cada etapa lê esta tabela no plano dela.
+
+| Origem | Achado | Severidade | Etapa |
+|---|---|---|---|
+| E2, security-reviewer | `images.remoteHosts` sem validação: `"**"` vira proxy aberto no `/_next/image`. Validar o host no `siteConfigSchema` (recusar `*`, `**`, curinga em TLD, `/` e `:`) | MEDIUM | E4 |
+| E2, adversarial-reviewer | `modules:check` só enxerga import relativo; import do próprio core por `@cbjk_iris/core/...` passa. Proibir por lint e tratar no isolamento | LOW | E4 |
+| E2, adversarial-reviewer | Tipo `SectionRegistry` no `schema` importa tipo do React (`react` como peer opcional), contra a regra "schema não importa React" | Decisão | E4 |
+| E2, security-reviewer | `check-modules.mjs`: `rmSync` sem conferir que o caminho fica dentro da cópia; `RegExp` sem escape | LOW | E6 |
+| E2, security-reviewer | `sync-brand.mjs`: valores de fonte interpolados no TS gerado sem `JSON.stringify`; `path` de fonte local aceita absoluto ou `..` | LOW | E6 (port para `SyncBrand`) |
+| E2, adversarial-reviewer | `apps/site` sem `build:packages` falha; conferir que a mensagem manda rodar `npm run build:packages` (§5.1.4) | LOW | E6 |
+| E2, security-reviewer | `e2e-docker.mjs` monta o repo inteiro em escrita; imagem por tag, não digest. Usar `:ro` + montagens rw só de saída, `--cap-drop=ALL`, `no-new-privileges`, digest na CI | LOW | E7 |
+| E2, security-reviewer | `npm audit` não rodou na revisão | — | E7 (CI) |
+| E2, adversarial-reviewer | Linha de base insensível a ajuste pequeno (`text-sm` → `text-[15px]` passou com `maxDiffPixelRatio: 0.001` em página inteira). Acrescentar capturas por região ou comparação de estilos computados | LOW | E3 ou E8 |
+| E2, iris-architect | Node 22.18 (mínimo declarado) nunca testado; só 24.18 | — | E7 (matriz da CI) |
+
+## 7. Fatos conferidos para este plano
 
 | Fato | Comando |
 |---|---|

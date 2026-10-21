@@ -1,0 +1,5 @@
+@import "@cbjk_iris/core/styles/iris.css";
+/* o Tailwind não varre node_modules nem fora do projeto: as classes do core vêm daqui (SPEC §5.1.3) */
+@source "../../../packages/core/src";
+
+/* CSS próprio do site pode vir depois destas linhas. */

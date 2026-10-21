@@ -309,7 +309,7 @@ Os aliases são configurados em dois lugares, sempre juntos:
 - `withIris()` (de `@cbjk_iris/engine/next`) em `turbopack.resolveAlias`, para o build;
 - `tsconfig.json` do projeto em `compilerOptions.paths`, para o `tsc` e o editor.
 
-Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@cbjk_iris/core` em `transpilePackages`, os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Nunca define `webpack`.
+Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@cbjk_iris/core` em `transpilePackages`, `@cbjk_iris/engine` em `serverExternalPackages` (obrigatório: [spike-001](./spike-001.md), ponto 7), os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Nunca define `webpack`, e falha com mensagem clara se um pacote ficar nas duas listas. Por isso o core só importa o engine em server components. No monorepo, o engine é um workspace fora de `node_modules` e o Turbopack o empacota mesmo assim ([migration-001](./migration-001.md)); o caminho "engine externo" é coberto pelo E2E do `create`.
 
 **Imports internos do core:** sempre relativos (`../lib/config`). Nada de `@/`, que no projeto do cliente resolveria para o `tsconfig` dele.
 
