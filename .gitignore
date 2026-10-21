@@ -49,3 +49,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# JSON Schema gerado no build do @cbjk_iris/schema (vai no tarball, não no git)
+packages/schema/json/

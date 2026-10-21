@@ -4,6 +4,7 @@
 //
 // 1. Isolamento no core: nenhum arquivo de packages/core/src fora de um módulo importa os arquivos
 //    do módulo (modules.json, "corePaths") nem as dependências dele ("dependencies").
+//    Nenhum arquivo do core importa o próprio core por "@cbjk_iris/core/..." (escaparia da checagem).
 // 2. Para cada módulo desligado sozinho, e para todos juntos: copia apps/site para
 //    apps/.modules-check-<cenário>/ (mesma profundidade, então tsconfig e @source continuam valendo),
 //    apaga as rotas e o conteúdo do módulo, tira menu e seções do site.config.ts, regenera o registro,
@@ -53,6 +54,12 @@ function checkCoreIsolation(modules) {
   for (const file of walk(CORE_SRC, /\.(tsx?)$/)) {
     const self = file.replace(/\.(tsx?)$/, "");
     const text = readFileSync(file, "utf8");
+    // import do próprio core pelo nome do pacote escaparia da checagem por caminho relativo abaixo
+    for (const [, spec] of text.matchAll(IMPORT_RE)) {
+      if (spec === "@cbjk_iris/core" || spec.startsWith("@cbjk_iris/core/")) {
+        problems.push(`${path.relative(ROOT, file)} importa ${spec}: dentro do core, use import relativo`);
+      }
+    }
     for (const mod of modules) {
       if (belongsTo(self, mod.corePaths)) continue;
       for (const [, spec] of text.matchAll(IMPORT_RE)) {

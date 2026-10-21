@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { NextConfig } from "next";
 import { IRIS_ALIASES, withIris } from "../src/next";
+import { siteConfigFixture } from "./fixtures/site-config";
 
-const site = { images: { remoteHosts: ["images.unsplash.com", "cdn.exemplo.com"] } };
+const site = siteConfigFixture({ images: { remoteHosts: ["images.unsplash.com", "cdn.exemplo.com"] } });
 
 describe("withIris", () => {
   it("põe o core em transpilePackages e mantém os pacotes do projeto", () => {
@@ -80,7 +81,7 @@ describe("withIris", () => {
   });
 
   it("aceita site sem hosts remotos", () => {
-    const config = withIris({ images: { remoteHosts: [] } });
+    const config = withIris(siteConfigFixture());
     expect(config.images?.remotePatterns).toEqual([]);
   });
 
@@ -107,5 +108,20 @@ describe("withIris", () => {
     withIris(site, input);
     expect(input).toEqual(snapshot);
     expect(site).toEqual(siteSnapshot);
+  });
+
+  it("valida o config inteiro: config inválido falha com mensagem em pt-BR e o caminho do campo", () => {
+    expect(() => withIris(siteConfigFixture({ images: { remoteHosts: ["**"] } }))).toThrow(
+      /site\.config\.ts tem erros:[\s\S]*images\.remoteHosts\[0\]: host inválido/,
+    );
+    expect(() => withIris(siteConfigFixture({ whatsapp: { phone: "abc", messages: { general: "a", product: "a", service: "a" } } }))).toThrow(
+      /whatsapp\.phone/,
+    );
+  });
+
+  it("recusa curinga e IP em remoteHosts antes de virar remotePatterns (proxy aberto no /_next/image)", () => {
+    for (const host of ["*", "**", "*.com", "127.0.0.1", "a.com/x"]) {
+      expect(() => withIris(siteConfigFixture({ images: { remoteHosts: [host] } })), host).toThrow(/remoteHosts/);
+    }
   });
 });

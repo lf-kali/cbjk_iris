@@ -1,7 +1,7 @@
-import type { SiteConfig } from "@cbjk_iris/schema";
+import type { SiteConfigInput } from "@cbjk_iris/schema";
 
 // Conteúdo de exemplo: troque nome, marca, contato e textos pelos do cliente.
-export const siteConfig: SiteConfig = {
+export const siteConfig = {
   name: "cbjk",
   locale: "pt-BR",
   currency: "BRL",
@@ -239,4 +239,4 @@ export const siteConfig: SiteConfig = {
       copyright: "© {year} {name}. Todos os direitos reservados.",
     },
   },
-};
+} satisfies SiteConfigInput;

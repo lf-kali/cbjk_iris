@@ -108,14 +108,14 @@ describe("scanSource e scanDir (fixture com cada padrão)", () => {
   const occ = scanDir(FIXTURE, UTILS);
   const byClass = (cls) => occ.filter((o) => o.class === cls);
 
-  it("acha as 34 ocorrências da fixture, com arquivo e linha", () => {
-    expect(occ).toHaveLength(34);
+  it("acha as 36 ocorrências da fixture, com arquivo e linha", () => {
+    expect(occ).toHaveLength(36);
     expect(byClass("rounded-none")[0]).toMatchObject({ file: "ui/Fixture.tsx", line: 6, family: "rounded" });
     expect(byClass("rounded-md")[0]).toMatchObject({ file: "extra.css", line: 3 });
   });
 
   it("cobre todas as famílias do §5.4 passo 1", () => {
-    expect(new Set(occ.map((o) => o.family))).toEqual(new Set(Object.keys(FAMILIES)));
+    expect(new Set(occ.map((o) => o.family))).toEqual(new Set([...Object.keys(FAMILIES), "inline-style"]));
   });
 
   it("lê base e variantes do cva, objetos e argumentos do cn()", () => {
@@ -164,6 +164,37 @@ describe("scanSource e scanDir (fixture com cada padrão)", () => {
       ["outline-2", 7],
       ["shadow-xs", 7],
     ]);
+  });
+
+  it("variant, size e atributo sem class: só a palavra única é descartada; lista de classes é lida", () => {
+    const src = [
+      'const a = button({ variant: "outline", size: "rounded-lg h-9" });',
+      'const b = <X tw="rounded-lg h-9" aria-label="Fechar menu" title="shadow-md" />;',
+    ].join("\n");
+    const found = scanSource(src, "w.tsx", []).map((o) => [o.class, o.line]);
+    expect(found).toEqual([
+      ["rounded-lg", 1],
+      ["rounded-lg", 2],
+    ]);
+  });
+
+  it("propriedade arbitrária de forma entre colchetes é ocorrência; variável CSS e outras propriedades não", () => {
+    expect(classify("[border-radius:4px]", [])).toMatchObject({ family: "arbitrary" });
+    expect(classify("hover:[box-shadow:0_0_0_1px_red]", [])).toMatchObject({ family: "arbitrary" });
+    for (const cls of ["[backdrop-filter:blur(4px)]", "[text-transform:uppercase]", "[letter-spacing:1px]", "[font-weight:600]", "[border-top-width:2px]", "[outline:2px_solid]"]) {
+      expect(classify(cls, []), cls).toMatchObject({ family: "arbitrary" });
+    }
+    for (const cls of ["[--card-spacing:--spacing(8)]", "[-webkit-touch-callout:none]", "[mask-type:alpha]"]) {
+      expect(classify(cls, []), cls).toBeNull();
+    }
+    expect(byClass("[border-radius:4px]")[0]).toMatchObject({ file: "ui/Fixture.tsx", line: 52, family: "arbitrary" });
+  });
+
+  it("estilo inline com propriedade de forma é ocorrência (style:<prop>)", () => {
+    expect(byClass("style:boxShadow")[0]).toMatchObject({ file: "ui/Fixture.tsx", line: 52, family: "inline-style" });
+    expect(byClass("style:maxWidth")).toHaveLength(0);
+    const src = 'const a = <div style={{ borderRadius: 4, textTransform: "uppercase", "letterSpacing": 1, padding: 2 }} />;';
+    expect(scanSource(src, "s.tsx", []).map((o) => o.class)).toEqual(["style:borderRadius", "style:textTransform", "style:letterSpacing"]);
   });
 
   it("acha a linha certa em string de várias linhas", () => {

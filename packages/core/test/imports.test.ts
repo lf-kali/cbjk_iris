@@ -48,6 +48,13 @@ describe("imports do core", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("o core não importa a si mesmo por @cbjk_iris/core (fura o isolamento dos módulos)", () => {
+    const offenders = FILES.filter((f) =>
+      specifiers(f.text).some((s) => s === "@cbjk_iris/core" || s.startsWith("@cbjk_iris/core/")),
+    ).map((f) => f.rel);
+    expect(offenders).toEqual([]);
+  });
+
   it("o core não importa a CLI", () => {
     const offenders = FILES.filter((f) =>
       specifiers(f.text).some((s) => s === "@cbjk_iris/cli" || s.startsWith("@cbjk_iris/cli/") || s === "create-iris-site"),

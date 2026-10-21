@@ -10,9 +10,17 @@
 // O script lê toda string do código (atributo de JSX, argumento do cn(), base e variantes do cva,
 // valores de objeto, partes de template literal) com o parser do TypeScript, e não só o className.
 // Comentários, texto de JSX e strings que não são lista de classes (ver notClassList) não contam.
-// Em .css, lê as classes do @apply.
+// Em .css, lê as classes do @apply. Também lista propriedade arbitrária de forma ([border-radius:4px])
+// e estilo inline de forma (style={{ borderRadius }}, registrado como "style:borderRadius").
 // Não contam: os utilitários congelados (lista "utilities" do JSON) e classes sob variante style-<id>,
 // que é o mecanismo permitido pelo §5.4.
+//
+// Limites conhecidos (o que o script NÃO vê; a revisão do PR cobre):
+// - estilo inline com chave calculada (style={{ [prop]: v }}), com objeto em variável
+//   (style={obj}) ou com spread (style={{ ...base }});
+// - classe de forma sozinha, de uma palavra, em atributo JSX cujo nome não tem "class"
+//   (tw="rounded-lg") ou como valor das chaves variant/size (size: "rounded-lg"): é descartada
+//   como nome de variante (ver notClassList).
 
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
@@ -41,7 +49,17 @@ export const FAMILIES = {
   tracking: /^tracking-.+$/,
   weight: /^font-(?:thin|extralight|light|normal|medium|semibold|bold|extrabold|black|\[\d+\])$/,
   "bg-alpha": /^bg-.+\/(?:\d+|\[[^\]]+\])$/,
+  // propriedade arbitrária de forma entre colchetes, ex.: [border-radius:4px] (variável CSS não conta)
+  arbitrary: /^\[(?:border(?:-[a-z]+)*-radius|box-shadow|backdrop-filter|filter|text-transform|letter-spacing|font-weight|outline(?:-[a-z]+)*|border(?:-[a-z]+)*-width|border(?:-[xytrblse])?):/,
 };
+
+// Propriedades de forma em estilo inline (style={{ ... }}); viram a ocorrência "style:<prop>"
+export const INLINE_STYLE_PROPS = new Set([
+  "borderRadius", "borderTopLeftRadius", "borderTopRightRadius", "borderBottomLeftRadius", "borderBottomRightRadius",
+  "boxShadow", "backdropFilter", "filter", "textTransform", "letterSpacing", "fontWeight",
+  "border", "borderWidth", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth",
+  "outline", "outlineWidth", "outlineOffset",
+]);
 
 // separa "hover:data-[a=b]:rounded-none" em variantes e base, respeitando colchetes e parênteses
 export function splitVariants(token) {
@@ -72,29 +90,57 @@ export function classify(token, utilities) {
 // Strings que com certeza não são lista de classes, mesmo contendo uma palavra igual a uma classe
 // (ex.: o nome de variante "outline" em variant="outline"):
 // - tipo literal (type V = "outline");
-// - valor de atributo JSX cujo nome não contém "class" (variant, aria-label, alt...): vale o
-//   atributo JSX mais próximo, então <X render={<div className="..."/>}/> continua lido;
-// - valor das chaves variant e size (seletores do cva, ex.: button({ variant: "outline" }));
+// - valor de atributo JSX cujo nome não contém "class" (variant, aria-label, alt...), quando é
+//   uma palavra só: vale o atributo JSX mais próximo, então <X render={<div className="..."/>}/>
+//   continua lido, e tw="rounded-lg h-9" (várias palavras) também;
+// - valor das chaves variant e size (seletores do cva, ex.: button({ variant: "outline" })), quando
+//   é uma palavra só: size: "rounded-lg h-9" é lido. Sobra: uma classe de forma sozinha nesses
+//   lugares (tw="rounded-lg") não é vista;
 // - operando de comparação (=== / !==) e rótulo de case.
 function notClassList(node) {
   const SK = ts.SyntaxKind;
   const parent = node.parent;
+  const oneWord = !/\s/.test(node.text.trim());
   if (parent.kind === SK.LiteralType || parent.kind === SK.CaseClause) return true;
   if (parent.kind === SK.BinaryExpression) {
     const op = parent.operatorToken.kind;
     if ([SK.EqualsEqualsEqualsToken, SK.ExclamationEqualsEqualsToken, SK.EqualsEqualsToken, SK.ExclamationEqualsToken].includes(op)) return true;
   }
-  if (parent.kind === SK.PropertyAssignment && parent.initializer === node && /^(?:variant|size)$/.test(parent.name.getText())) return true;
+  if (oneWord && parent.kind === SK.PropertyAssignment && parent.initializer === node && /^(?:variant|size)$/.test(parent.name.getText())) return true;
   for (let p = parent; p && p.kind !== SK.SourceFile; p = p.parent) {
-    if (p.kind === SK.JsxAttribute) return !/class/i.test(p.name.getText());
+    if (p.kind === SK.JsxAttribute) return oneWord && !/class/i.test(p.name.getText());
   }
   return false;
 }
 
-// trechos de string do código, com a posição do primeiro caractere no arquivo
-function stringPieces(text, file) {
+function sourceFile(text, file) {
   const kind = file.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
-  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, kind);
+  return ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, kind);
+}
+
+// propriedades de forma em style={{ ... }}: { pos, prop }
+function inlineStyleProps(sf) {
+  const SK = ts.SyntaxKind;
+  const found = [];
+  const visit = (node) => {
+    if (node.kind === SK.JsxAttribute && node.name.getText() === "style") {
+      const expr = node.initializer?.expression;
+      if (expr?.kind === SK.ObjectLiteralExpression) {
+        for (const prop of expr.properties) {
+          const name = prop.name && (prop.name.kind === SK.Identifier || prop.name.kind === SK.StringLiteral) ? prop.name.text : null;
+          if (name && INLINE_STYLE_PROPS.has(name)) found.push({ pos: prop.getStart(sf), prop: name });
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return found;
+}
+
+// trechos de string do código, com a posição do primeiro caractere no arquivo
+function stringPieces(sf) {
+  const text = sf.text;
   const pieces = [];
   const SK = ts.SyntaxKind;
   // quantos caracteres cortar no fim: aspas/crase (1) ou "${" (2)
@@ -120,8 +166,17 @@ export function scanSource(text, file, utilities) {
   const lineStarts = [0, ...[...text.matchAll(/\n/g)].map((m) => m.index + 1)];
   const lineOf = (pos) => lineStarts.findLastIndex((s) => s <= pos) + 1;
   const lines = text.split("\n");
-  const pieces = file.endsWith(".css") ? cssPieces(text) : stringPieces(text, file);
-  return pieces.flatMap(({ start, raw }) =>
+  const isCss = file.endsWith(".css");
+  const sf = isCss ? null : sourceFile(text, file);
+  const pieces = isCss ? cssPieces(text) : stringPieces(sf);
+  const inline = isCss
+    ? []
+    : inlineStyleProps(sf).map(({ pos, prop }) => {
+        const line = lineOf(pos);
+        const cls = `style:${prop}`;
+        return { file, line, class: cls, base: cls, family: "inline-style", lineText: lines[line - 1] };
+      });
+  const classes = pieces.flatMap(({ start, raw }) =>
     [...raw.matchAll(/\S+/g)].flatMap((m) => {
       const hit = classify(m[0], utilities);
       if (!hit) return [];
@@ -129,6 +184,7 @@ export function scanSource(text, file, utilities) {
       return [{ file, line, class: m[0], base: hit.base, family: hit.family, lineText: lines[line - 1] }];
     }),
   );
+  return [...classes, ...inline];
 }
 
 function walk(dir) {
