@@ -1,0 +1,33 @@
+{
+  "$comment": "Módulos opcionais (formato de transição da E2; na E4 vira packages/schema/src/modules.ts e o módulo ativo passa a ser o que está em siteConfig.modules). Um módulo está ativo quando o primeiro de seus 'paths' (a rota principal em app/(iris)/) existe. 'corePaths' são os arquivos do módulo dentro de packages/core/src: nenhum arquivo do core fora deles pode importá-los, nem importar as 'dependencies' do módulo. npm run modules:sync regenera app/iris.registry.generated.tsx; npm run modules:check (na raiz) testa a remoção de cada módulo.",
+  "coreSections": ["hero", "benefits", "text-image", "cta-banner", "testimonials", "stats", "faq", "contact", "lead-form", "widget"],
+  "modules": [
+    {
+      "id": "products",
+      "name": "Produtos",
+      "paths": ["app/(iris)/produtos", "app/(iris)/produto", "public/products"],
+      "corePaths": ["app/products", "products", "catalog/products.ts", "catalog/data/products.ts", "sections/products.tsx"],
+      "menu": ["/produtos"],
+      "dependencies": [],
+      "sections": ["products"]
+    },
+    {
+      "id": "services",
+      "name": "Serviços",
+      "paths": ["app/(iris)/servicos", "app/(iris)/servico", "public/services"],
+      "corePaths": ["app/services", "services", "catalog/services.ts", "catalog/data/services.ts", "sections/services.tsx"],
+      "menu": ["/servicos"],
+      "dependencies": [],
+      "sections": ["services"]
+    },
+    {
+      "id": "gallery",
+      "name": "Últimos projetos",
+      "paths": ["app/(iris)/ultimos-projetos", "public/ultimos_projetos"],
+      "corePaths": ["app/gallery", "gallery", "sections/gallery.tsx"],
+      "menu": ["/ultimos-projetos"],
+      "dependencies": ["image-size", "react-photo-album"],
+      "sections": ["gallery"]
+    }
+  ]
+}

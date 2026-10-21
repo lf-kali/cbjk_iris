@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["node"],
+    // typecheck isolado do core (SPEC §5.1): os aliases que, num projeto, apontam para
+    // site.config.ts e para o registro gerado aqui apontam para fixtures
+    "paths": {
+      "@cbjk_iris/site-config": ["./test/fixtures/site.config.ts"],
+      "@cbjk_iris/site-registry": ["./test/fixtures/registry.tsx"]
+    }
+  },
+  "include": ["src", "test", "next-env.d.ts"]
+}

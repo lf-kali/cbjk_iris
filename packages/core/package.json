@@ -1,0 +1,52 @@
+{
+  "name": "@cbjk_iris/core",
+  "version": "0.0.0",
+  "description": "Componentes React, seções e páginas do Iris. Publicado como TSX fonte, transpilado pelo Next (transpilePackages).",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src",
+    "styles",
+    "components.json"
+  ],
+  "exports": {
+    "./app/*": "./src/app/*.tsx",
+    "./sections/*": "./src/sections/*.tsx",
+    "./styles/*": "./styles/*",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@cbjk_iris/engine": "0.0.0",
+    "@cbjk_iris/schema": "0.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "image-size": "^2.0.2",
+    "lucide-react": "^1.27.0",
+    "react-photo-album": "^3.6.0",
+    "shadcn": "^4.15.0",
+    "tailwind-merge": "^3.6.0",
+    "tw-animate-css": "^1.4.0"
+  },
+  "peerDependencies": {
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwindcss": "^4"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}
