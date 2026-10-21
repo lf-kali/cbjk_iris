@@ -46,3 +46,8 @@ export function Extra({ variant }: { variant: Variant }) {
     </dl>
   );
 }
+
+// propriedade arbitrária de forma e estilo inline de forma (E4b)
+export function Inline() {
+  return <div className="[border-radius:4px] [--card-spacing:--spacing(8)]" style={{ boxShadow: "none", maxWidth: 10 }} />;
+}
