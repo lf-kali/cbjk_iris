@@ -118,10 +118,13 @@ function declarations(tokens: Record<string, string>) {
 
 /** CSS com as variáveis finais, injetado no <head> pelo layout. */
 export function renderThemeCss(theme: SiteTheme): string {
-  return (
+  const css =
     `:root{color-scheme:light;--radius:${theme.radius};${declarations(theme.light)}${declarations(theme.extra.light)}}` +
-    `.dark{color-scheme:dark;${declarations(theme.dark)}${declarations(theme.extra.dark)}}`
-  );
+    `.dark{color-scheme:dark;${declarations(theme.dark)}${declarations(theme.extra.dark)}}`;
+  // Defesa em profundidade (correção de segurança da E4, iris-architect): o schema já recusa
+  // < e > nesses valores; se algo escapar, "</style" não fecha a tag do <head>. Não muda
+  // nada para entrada válida.
+  return css.replace(/<\/(style)/gi, "<\\/$1");
 }
 
 // Pares texto/fundo conferidos; texto pequeno pede 4.5:1 (WCAG AA).

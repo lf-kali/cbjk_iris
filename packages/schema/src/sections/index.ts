@@ -1,136 +1,63 @@
-// Blocos configuráveis que compõem a home e as páginas definidas no site.config.ts.
-// Cada tipo é renderizado por um componente registrado em components/sections/registry.tsx
-// (gerado a partir do modules.json: seções do núcleo + seções dos módulos ativos).
+// Seções da home e das páginas (SPEC §5.5): um arquivo por seção, reunidos aqui.
+// Cada tipo é renderizado pelo componente @cbjk_iris/core/sections/<type>, no registro gerado.
+import { z } from "zod";
+import type { SectionModule } from "../define";
+import { benefits } from "./benefits";
+import { contact } from "./contact";
+import { ctaBanner } from "./cta-banner";
+import { faq } from "./faq";
+import { gallery } from "./gallery";
+import { hero } from "./hero";
+import { leadForm } from "./lead-form";
+import { products } from "./products";
+import { services } from "./services";
+import { stats } from "./stats";
+import { testimonials } from "./testimonials";
+import { textImage } from "./text-image";
+import { widget } from "./widget";
 
-/** Link de botão: rota/URL ou WhatsApp (true = mensagem geral; texto = mensagem própria). */
-export type SiteLink = { label: string } & ({ href: string } | { whatsapp: true | string });
-
-/** Ícones disponíveis para benefícios (lista fixa do lucide, ver components/sections/icons.ts). */
-export const SECTION_ICONS = [
-  "shield-check", "badge-check", "award", "star", "thumbs-up", "heart", "gem",
-  "clock", "timer", "calendar", "truck", "package", "credit-card", "hand-coins",
-  "wrench", "hammer", "ruler", "paint-roller", "house", "zap", "droplets", "lightbulb",
-  "leaf", "recycle", "users", "headset", "phone", "message-circle", "map-pin", "sparkles",
+/** Todas as definições, na ordem de hoje: as do núcleo e depois as dos módulos. */
+export const sectionDefinitions = [
+  hero, benefits, textImage, ctaBanner, testimonials, stats, faq, contact, leadForm, widget,
+  products, services, gallery,
 ] as const;
-export type SectionIcon = (typeof SECTION_ICONS)[number];
 
-interface SectionBase {
-  /** âncora para links (#id) */
-  id?: string;
-  title?: string;
-  subtitle?: string;
+export const sectionSchema = z.discriminatedUnion("type", [
+  hero.schema, benefits.schema, textImage.schema, ctaBanner.schema, testimonials.schema, stats.schema,
+  faq.schema, contact.schema, leadForm.schema, widget.schema, products.schema, services.schema, gallery.schema,
+]);
+
+export type Section = z.output<typeof sectionSchema>;
+export type SectionInput = z.input<typeof sectionSchema>;
+export type SectionType = Section["type"];
+export type SectionOf<T extends SectionType> = Extract<Section, { type: T }>;
+export type SectionDefinitionOf<T extends SectionType> = Extract<(typeof sectionDefinitions)[number], { type: T }>;
+
+export const SECTION_TYPES: readonly SectionType[] = sectionDefinitions.map((d) => d.type);
+
+export function getSectionDefinition<T extends SectionType>(type: T): SectionDefinitionOf<T> {
+  const def = sectionDefinitions.find((d) => d.type === type);
+  if (!def) throw new Error(`Seção desconhecida: "${type}". Tipos válidos: ${SECTION_TYPES.join(", ")}`);
+  return def as SectionDefinitionOf<T>;
 }
 
-export interface HeroSlide {
-  image: string;
-  alt: string;
-  title: string;
-  subtitle?: string;
-  /** botão principal do slide */
-  cta?: SiteLink;
-  /** segundo botão, com estilo discreto */
-  secondaryCta?: SiteLink;
-  /** torna o slide inteiro clicável (útil para banners de promoção sem botão) */
-  href?: string;
-  /** posição do texto */
-  align?: "left" | "center" | "right";
+/** Tipos de seção de um módulo ("core" = sempre presentes). */
+export function sectionsOfModule(module: SectionModule): SectionType[] {
+  return sectionDefinitions.filter((d) => d.module === module).map((d) => d.type);
 }
 
-export type HeroSection = {
-  type: "hero";
-  id?: string;
-  slides: HeroSlide[];
-  autoplay?: boolean;
-  /** ms entre slides */
-  interval?: number;
-  height?: "sm" | "md" | "lg" | "full";
-};
-
-export type BenefitsSection = SectionBase & {
-  type: "benefits";
-  items: { icon: SectionIcon; title: string; text: string }[];
-};
-
-export type TextImageSection = SectionBase & {
-  type: "text-image";
-  /** parágrafos separados por linha em branco */
-  text: string;
-  image: string;
-  imageAlt: string;
-  imageSide?: "left" | "right";
-  cta?: SiteLink;
-};
-
-export type CtaBannerSection = SectionBase & {
-  type: "cta-banner";
-  text?: string;
-  cta: SiteLink;
-  /** cor de fundo: primária, cor de ação ou discreta */
-  tone?: "primary" | "cta" | "muted";
-};
-
-export type TestimonialsSection = SectionBase & {
-  type: "testimonials";
-  items: { name: string; text: string; role?: string; rating?: 1 | 2 | 3 | 4 | 5; image?: string }[];
-};
-
-export type StatsSection = SectionBase & {
-  type: "stats";
-  items: { value: string; label: string }[];
-};
-
-export type FaqSection = SectionBase & {
-  type: "faq";
-  items: { question: string; answer: string }[];
-};
-
-export type ContactSection = SectionBase & {
-  type: "contact";
-  /** mostra o mapa de siteConfig.contact.mapEmbedUrl */
-  showMap?: boolean;
-};
-
-export type LeadField = "name" | "phone" | "email" | "message";
-
-/** Formulário de contato. O destino dos dados vem de siteConfig.leads. */
-export type LeadFormSection = SectionBase & {
-  type: "lead-form";
-  /** campos, na ordem; em branco = nome, telefone e mensagem */
-  fields?: LeadField[];
-  submitLabel?: string;
-  /** texto de consentimento (LGPD) exibido com uma caixa de seleção obrigatória */
-  consentText?: string;
-};
-
-/**
- * Código de widget colado (avaliações do TripAdvisor, Reclame Aqui, Trustpilot,
- * Elfsight...). Os <script> do código são executados no navegador.
- */
-export type WidgetSection = SectionBase & {
-  type: "widget";
-  html: string;
-  /** altura mínima reservada enquanto o widget carrega, ex.: "320px" */
-  minHeight?: string;
-};
-
-// Seções dos módulos: somem junto com o módulo (ver modules.json).
-export type ProductsSection = SectionBase & { type: "products"; category?: string; limit?: number };
-export type ServicesSection = SectionBase & { type: "services"; limit?: number };
-export type GallerySection = SectionBase & { type: "gallery"; limit?: number };
-
-export type Section =
-  | HeroSection
-  | BenefitsSection
-  | TextImageSection
-  | CtaBannerSection
-  | TestimonialsSection
-  | StatsSection
-  | FaqSection
-  | ContactSection
-  | LeadFormSection
-  | WidgetSection
-  | ProductsSection
-  | ServicesSection
-  | GallerySection;
-
-export type SectionOf<T extends Section["type"]> = Extract<Section, { type: T }>;
+// Nomes de tipo usados pelo core desde antes da migração
+export type HeroSection = SectionOf<"hero">;
+export type HeroSlide = HeroSection["slides"][number];
+export type BenefitsSection = SectionOf<"benefits">;
+export type TextImageSection = SectionOf<"text-image">;
+export type CtaBannerSection = SectionOf<"cta-banner">;
+export type TestimonialsSection = SectionOf<"testimonials">;
+export type StatsSection = SectionOf<"stats">;
+export type FaqSection = SectionOf<"faq">;
+export type ContactSection = SectionOf<"contact">;
+export type LeadFormSection = SectionOf<"lead-form">;
+export type WidgetSection = SectionOf<"widget">;
+export type ProductsSection = SectionOf<"products">;
+export type ServicesSection = SectionOf<"services">;
+export type GallerySection = SectionOf<"gallery">;

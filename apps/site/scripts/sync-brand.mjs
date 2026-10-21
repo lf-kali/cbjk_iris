@@ -12,7 +12,17 @@ const OUT = "app/fonts.generated.ts";
 // resolve a partir do projeto: no monorepo o next fica no node_modules da raiz (SPEC §5.6, SyncBrand)
 const require = createRequire(path.join(ROOT, "package.json"));
 
-const { siteConfig } = await import(path.join(ROOT, "site.config.ts"));
+const { siteConfig: rawConfig } = await import(path.join(ROOT, "site.config.ts"));
+// Roda no predev/prebuild, antes do next.config (withIris): valida o config antes de gerar código.
+const { resolveSiteConfig, SiteConfigError } = await import("@cbjk_iris/schema");
+let siteConfig;
+try {
+  siteConfig = resolveSiteConfig(rawConfig);
+} catch (error) {
+  if (!(error instanceof SiteConfigError)) throw error;
+  console.error(error.message);
+  process.exit(1);
+}
 // motor de tema compilado (rode npm run build:packages na raiz antes)
 const { contrastReport, resolveSiteTheme, readThemeFile, firstFontFamily } = await import("@cbjk_iris/engine/theme");
 const googleFonts = require(require.resolve("next/dist/compiled/@next/font/dist/google/font-data.json"));
@@ -20,7 +30,8 @@ const googleFonts = require(require.resolve("next/dist/compiled/@next/font/dist/
 const errors = [];
 
 function googleCall(role, font) {
-  const data = googleFonts[font.google];
+  // hasOwn: "constructor" e outras chaves de Object.prototype não são fontes
+  const data = Object.hasOwn(googleFonts, font.google) ? googleFonts[font.google] : undefined;
   if (!data) {
     errors.push(`brand.fonts.${role}: "${font.google}" não existe no Google Fonts (confira a grafia exata, ex.: "Playfair Display").`);
     return null;
@@ -44,7 +55,8 @@ function localCall(role, font) {
   const src = font.local.map((file) => {
     if (!existsSync(path.join(ROOT, file.path))) errors.push(`brand.fonts.${role}: arquivo ${file.path} não encontrado.`);
     const rel = path.relative(path.dirname(path.join(ROOT, OUT)), path.join(ROOT, file.path)).split(path.sep).join("/");
-    return `    { path: "${rel}", weight: "${file.weight}", style: "${file.style ?? "normal"}" },`;
+    // valores em JSON: nada do config entra cru no código gerado
+    return `    { path: ${JSON.stringify(rel)}, weight: ${JSON.stringify(file.weight)}, style: ${JSON.stringify(file.style ?? "normal")} },`;
   });
   return {
     import: { from: "next/font/local", name: "localFont", default: true },
@@ -57,7 +69,7 @@ const theme = readThemeFile(siteConfig.theme.name);
 const themeSans = firstFontFamily(theme.light["font-sans"]);
 const fonts = { ...siteConfig.brand.fonts };
 if (!fonts.sans && themeSans) {
-  if (googleFonts[themeSans]) fonts.sans = { google: themeSans };
+  if (Object.hasOwn(googleFonts, themeSans)) fonts.sans = { google: themeSans };
   else console.warn(`Fonte do tema "${themeSans}" não está no Google Fonts; o site usa a fonte do sistema.`);
 }
 

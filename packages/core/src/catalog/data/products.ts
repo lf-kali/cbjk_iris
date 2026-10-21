@@ -1,6 +1,8 @@
-import type { Product } from "@cbjk_iris/schema";
+import type { Product, ProductInput } from "@cbjk_iris/schema";
 
-export const products: Product[] = [
+// Transição até a E5 (vira content/products/*.json, lido pelos loaders do engine).
+// whatsappButton tem padrão true no schema; aqui o padrão é aplicado sem zod.
+const items = [
   {
     kind: "product",
     slug: "porcelanato-marmo-carrara-90x90",
@@ -79,4 +81,6 @@ export const products: Product[] = [
     ],
     stockQty: 10,
   },
-];
+] satisfies ProductInput[];
+
+export const products: Product[] = items.map((item: ProductInput) => ({ ...item, whatsappButton: item.whatsappButton ?? true }));

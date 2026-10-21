@@ -1,12 +1,15 @@
 // withIris: liga um projeto Next ao Iris (SPEC §5.1.3). Uso no next.config.ts do projeto:
 //   export default withIris(siteConfig, { ...opções do Next });
 // Só usa transpilePackages, serverExternalPackages, turbopack.resolveAlias e images.
+// Também valida o site.config.ts inteiro (resolveSiteConfig, zod, no Node): config inválido
+// falha o next build e o next dev aqui, com a lista de erros em pt-BR. No navegador o core só
+// preenche os padrões (@cbjk_iris/schema/defaults), sem validar.
 // Nunca define "webpack": o Next 16 usa Turbopack e falha o build com essa chave.
 import type { NextConfig } from "next";
-import type { SiteConfig } from "@cbjk_iris/schema";
+import { resolveSiteConfig, type SiteConfigInput } from "@cbjk_iris/schema";
 
-/** O que o withIris lê do config do site. */
-export type WithIrisSiteConfig = Pick<SiteConfig, "images">;
+/** O config do site, como o site.config.ts o exporta. */
+export type WithIrisSiteConfig = SiteConfigInput;
 
 const CORE = "@cbjk_iris/core";
 const ENGINE = "@cbjk_iris/engine";
@@ -38,14 +41,16 @@ function assertDisjoint(transpile: readonly string[], external: readonly string[
   }
 }
 
-export function withIris(siteConfig: WithIrisSiteConfig, nextConfig: NextConfig = {}): NextConfig {
+export function withIris(siteConfig: SiteConfigInput, nextConfig: NextConfig = {}): NextConfig {
+  // lança SiteConfigError ("site.config.ts tem erros: ...") se o config for inválido
+  const { images } = resolveSiteConfig(siteConfig);
   const transpilePackages = withPackage(nextConfig.transpilePackages, CORE);
   const serverExternalPackages = withPackage(nextConfig.serverExternalPackages, ENGINE);
   assertDisjoint(transpilePackages, serverExternalPackages);
 
   const remotePatterns = [
     ...(nextConfig.images?.remotePatterns ?? []),
-    ...siteConfig.images.remoteHosts.map((hostname) => ({ protocol: "https" as const, hostname })),
+    ...images.remoteHosts.map((hostname) => ({ protocol: "https" as const, hostname })),
   ];
 
   return {

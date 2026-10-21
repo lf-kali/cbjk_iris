@@ -235,7 +235,7 @@ cbjk_iris/                         ← raiz, "private": true
 
 | Pacote | Depende de | Publicado como | Quem executa |
 |---|---|---|---|
-| `schema` | zod, culori | ESM + `.d.ts` + `json/*.schema.json` | Next, Node, CLI |
+| `schema` | zod | ESM + `.d.ts` + `json/*.schema.json`. Subpath `./defaults` sem zod (vai para o navegador) | Next, Node, CLI |
 | `engine` | schema | ESM + `.d.ts`. Subpath `./next` exporta `withIris` | Node (CLI, `next.config.ts`), server components |
 | `core` | schema, engine; peer: next 16, react 19 | TSX fonte, transpilado pelo Next | Next |
 | `cli` | schema, engine, commander, @clack/prompts, magicast, std-env | ESM, `bin.iris` | Node |
@@ -300,7 +300,7 @@ meu-site/
 
 | O core precisa de | Mecanismo | Assinatura exigida no arquivo do projeto |
 |---|---|---|
-| Config | Alias `@cbjk_iris/site-config` → `./site.config.ts` | `export const siteConfig: SiteConfig` |
+| Config | Alias `@cbjk_iris/site-config` → `./site.config.ts` | `export const siteConfig = { ... } satisfies SiteConfigInput` |
 | Registro de seções | Alias `@cbjk_iris/site-registry` → `./app/iris.registry.generated.tsx` | `export const sectionRegistry: SectionRegistry` |
 | Fontes | Prop: o `app/layout.tsx` gerado importa `./fonts.generated` e passa para o `IrisRootLayout` | `export const fontClassName: string` |
 | Conteúdo | Loaders do `engine` leem `content/` a partir de `process.cwd()` | — |
@@ -309,7 +309,7 @@ Os aliases são configurados em dois lugares, sempre juntos:
 - `withIris()` (de `@cbjk_iris/engine/next`) em `turbopack.resolveAlias`, para o build;
 - `tsconfig.json` do projeto em `compilerOptions.paths`, para o `tsc` e o editor.
 
-Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@cbjk_iris/core` em `transpilePackages`, `@cbjk_iris/engine` em `serverExternalPackages` (obrigatório: [spike-001](./spike-001.md), ponto 7), os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Nunca define `webpack`, e falha com mensagem clara se um pacote ficar nas duas listas. Por isso o core só importa o engine em server components. No monorepo, o engine é um workspace fora de `node_modules` e o Turbopack o empacota mesmo assim ([migration-001](./migration-001.md)); o caminho "engine externo" é coberto pelo E2E do `create`.
+Assinatura: `withIris(siteConfig: SiteConfigInput, nextConfig?: NextConfig): NextConfig`. O `next.config.ts` do projeto já importa o `site.config.ts` (como hoje) e o passa. O `withIris` acrescenta `@cbjk_iris/core` em `transpilePackages`, `@cbjk_iris/engine` em `serverExternalPackages` (obrigatório: [spike-001](./spike-001.md), ponto 7), os aliases em `turbopack.resolveAlias` e os hosts de `images.remoteHosts` em `images.remotePatterns`. Antes disso, valida o config inteiro com `resolveSiteConfig` (zod, no Node): config inválido falha o `next build` e o `next dev` com `SiteConfigError` e a lista de erros em pt-BR (`site.config.ts tem erros:` e uma linha `caminho: mensagem` por erro). Nunca define `webpack`, e falha com mensagem clara se um pacote ficar nas duas listas. Por isso o core só importa o engine em server components. No monorepo, o engine é um workspace fora de `node_modules` e o Turbopack o empacota mesmo assim ([migration-001](./migration-001.md)); o caminho "engine externo" é coberto pelo E2E do `create`.
 
 **Imports internos do core:** sempre relativos (`../lib/config`). Nada de `@/`, que no projeto do cliente resolveria para o `tsconfig` dele.
 
@@ -396,7 +396,7 @@ export const productSchema = catalogItemBase.extend({
 | `externalLink` | `https:`, qualquer host. Rejeita `http:`, `javascript:`, `data:` e URL sem host | "externalLink precisa começar com https://" |
 | Todos os links | Máx. 2048 caracteres. Sem credenciais na URL (`user:pass@`) | — |
 
-Regra de host: aceita quando `host === d` ou `host.endsWith("." + d)`, para algum `d` da lista. Comparação em minúsculas, depois de `new URL()`.
+Regra de host: aceita quando `hostname === d` ou `hostname.endsWith("." + d)`, para algum `d` da lista. Comparação em minúsculas, depois de `new URL()`. Vale o `hostname` (sem porta), e URL com porta explícita é rejeitada; host com ponto final (`mercadolivre.com.br.`) não casa e também é rejeitado. A URL precisa começar com `https://` em minúsculas (é o `pattern` do JSON Schema). A mesma checagem (`urlProblem` em `packages/schema/src/fields.ts`) vale para `externalLink` e para todo link https do config e das seções.
 
 ```ts
 export const PLATFORM_HOSTS = {
@@ -509,18 +509,33 @@ export type SiteConfigInput = z.input<typeof siteConfigSchema>;   // o que o cli
 export type SiteConfig = z.output<typeof siteConfigSchema>;       // tudo preenchido
 export function resolveSiteConfig(input: SiteConfigInput): SiteConfig; // valida e preenche os padrões
 export function resolveTexts(partial?: DeepPartial<SiteTexts>): SiteTexts; // usada por resolveSiteConfig
-export type PurchaseButtonTexts = SiteTexts["products"]["buttons"];
+export type PurchaseButtonTexts = SiteTexts["products"]["buttons"]; // definido em texts.ts, reexportado pelo pacote
 ```
 
 - O `site.config.ts` do projeto exporta `siteConfig` com `satisfies SiteConfigInput`.
-- `resolveTexts` faz o merge profundo com `DEFAULT_TEXTS` e aplica o fallback: se o cliente definiu `products.buyOnWhatsapp` e não `products.buttons.whatsapp`, o primeiro vale como o segundo.
-- **No core, ninguém importa o alias direto.** Só `packages/core/src/lib/config.ts` importa `@cbjk_iris/site-config` e exporta `export const siteConfig: SiteConfig = resolveSiteConfig(raw)`. Os 53 acessos de hoje a `siteConfig.texts.*` continuam iguais; muda só o import, que o arquiteto troca na migração.
+- `resolveTexts` faz o merge profundo com `DEFAULT_TEXTS` e aplica o fallback: se o cliente definiu `products.buyOnWhatsapp` e não `products.buttons.whatsapp`, o primeiro vale como o segundo. Na saída, `SiteTexts.products.buyOnWhatsapp` continua existindo, marcado `@deprecated`, sempre igual ao `buttons.whatsapp` final (o core ainda o lê até o `iris-commerce` trocar). `DEFAULT_TEXTS` não tem essa chave.
+- `texts` é parcial em todos os níveis, mas strict: chave de texto desconhecida é erro de validação (pega erro de digitação).
+- `resolveSiteConfig` lança `SiteConfigError` (com `issues`), mensagem `site.config.ts tem erros:` e uma linha `caminho: mensagem` por erro. As mensagens padrão do zod saem em pt-BR (locale `ptBR` do zod, passado em cada parse, sem mudar a config global).
+- **No core, ninguém importa o alias direto.** Só `packages/core/src/lib/config.ts` importa `@cbjk_iris/site-config` e exporta `export const siteConfig: SiteConfig = applySiteConfigDefaults(raw)`, de `@cbjk_iris/schema/defaults`. Os 53 acessos de hoje a `siteConfig.texts.*` continuam iguais; muda só o import, que o arquiteto troca na migração.
+- **Onde o config é validado (R-1 da E4, decisão do dono em 2026-10-21):** `lib/config.ts` vai para o navegador (componentes `"use client"` o importam), e o zod no bundle somava cerca de 62 KB gzip. Por isso o core só preenche os padrões, com `applySiteConfigDefaults` (subpath `@cbjk_iris/schema/defaults`, que não importa zod nem de forma indireta; um teste confere o fonte e o `dist`). A validação completa (`resolveSiteConfig`) roda no Node: no `withIris` (o `next.config` carrega o config, então o build falha antes de renderizar) e, a partir da E6, em `LoadSiteConfig`, `Sync` e `iris check`. Um teste garante que `applySiteConfigDefaults(x)` é igual a `siteConfigSchema.parse(x)` para configs válidos.
+- **Validações de segurança do config e das seções** (`packages/schema/src/fields.ts`):
+  - **Valor cru primeiro:** link, caminho e imagem recusam, antes de qualquer outra regra, caractere de controle (C0, DEL, C1), espaço, espaço e marca invisível (NBSP, soft hyphen U+00AD, U+200B a U+200F, U+2028, U+2029, controles bidi U+202A a U+202E, U+2060 a U+206F, CGJ U+034F, ALM U+061C, MVS U+180E, BOM), a barra invertida e os pontos unicode `\u3002`, `\uff0e` e `\uff61`. O navegador e o `new URL()` removem ou reinterpretam esses caracteres: `"/\t/evil.com"` vira `//evil.com`, e `"https://mercadolivre.com.br\\@evil.com"` aponta para `evil.com`.
+  - **Links** de botão e de menu (`href`, `path`): só rota (`/`, nunca `//`), âncora (`#`), `https:`, `mailto:` e `tel:` (sem espaço). O `mailto:` aceita um único e-mail válido (formato do `z.email()`) e, na query, só `subject` e `body`: `cc`, `bcc`, `to` e outros parâmetros são recusados, e `%0d`/`%0a` em qualquer parte também.
+  - **Imagens:** caminho em `public/` (começa com `/`, sem `//` e sem `..`) ou `https:`.
+  - **Caminho local** (link ou imagem começando por `/`): também recusa `%2e`, `%2f` e `%5c`, em maiúsculas ou minúsculas.
+  - **Valores que vão crus para o `<style>` do layout** (`brand.colors`, `brand.radius`, `brand.shape`, `brand.overrides`, validados por `cssValue`): estrutura permitida, não lista negra. Até 200 caracteres (o limite vem antes das outras regras); só os caracteres permitidos, letras ASCII, dígitos, espaço e `. , % # ( ) / + - * _` (fica de fora todo o resto, como `[` e `]`, que abririam um bloco que engole o resto da folha, `!`, `:`, `=`, `;`, `{ }`, `< >`, `@`, aspas, `\` e qualquer caractere não-ASCII); sem `/*` nem `*/`; parênteses balanceados; toda chamada de função na lista permitida (`calc`, `min`, `max`, `clamp`, `var`, `rgb`, `rgba`, `hsl`, `hsla`, `hwb`, `lab`, `lch`, `oklab`, `oklch`, `color`, `color-mix`, sem diferenciar maiúsculas; `url`, `image-set`, `attr`, `env`, `expression` e qualquer outra são recusadas); `var()` só com `--nome` como primeiro argumento. Os padrões `sera` de `SHAPE_TOKENS` passam (um teste confere). Defesa em profundidade: o `renderThemeCss` do engine escapa `</style`.
+  - **`brand.fonts`:** nome do Google só com letras, números e espaços; pesos com 3 dígitos ou `variable`; fonte local com caminho relativo à raiz, sem `..`, terminando em `.woff2`, `.woff`, `.ttf` ou `.otf`.
+  - **`images.remoteHosts`:** só o host exato, porque um curinga vira proxy aberto no `/_next/image`. Recusa curinga (`*`/`**`), protocolo, caminho, porta, IP, maiúsculas e host sem ponto. Recusa também o host que é exatamente um sufixo de hospedagem pública ou de registro de 2 níveis (`PUBLIC_SUFFIX_HOSTS`: `vercel.app`, `github.io`, `r2.dev`, `ngrok.io`, `googleapis.com`, `com.br`, `co.uk`...), aceitando o subdomínio específico (`meu-site.vercel.app`). E recusa host de rede interna, nome reservado ou DNS curinga, igual ou terminado em `internal`, `local`, `localhost`, `arpa`, `lan`, `corp`, `intranet`, `private`, `home`, `test`, `example`, `invalid`, `onion`, `nip.io`, `sslip.io`, `xip.io`, `localtest.me`, `lvh.me`, `vcap.me` ou `traefik.me` (`PRIVATE_HOST_SUFFIXES`). As duas listas são dado, não contrato: acrescentar um item é PR ao arquiteto. São defesa em profundidade: a defesa principal contra imagem de rede interna é do Next 16, cujo otimizador recusa IP local por padrão (`images.dangerouslyAllowLocalIP`, padrão `false`: `node_modules/next/dist/docs/01-app/03-api-reference/02-components/image.md`, linhas 896 a 900, conferido no 16.2.11), e o `withIris` nunca liga essa opção.
+  - **`contact.mapEmbedUrl`** (src do iframe do mapa): passa pelas regras de link https acima, com host exato `www.google.com` e caminho `/maps/embed` (qualquer query) ou `/maps` com `output=embed` na query. Qualquer outro host ou caminho é recusado.
+  - **Outros campos:** `contact.email` validado como e-mail (`z.email()`); `contact.social` e `leads.endpoint` só `https:`; `theme.name` em formato de slug; `whatsapp.phone` só dígitos (10 a 15); `currency` ISO 4217; `seo.titleTemplate` com `%s`.
+- **`widget.html` é área de confiança:** o HTML e os `<script>` colados executam no site, com acesso à página inteira. O schema só exige texto não vazio. Quem edita o conteúdo é o dono do site. A CLI (`iris-cli`) deve exigir uma flag explícita para gravar um widget e dar aviso quando o código tiver `<script>`.
+- **Transição até a E5:** `home` e `pages` continuam no `siteConfigSchema`, marcados `@deprecated` (`home` ausente vira `{ sections: [] }`; `pages` com slug não reservado e sem repetição). A E5 os remove, quando o conteúdo passa para `content/`.
 
 Regras de conteúdo:
 - **Slug:** `^[a-z0-9]+(?:-[a-z0-9]+)*$`, até 80 caracteres. O nome do arquivo é o slug, o que impede caminho com `..` ou `/`.
 - **Slugs reservados para páginas:** `produtos`, `produto`, `servicos`, `servico`, `ultimos-projetos`, `api`, `_next`, `home`, mesmo com o módulo desligado.
 - **`$schema` em cada JSON:** caminho relativo para o JSON Schema ([§5.1.4](#514-de-appssite-para-o-starter)). O loader remove a chave `$schema` antes de validar, porque os schemas são `.strict()`.
-- **JSON Schema publicado:** gerado com `z.toJSONSchema(schema, { io: "input" })` (campos com padrão ficam opcionais) e com a propriedade `$schema: { type: "string" }` declarada.
+- **JSON Schema publicado:** gerado com `z.toJSONSchema(schema, { io: "input" })` (campos com padrão ficam opcionais) e com a propriedade `$schema: { type: "string" }` declarada nas 4 raízes de arquivo (`home`, `page`, `product`, `service`; o `section.schema.json` não é raiz de arquivo). Os metadados de campo viram palavras-chave do JSON Schema: `label` → `title`, `example` → `examples`; `ask`, `input` e `order` são da CLI e não vão para o arquivo. A pasta `packages/schema/json/` é gerada no build (`tsdown && node scripts/write-json.mjs`), fica fora do git e vai no tarball.
 - **Validação no build:** os loaders do `engine` (`loadHome`, `loadPage`, `loadPages`, `loadProducts`, `loadServices`) validam cada arquivo e param o build com `content/pages/sobre.json → sections[2].items[0].answer: obrigatório`.
 - **Seção de módulo desligado:** erro com as duas saídas: `iris module add gallery` ou remover a seção.
 - **Repositórios:** `ProductRepository` e `ServiceRepository` mantêm a assinatura de hoje e ficam em `packages/core/src/catalog/repositories.ts`. A implementação padrão chama `loadProducts` e `loadServices`.
@@ -528,6 +543,18 @@ Regras de conteúdo:
 ### 5.4 Tokens de forma e estilos
 
 Fonte da lista: `packages/schema/src/theme/tokens.ts` (`SHAPE_TOKENS`, com nome, tipo, faixa e padrão do `sera`) e `STYLE_IDS`. Os valores de cada preset são do `iris-theme`, em `packages/engine/src/theme/styles.ts`.
+
+Formato de cada entrada de `SHAPE_TOKENS`:
+
+```ts
+type ShapeTokenSpec =
+  | { name: `--${string}`; kind: "length"; min: string; max: string; units?: ("px" | "rem" | "em")[]; sera: string }
+  | { name: `--${string}`; kind: "percentage" | "number"; min: number; max: number; sera: string }
+  | { name: `--${string}`; kind: "color" | "shadow"; sera: string }   // shadow aceita "none"
+  | { name: `--${string}`; kind: "keyword"; values: string[]; sera: string };
+```
+
+Alguns padrões do `sera` são expressões (`var()`, `calc()`, `color-mix()`): o validador de faixa (`ValidateTheme`) precisa aceitá-las. O `--radius` tem padrão `0.625rem`, e o tema sobrescreve. `brand.shape` usa a chave sem o `--`, em kebab-case, como `brand.overrides` (ex.: `{ "radius-control": "9999px" }`; tipo `Partial<ShapeTokens>`, com `ShapeTokenKey` e `SHAPE_TOKEN_KEYS`). Os utilitários congelados da tabela abaixo também estão em `tokens.ts`, como `FROZEN_UTILITIES`; um teste confere que a lista é igual ao `utilities` do `style-inventory.json`. `IRIS_STYLE_VAR` é `"--iris-style"`, e `DEFAULT_STYLE_ID` é `"sera"`.
 
 Os padrões do `sera` foram tirados do código de hoje, para reproduzir o visual atual. A coluna "Consumido por" diz onde cada token entra; o destino de cada classe, ocorrência por ocorrência, está em [`style-inventory.json`](./style-inventory.json).
 
@@ -594,7 +621,7 @@ Mudança aceita no `sera`: hoje badge e tabs usam foco de 3px e o botão, de 2px
 
 **Estas tabelas saíram do inventário.** A primeira versão foi escrita à mão e, nas duas revisões, sempre sobrou alguma classe sem destino (ex.: `rounded-lg` em 11 seções, `rounded-xl` no CtaBanner, `rounded-md` e `rounded-xs` em LeadForm, ImageGallery e CatalogMiniCard, `border-2` na miniatura da galeria). O inventário por script ([§6.1](#61-iris-architect-arquitetura-e-contratos), passo 3, feito em 2026-10-20) acrescentou 5 tokens (`--radius-surface`, `--radius-field`, `--radius-card-compact`, `--surface-border-width`, `--popover-ring-color`) e os utilitários que os consomem. O processo continua valendo:
 
-1. `scripts/style-inventory.mjs` lista cada ocorrência de classe de forma fixa em `packages/core/src` (`rounded-*`, `shadow-*`, `backdrop-blur*`, `ring-<n>`, `border-<n>`, `uppercase`, `tracking-*`, `font-(medium|semibold|bold)` em controles, `bg-*/<n>` em superfícies), com arquivo e linha. Ele lê toda string do código pelo parser do TypeScript (atributos de JSX, argumentos do `cn()`, base e variantes do `cva`, objetos, template literals) e o `@apply` de `.css`; comentários e texto de JSX não contam, nem strings que com certeza não são lista de classes (tipo literal, atributo JSX cujo nome não contém `class`, valor das chaves `variant` e `size`, operando de `===`/`!==` e rótulo de `case`; assim o nome de variante `variant="outline"` não vira ocorrência). Para não deixar nada de fora, também lista `border` e `border-<lado>` sem número (largura de 1px implícita), `divide-x`/`divide-y` (com ou sem número) e cor de `divide` com opacidade, `blur-*`, `ring-offset-<n>`, cor de anel e de outline com opacidade, `outline` com ou sem número, `outline-offset-<n>`, as outras classes de caixa e todos os pesos `font-*`; a decisão "é controle", "é superfície" fica no JSON. Não contam os utilitários congelados nem classes sob variante `style-<id>:`.
+1. `scripts/style-inventory.mjs` lista cada ocorrência de classe de forma fixa em `packages/core/src` (`rounded-*`, `shadow-*`, `backdrop-blur*`, `ring-<n>`, `border-<n>`, `uppercase`, `tracking-*`, `font-(medium|semibold|bold)` em controles, `bg-*/<n>` em superfícies), com arquivo e linha. Ele lê toda string do código pelo parser do TypeScript (atributos de JSX, argumentos do `cn()`, base e variantes do `cva`, objetos, template literals) e o `@apply` de `.css`; comentários e texto de JSX não contam, nem strings que com certeza não são lista de classes (tipo literal, operando de `===`/`!==`, rótulo de `case` e, quando o valor é uma palavra só, atributo JSX cujo nome não contém `class` e valor das chaves `variant` e `size`; assim o nome de variante `variant="outline"` não vira ocorrência, mas `size: "rounded-lg h-9"` e `tw="rounded-lg h-9"` são lidos). Também lista a propriedade arbitrária de forma entre colchetes (`[border-radius:4px]`, `[box-shadow:…]`, `[backdrop-filter:…]`, `[text-transform:…]`, `[letter-spacing:…]`, `[font-weight:…]`, `[outline…]`, `[border…-width:…]`; variável CSS como `[--card-spacing:…]` não conta) e o estilo inline com propriedade de forma (`style={{ borderRadius, boxShadow, backdropFilter, textTransform, letterSpacing, fontWeight, border*Width, outline… }}`), registrado como `style:<prop>`. Para não deixar nada de fora, também lista `border` e `border-<lado>` sem número (largura de 1px implícita), `divide-x`/`divide-y` (com ou sem número) e cor de `divide` com opacidade, `blur-*`, `ring-offset-<n>`, cor de anel e de outline com opacidade, `outline` com ou sem número, `outline-offset-<n>`, as outras classes de caixa e todos os pesos `font-*`; a decisão "é controle", "é superfície" fica no JSON. Não contam os utilitários congelados nem classes sob variante `style-<id>:`.
 2. O arquiteto grava em `docs/spec/style-inventory.json` o destino de cada ocorrência: um utilitário congelado ou uma exceção justificada. Cada entrada casa por arquivo e classe exata (com as variantes, ex.: `hover:shadow-md`), com `count`, e `near` (trecho da linha) quando a mesma classe do mesmo arquivo tem destinos diferentes. O iris-theme mantém os prefixos de variante ao trocar (`hover:shadow-md` → `hover:shadow-card-hover`). Token que faltar entra em `SHAPE_TOKENS` antes da tag, com o padrão do `sera` igual ao valor de hoje (ex.: `--radius-surface: var(--radius)` para os `rounded-lg` das seções).
 3. `node scripts/style-inventory.mjs --check` sai com 0 só se toda ocorrência tiver destino e nenhuma entrada do JSON estiver obsoleta (entrada que acha menos ocorrências que o `count`). Entrada obsoleta é erro, não aviso: quem troca ou apaga uma classe atualiza o JSON no mesmo PR, revisado pelo arquiteto.
 
@@ -697,6 +724,13 @@ Metadados de campo (`FieldMeta`, via `.meta()`):
 
 Regras:
 - `.meta()` vem por último, depois de `.optional()` e `.default()`, porque o zod guarda o metadado na instância.
+- Todos os objetos são strict, em todos os níveis (inclusive itens de lista): sem isso, uma chave com erro de digitação dentro de `items` seria descartada sem aviso.
+- `defineSection` valida na chamada e lança erro: `type` fora de kebab-case, metadado fora de `FieldMeta` (`fieldMetaSchema`), campo perguntado (`ask` diferente de `never`, inclusive dentro de listas, objetos e uniões) sem `label`, ou preset que não valida. Não há module augmentation do zod para tipar o `.meta()`: mudaria o zod de quem instala o pacote. Funções auxiliares: `fieldMeta(schema)`, `fieldAsk(schema)`.
+- `limits` em uso: `hero` e `faq` com `maxPerPage: 1` (o Google aceita um FAQPage por página). `homeSchema` e `pageSchema` validam os limites.
+- `widget`: o campo `html` executa no navegador (área de confiança, ver §5.3).
+- Presets: um preset genérico em pt-BR (sem falar de um ramo) para cada seção com lista obrigatória (`hero`, `benefits`, `stats`, `testimonials`, `faq`). Acrescentar preset é dado, não contrato.
+- O pacote exporta `sectionDefinitions`, `sectionSchema`, `getSectionDefinition(type)`, `sectionsOfModule(module)` e `SECTION_TYPES`; as definições individuais não são exportadas da raiz.
+- `SectionRegistry` (`packages/schema/src/registry.ts`) não importa React (regra 5): `type SectionComponent<T> = (props: { section: SectionOf<T> }) => unknown`, que aceita componente síncrono e assíncrono; o `RenderSections` do core faz o cast para `ComponentType`.
 - A união é `z.discriminatedUnion("type", definitions.map((d) => d.schema))`. `Section` e `SectionOf<T>` saem dela por `z.infer`.
 - O `schema` publica `json/section.schema.json`, `page.schema.json`, `home.schema.json`, `product.schema.json` e `service.schema.json`, gerados no build ([§5.3](#53-config-e-conteúdo)).
 - O `core` exporta um componente por `type` em `@cbjk_iris/core/sections/<type>`. Um teste **do core** (`packages/core/test/sections.test.ts`) falha se houver definição sem componente, ou o contrário.
@@ -744,7 +778,11 @@ export type ListThemes = (root: string) => ThemeInfo[];
 export type ListStyles = () => StyleInfo[];
 export type ValidateTheme = (root: string, name: string) => Diagnostic[];
 export type SyncBrand = (root: string, opts: { check: boolean }) => SyncResult; // ex-brand:sync: fontes + contraste
-export type ImportTheme = (source: { tweakcn?: string; url?: string; shadcn?: string }, as?: string) => Promise<{ name: string; css: string }>; // ex-theme:add, sem escrever
+export type ImportThemeSource =                      // exatamente uma fonte
+  | { tweakcn: string; url?: never; shadcn?: never }
+  | { url: string; tweakcn?: never; shadcn?: never }
+  | { shadcn: string; tweakcn?: never; url?: never };
+export type ImportTheme = (source: ImportThemeSource, as?: string) => Promise<{ name: string; css: string }>; // ex-theme:add, sem escrever
 
 // codegen, modules, content (iris-architect)
 export type SyncRegistry = (root: string, opts: { check: boolean }) => SyncResult;
@@ -766,9 +804,24 @@ Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funç�
 
 | Pacote | Subpaths |
 |---|---|
-| `schema` | `.`, `./json/*` |
+| `schema` | `.`, `./defaults` (sem zod: `applySiteConfigDefaults`, `resolveTexts`, `DEFAULT_TEXTS`, `DEFAULT_BUTTON_ORDER`, `DEFAULT_MODULES` e os tipos), `./json/*` |
 | `engine` | `.`, `./next`, `./theme`, `./codegen`, `./content`, `./themes/*` |
 | `core` | `./app/*`, `./sections/*`, `./styles/*` |
+
+**Exports do `@cbjk_iris/schema`** (lista fechada, sem `export *`; `packages/schema/test/exports.test.ts` congela os nomes, e um nome novo é mudança de contrato):
+
+| Grupo | Valores | Tipos |
+|---|---|---|
+| §5.2 catálogo | `productSchema`, `serviceSchema`, `catalogItemBase`, `installmentSchema`, `productContentSchema` e `serviceContentSchema` (formato de `content/<tipo>/<slug>.json`, sem `kind` e `slug`, para os loaders e a CLI), `PLATFORM_HOSTS`, `platformUrl`, `httpsUrl`, `PURCHASE_PLATFORMS`, `DEFAULT_BUTTON_ORDER` | `Product`, `ProductInput`, `Service`, `ServiceInput`, `CatalogItem`, `Spec`, `Installment`, `ProductFilter`, `MarketplacePlatform`, `PurchasePlatform`, `PurchaseContext`, `PurchaseButton`, `ResolvePurchaseButtons` |
+| §5.3 config | `siteConfigSchema`, `resolveSiteConfig`, `SiteConfigError`, `applySiteConfigDefaults`, `COLOR_TOKENS`, `slugSchema` | `SiteConfigInput`, `SiteConfig`, `MenuItem`, `BrandConfig`, `BrandColors`, `BrandFont`, `SiteLogo`, `ContactInfo`, `LeadsConfig`, `FooterConfig`, `CommerceConfig`, `PageConfig` (transição até a E5), `ColorMode`, `ColorToken`, `ColorTokens`, `SocialNetwork`, `SiteLink` |
+| §5.3 textos | `DEFAULT_TEXTS`, `resolveTexts` | `SiteTexts`, `PurchaseButtonTexts`, `DeepPartial` |
+| §5.3 conteúdo | `homeSchema`, `pageSchema`, `pageSlugSchema`, `RESERVED_PAGE_SLUGS`, `formatIssuePath` (caminho `sections[2].items[0].answer` das mensagens), `ptBRError` (mensagens do zod em pt-BR, passadas por parse: `{ error: ptBRError }`) | `Home`, `Page` |
+| §5.4 forma | `SHAPE_TOKENS`, `SHAPE_TOKEN_KEYS`, `STYLE_IDS`, `DEFAULT_STYLE_ID`, `IRIS_STYLE_VAR`, `FROZEN_UTILITIES` | `ShapeTokenSpec`, `ShapeTokenName`, `ShapeTokenKey`, `ShapeTokens`, `StyleId` |
+| §5.5 seções e módulos | `defineSection`, `sectionBase`, `fieldMeta`, `fieldAsk`, `fieldMetaSchema`, `sectionDefinitions`, `sectionSchema`, `getSectionDefinition`, `sectionsOfModule`, `SECTION_TYPES`, `SECTION_ICONS` (dado: ícone novo é PR ao arquiteto), `MODULES`, `MODULE_IDS`, `DEFAULT_MODULES` | `FieldMeta`, `SectionDefinition`, `SectionModule`, `SectionLimits`, `SectionPreset`, `Section`, `SectionInput`, `SectionType`, `SectionOf`, `SectionIcon`, `LeadField`, `ModuleId`, `SectionComponent`, `SectionRegistry`, e um alias por seção, usado pelo core: `HeroSection`, `HeroSlide`, `BenefitsSection`, `TextImageSection`, `CtaBannerSection`, `TestimonialsSection`, `StatsSection`, `FaqSection`, `ContactSection`, `LeadFormSection`, `WidgetSection`, `ProductsSection`, `ServicesSection`, `GallerySection` |
+| §5.6 engine | — | `Diagnostic`, `SyncResult`, `ThemeInfo`, `StyleInfo`, `FileChange`, `ImportThemeSource`, `LoadSiteConfig`, `ListThemes`, `ListStyles`, `ValidateTheme`, `SyncBrand`, `ImportTheme`, `SyncRegistry`, `SyncRoutes`, `Sync`, `CheckContent`, `RemoveModuleContent` |
+| §5.7 CLI | `EXIT_CODES`, `cliResultSchema` | `CliResult`, `CliError`, `CliErrorCode` |
+
+`./defaults` exporta só `applySiteConfigDefaults`, `resolveTexts`, `DEFAULT_TEXTS`, `DEFAULT_BUTTON_ORDER` e `DEFAULT_MODULES`, e os tipos `SiteConfig`, `SiteConfigInput`, `SiteTexts`, `PurchaseButtonTexts`, `DeepPartial`, `PurchasePlatform` e `ModuleId`. Os auxiliares de validação (`urlProblem`, `siteHref`, `imageSrc`, `cssValue`, `hostnameSchema`, as listas de hosts) são internos: os testes do pacote os importam pelo caminho do arquivo.
 
 ### 5.7 Interface pública da CLI
 
@@ -890,7 +943,7 @@ const interactive =
 }
 ```
 
-Em sucesso, `ok: true`, `error` ausente, `data` com o item criado e `changes` com `{ "path": "content/products/piso-x.json", "action": "create" }`. `warnings` usa o tipo `Diagnostic`. O tipo `CliResult` fica em `packages/schema/src/cli.ts`. `iris --help --json` devolve a árvore de comandos e flags no mesmo envelope.
+Em sucesso, `ok: true`, `error` ausente, `data` com o item criado e `changes` com `{ "path": "content/products/piso-x.json", "action": "create" }`. `warnings` usa o tipo `Diagnostic`. O tipo `CliResult` fica em `packages/schema/src/cli.ts`, com `EXIT_CODES` (a tabela acima), `CliErrorCode`, `CliError` e `cliResultSchema` (zod), que valida um envelope em runtime, inclusive que `exitCode` corresponde ao `code`. `iris --help --json` devolve a árvore de comandos e flags no mesmo envelope.
 
 #### Edição do `site.config.ts`
 

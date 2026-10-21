@@ -19,4 +19,22 @@ describe("brand (movido de lib/brand.ts)", () => {
     expect(theme.light.highlight).toBe(theme.light.destructive);
     expect(Array.isArray(contrastReport(theme))).toBe(true);
   });
+
+  it("defesa em profundidade: um valor com </style não fecha a tag no <head> (o schema já recusa)", () => {
+    const theme = resolveSiteTheme("neutral", {
+      colors: {},
+      radius: "1rem</style><script>alert(1)</script>",
+      overrides: { dark: { primary: "red</STYLE ><img src=x onerror=alert(1)>" } },
+    });
+    const css = renderThemeCss(theme);
+    expect(css).not.toMatch(/<\/style/i);
+    expect(css).toContain("<\\/style><script>");
+    expect(css).toContain("<\\/STYLE >");
+  });
+
+  it("para entrada válida o CSS não muda", () => {
+    const css = renderThemeCss(resolveSiteTheme("neutral", { colors: { primary: "#1d4ed8" }, radius: "0.5rem" }));
+    expect(css).toContain("--radius:0.5rem;");
+    expect(css).not.toContain("\\");
+  });
 });
