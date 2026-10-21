@@ -1,0 +1,8 @@
+{
+  "utilities": ["rounded-control"],
+  "exceptions": { "avatar": "avatar é redondo em todo estilo" },
+  "occurrences": [
+    { "file": "Avatar.tsx", "class": "rounded-full", "count": 1, "to": "exception:avatar" },
+    { "file": "Avatar.tsx", "class": "shadow-md", "count": 1, "to": "exception:avatar" }
+  ]
+}

@@ -176,8 +176,11 @@ Achados das revisões já mergeadas, distribuídos pela etapa que vai tocar no a
 | E2, adversarial-reviewer | `apps/site` sem `build:packages` falha; conferir que a mensagem manda rodar `npm run build:packages` (§5.1.4) | LOW | E6 |
 | E2, security-reviewer | `e2e-docker.mjs` monta o repo inteiro em escrita; imagem por tag, não digest. Usar `:ro` + montagens rw só de saída, `--cap-drop=ALL`, `no-new-privileges`, digest na CI | LOW | E7 |
 | E2, security-reviewer | `npm audit` não rodou na revisão | — | E7 (CI) |
-| E2, adversarial-reviewer | Linha de base insensível a ajuste pequeno (`text-sm` → `text-[15px]` passou com `maxDiffPixelRatio: 0.001` em página inteira). Acrescentar capturas por região ou comparação de estilos computados | LOW | E3 ou E8 |
+| E2, adversarial-reviewer | Linha de base insensível a ajuste pequeno (`text-sm` → `text-[15px]` passou com `maxDiffPixelRatio: 0.001` em página inteira). Acrescentar capturas por região ou comparação de estilos computados | LOW | Resolvido na E3: `apps/site/e2e/baseline/styles.spec.ts` compara os estilos computados de todos os elementos (controle negativo: o mesmo `text-[15px]` falha). Na E8, os `.txt` são regerados no container junto com as capturas |
 | E2, iris-architect | Node 22.18 (mínimo declarado) nunca testado; só 24.18 | — | E7 (matriz da CI) |
+| E3, adversarial-reviewer (2ª rodada) | `notClassList` do `style-inventory.mjs` descarta qualquer string em atributo JSX sem "class" no nome (ex.: `tw=`) e qualquer valor das chaves `variant`/`size` (ex.: `size: "rounded-lg h-9"`). Não ocorre no core hoje. Restringir o descarte de `variant`/`size` a identificadores de uma palavra, ou documentar | LOW | E4 |
+| E3, adversarial-reviewer | Estilo inline (`style={{…}}`) e propriedade arbitrária entre colchetes (`[border-radius:4px]`) não são inventariados. Nenhum caso de forma no core hoje | LOW | Avaliar na E4 (lint) ou no `--after` do iris-theme |
+| E3, adversarial-reviewer | `border-selected` (miniatura escolhida da ImageGallery) usa `--ring-width`: borda acoplada à largura do foco | LOW | Aceito como está; token próprio só se um estilo precisar |
 
 ## 7. Fatos conferidos para este plano
 
