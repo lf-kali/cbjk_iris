@@ -19,7 +19,8 @@ const EXPECTED: Record<string, { file: string; values: string[]; types: string[]
     file: "index.ts",
     values: [
       ...THEME_VALUES, "BUILTIN_THEMES_DIR", "ContentError", "IRIS_ALIASES", "ROUTE_PAGES", "SiteConfigLoadError",
-      "checkContent", "configDiagnostics", "formatDiagnostic", "loadSiteConfig", "removeModuleContent", "sync",
+      "checkContent", "configDiagnostics", "formatDiagnostic", "importTheme", "listStyles", "listThemes",
+      "loadSiteConfig", "removeModuleContent", "sync", "validateTheme", "writeThemeFile",
       "syncBrand", "syncRegistry", "syncRoutes", "withIris",
     ],
     types: [...THEME_TYPES, "RoutePage", "WithIrisSiteConfig"],

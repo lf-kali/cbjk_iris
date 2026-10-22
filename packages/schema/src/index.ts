@@ -29,7 +29,7 @@ export type {
 } from "./catalog";
 export { DEFAULT_BUTTON_ORDER, PURCHASE_PLATFORMS } from "./constants";
 export type { PurchasePlatform } from "./constants";
-export { httpsUrl, ptBRError, slugSchema } from "./fields";
+export { cssValue, httpsUrl, ptBRError, slugSchema } from "./fields";
 
 // §5.3 config, textos e conteúdo
 export { applySiteConfigDefaults } from "./defaults";

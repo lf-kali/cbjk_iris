@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "sync": "node scripts/sync.mjs",
     "sync:check": "node scripts/sync.mjs --check",
-    "theme:add": "node scripts/add-theme.mjs"
+    "theme:add": "node scripts/theme-add.mjs"
   },
   "dependencies": {
     "@cbjk_iris/core": "*",
