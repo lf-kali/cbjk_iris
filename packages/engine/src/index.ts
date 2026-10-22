@@ -6,4 +6,6 @@ export { BUILTIN_THEMES_DIR } from "./paths";
 export { IRIS_ALIASES, withIris, type WithIrisSiteConfig } from "./next";
 export { configDiagnostics, loadSiteConfig, SiteConfigLoadError } from "./project";
 export { ROUTE_PAGES, sync, syncBrand, syncRegistry, syncRoutes, type RoutePage } from "./codegen";
-export { formatDiagnostic } from "./content/errors";
+export { ContentError, formatDiagnostic } from "./content/errors";
+export { checkContent } from "./content/check";
+export { removeModuleContent } from "./modules";

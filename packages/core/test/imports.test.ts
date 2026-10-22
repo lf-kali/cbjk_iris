@@ -72,7 +72,7 @@ type Source = { rel: string; text: string };
 const SERVER_ONLY = [/^@cbjk_iris\/engine(\/|$)/, /^@cbjk_iris\/schema$/, /^zod(\/|$)/, /^node:/, /^(fs|path|os|child_process)$/];
 
 function valueImports(text: string): string[] {
-  const file = ts.createSourceFile("x.tsx", text, ts.ScriptTarget.Latest, false, ts.ScriptKind.TSX);
+  const file = ts.createSourceFile("x.tsx", text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const out: string[] = [];
   for (const st of file.statements) {
     if (ts.isImportDeclaration(st) && ts.isStringLiteral(st.moduleSpecifier)) {
@@ -85,8 +85,26 @@ function valueImports(text: string): string[] {
       if (!allTypes) out.push(st.moduleSpecifier.text);
     } else if (ts.isExportDeclaration(st) && st.moduleSpecifier && ts.isStringLiteral(st.moduleSpecifier) && !st.isTypeOnly) {
       out.push(st.moduleSpecifier.text);
+    } else if (
+      ts.isImportEqualsDeclaration(st) &&
+      !st.isTypeOnly &&
+      ts.isExternalModuleReference(st.moduleReference) &&
+      ts.isStringLiteral(st.moduleReference.expression)
+    ) {
+      // import x = require("y")
+      out.push(st.moduleReference.expression.text);
     }
   }
+  // import("y") e require("y") em qualquer lugar do arquivo (E6b: antes só os imports do topo)
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node) && node.arguments.length && ts.isStringLiteral(node.arguments[0])) {
+      const isImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
+      const isRequire = ts.isIdentifier(node.expression) && node.expression.text === "require";
+      if (isImport || isRequire) out.push(node.arguments[0].text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(file);
   return out;
 }
 
@@ -131,6 +149,18 @@ describe("grafo dos arquivos \"use client\" (R-1)", () => {
       "a.tsx → b.ts importa @cbjk_iris/engine/content",
       "a.tsx → c/index.ts importa @cbjk_iris/schema",
       "a.tsx → c/index.ts importa node:fs",
+    ]);
+  });
+
+  it("controle negativo: import() dinâmico, require() e import x = require() também são seguidos e apontados", () => {
+    const fake: Source[] = [
+      { rel: "a.tsx", text: '"use client";\nexport async function f() { const m = await import("./b"); return m; }' },
+      { rel: "b.ts", text: 'const fs = require("node:fs");\nexport const x = 1;\nimport c = require("./c");' },
+      { rel: "c.ts", text: 'export async function g() { return import("@cbjk_iris/engine/content"); }\nimport type z = require("zod");' },
+    ];
+    expect(clientGraphOffenders(fake)).toEqual([
+      "a.tsx → b.ts importa node:fs",
+      "a.tsx → c.ts importa @cbjk_iris/engine/content",
     ]);
   });
 });

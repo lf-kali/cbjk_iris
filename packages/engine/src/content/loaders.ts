@@ -95,13 +95,18 @@ function byOrderThenSlug(a: { order?: number; slug: string }, b: { order?: numbe
   return a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0;
 }
 
-function loadCatalog<S extends z.ZodType, K extends string>(
-  opts: ContentOptions,
+/** Resultado do núcleo síncrono: os dados válidos e todos os problemas, sem lançar (usado pelo checkContent). */
+export interface Collected<T> {
+  data: T;
+  diagnostics: Diagnostic[];
+}
+
+export function collectCatalog<S extends z.ZodType, K extends string>(
+  ctx: ContentContext,
   sub: string,
   schema: S,
   kind: K,
-): (z.output<S> & { kind: K; slug: string })[] {
-  const ctx = contentContext(opts.root);
+): Collected<(z.output<S> & { kind: K; slug: string })[]> {
   const { files, diagnostics } = listContentDir(ctx, sub);
   const items = files.flatMap((file: ContentFile) => {
     const result = readValidated(ctx, file.abs, schema);
@@ -112,9 +117,23 @@ function loadCatalog<S extends z.ZodType, K extends string>(
     }
     return [{ ...(result.data as object), kind, slug: file.slug } as z.output<S> & { kind: K; slug: string }];
   });
-  throwIfAny(diagnostics);
-  return items.sort(byOrderThenSlug);
+  return { data: items.sort(byOrderThenSlug), diagnostics };
 }
+
+function loadCatalog<S extends z.ZodType, K extends string>(
+  opts: ContentOptions,
+  sub: string,
+  schema: S,
+  kind: K,
+): (z.output<S> & { kind: K; slug: string })[] {
+  const { data, diagnostics } = collectCatalog(contentContext(opts.root), sub, schema, kind);
+  throwIfAny(diagnostics);
+  return data;
+}
+
+/** content/products/<slug>.json e content/services/<slug>.json, sem lançar. */
+export const collectProducts = (ctx: ContentContext) => collectCatalog(ctx, "products", productContentSchema, "product");
+export const collectServices = (ctx: ContentContext) => collectCatalog(ctx, "services", serviceContentSchema, "service");
 
 /** content/products/<slug>.json, validados e ordenados. Pasta ausente = []. */
 export async function loadProducts(opts: ContentOptions = {}): Promise<Product[]> {
@@ -127,15 +146,19 @@ export async function loadServices(opts: ContentOptions = {}): Promise<Service[]
 }
 
 /** content/home.json. Ausente = { sections: [] }. */
-export async function loadHome(opts: SectionContentOptions): Promise<Home> {
-  assertModules(opts, "loadHome");
-  const ctx = contentContext(opts.root);
+export function collectHome(ctx: ContentContext, modules: readonly ModuleId[]): Collected<Home> {
   const abs = path.join(ctx.root, "content", "home.json");
   const result = readValidated(ctx, abs, homeSchema);
-  if (!result) return { sections: [] };
-  if (!result.ok) throw new ContentError(result.diagnostics);
-  throwIfAny(disabledModuleSections(result.data.sections, opts.modules, relPath(ctx, abs)));
-  return result.data;
+  if (!result) return { data: { sections: [] }, diagnostics: [] };
+  if (!result.ok) return { data: { sections: [] }, diagnostics: result.diagnostics };
+  return { data: result.data, diagnostics: disabledModuleSections(result.data.sections, modules, relPath(ctx, abs)) };
+}
+
+export async function loadHome(opts: SectionContentOptions): Promise<Home> {
+  assertModules(opts, "loadHome");
+  const { data, diagnostics } = collectHome(contentContext(opts.root), opts.modules);
+  throwIfAny(diagnostics);
+  return data;
 }
 
 function loadPageFile(ctx: ContentContext, file: ContentFile, modules: readonly ModuleId[]): Validated<LoadedPage> | null {
@@ -150,12 +173,10 @@ function loadPageFile(ctx: ContentContext, file: ContentFile, modules: readonly 
 }
 
 /** content/pages/<slug>.json, validadas e ordenadas pelo slug. Pasta ausente = []. */
-export async function loadPages(opts: SectionContentOptions): Promise<LoadedPage[]> {
-  assertModules(opts, "loadPages");
-  const ctx = contentContext(opts.root);
+export function collectPages(ctx: ContentContext, modules: readonly ModuleId[]): Collected<LoadedPage[]> {
   const { files, diagnostics } = listContentDir(ctx, "pages");
   const pages = files.flatMap((file) => {
-    const result = loadPageFile(ctx, file, opts.modules);
+    const result = loadPageFile(ctx, file, modules);
     if (!result) return [];
     if (!result.ok) {
       diagnostics.push(...result.diagnostics);
@@ -163,8 +184,14 @@ export async function loadPages(opts: SectionContentOptions): Promise<LoadedPage
     }
     return [result.data];
   });
+  return { data: pages, diagnostics };
+}
+
+export async function loadPages(opts: SectionContentOptions): Promise<LoadedPage[]> {
+  assertModules(opts, "loadPages");
+  const { data, diagnostics } = collectPages(contentContext(opts.root), opts.modules);
   throwIfAny(diagnostics);
-  return pages;
+  return data;
 }
 
 /**

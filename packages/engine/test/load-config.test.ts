@@ -88,6 +88,14 @@ describe("loadSiteConfig", () => {
     expect(error.diagnostics[0].message).not.toMatch(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/);
   });
 
+  it("controles invisíveis de direção e separadores de linha unicode também saem", () => {
+    const sneaky = ["\\u200e", "\\u200f", "\\u202a", "\\u202b", "\\u202c", "\\u202d", "\\u202e", "\\u2066", "\\u2067", "\\u2068", "\\u2069", "\\u2028", "\\u2029"];
+    const root = makeProject(`throw new Error("a${sneaky.join("")}b");\nexport const siteConfig = {};\n`);
+    const error = loadError(() => loadSiteConfigSync(root));
+    expect(error.diagnostics[0].message).toMatch(/ab/);
+    expect(error.message).not.toMatch(/[\u200e\u200f\u202a-\u202e\u2066-\u2069\u2028\u2029]/);
+  });
+
   it("console.log no config não atrapalha a leitura", () => {
     const root = makeProject(`console.log("{oi}");\nexport const siteConfig = ${JSON.stringify(siteConfigFixture())};\n`);
     expect(loadSiteConfigSync(root).name).toBe("Loja");

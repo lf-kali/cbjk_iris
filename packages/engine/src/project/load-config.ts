@@ -69,7 +69,9 @@ type ChildMessage =
 // Texto que vem do processo filho (mensagem de erro, stderr) é do projeto: sequências ANSI e
 // caracteres de controle sairiam crus no terminal de quem roda a CLI (limpar a tela, mudar o título).
 const ANSI = /\u001b(?:\[[0-9;?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
-const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g;
+// também os invisíveis que reordenam ou quebram a linha no terminal: marcas de direção (U+200E, U+200F),
+// embutir/sobrepor direção (U+202A a U+202E), isolar direção (U+2066 a U+2069) e separadores U+2028/U+2029
+const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069\u2028\u2029]/g;
 
 export function stripControl(text: string): string {
   return text.replace(ANSI, "").replace(CONTROL, "");

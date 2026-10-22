@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { NextConfig } from "next";
 import { IRIS_ALIASES, withIris } from "../src/next";
 import { siteConfigFixture } from "./fixtures/site-config";
@@ -123,5 +123,30 @@ describe("withIris", () => {
     for (const host of ["*", "**", "*.com", "127.0.0.1", "a.com/x"]) {
       expect(() => withIris(siteConfigFixture({ images: { remoteHosts: [host] } })), host).toThrow(/remoteHosts/);
     }
+  });
+
+  describe("images.dangerouslyAllowLocalIP do projeto (P-3: aviso, sem bloquear)", () => {
+    afterEach(() => vi.restoreAllMocks());
+
+    it("avisa no stderr e mantém a opção", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const config = withIris(site, { images: { dangerouslyAllowLocalIP: true } });
+      expect(config.images?.dangerouslyAllowLocalIP).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0][0])).toMatch(/dangerouslyAllowLocalIP.*rede interna/s);
+    });
+
+    it("qualquer valor verdadeiro (o Next testa truthy) também avisa", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      for (const value of ["true", 1]) withIris(site, { images: { dangerouslyAllowLocalIP: value as never } });
+      expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it("sem a opção, ou com false: nenhum aviso", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      withIris(site);
+      withIris(site, { images: { dangerouslyAllowLocalIP: false } });
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

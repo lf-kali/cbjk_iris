@@ -65,4 +65,5 @@ export type SyncRoutes = (root: string, opts: { check: boolean }) => SyncResult;
 /** brand + registry + routes */
 export type Sync = (root: string, opts: { check: boolean }) => SyncResult;
 export type CheckContent = (root: string) => Diagnostic[];
-export type RemoveModuleContent = (root: string, id: ModuleId) => { changes: FileChange[] };
+/** Tira as seções do módulo de content/home.json e content/pages/*.json. dryRun: só devolve as mudanças (P-4). */
+export type RemoveModuleContent = (root: string, id: ModuleId, opts?: { dryRun?: boolean }) => { changes: FileChange[] };

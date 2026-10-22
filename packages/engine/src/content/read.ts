@@ -36,7 +36,9 @@ export interface ContentFile {
 }
 
 export type ReadResult =
-  | { status: "ok"; data: Record<string, unknown> }
+  // raw: o objeto como está no arquivo, com $schema e na ordem original (para quem regrava, como o removeModuleContent)
+  // text: o texto lido (sem BOM), para quem precisa conferir os literais (números) antes de regravar
+  | { status: "ok"; data: Record<string, unknown>; raw: Record<string, unknown>; text: string }
   | { status: "missing" }
   | { status: "error"; diagnostics: Diagnostic[] };
 
@@ -197,5 +199,5 @@ export function readContentJson(ctx: ContentContext, abs: string): ReadResult {
       diagnostics: [contentDiagnostic(rel, "precisa ser texto: o caminho do JSON Schema (ex.: ../../node_modules/@cbjk_iris/schema/json/product.schema.json)", { path: "$schema" })],
     };
   }
-  return { status: "ok", data };
+  return { status: "ok", data, raw: parsed as Record<string, unknown>, text: json };
 }
