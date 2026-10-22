@@ -25,7 +25,7 @@ const ROOT_TYPES = [
   "PurchaseButtonTexts", "PurchaseContext", "PurchasePlatform", "ResolvePurchaseButtons", "Service", "ServiceInput", "Spec",
   // §5.3
   "BrandColors", "BrandConfig", "BrandFont", "ColorMode", "ColorToken", "ColorTokens", "CommerceConfig", "ContactInfo",
-  "DeepPartial", "FooterConfig", "Home", "LeadsConfig", "MenuItem", "Page", "PageConfig", "SiteConfig", "SiteConfigInput",
+  "DeepPartial", "FooterConfig", "Home", "LeadsConfig", "MenuItem", "Page", "SiteConfig", "SiteConfigInput",
   "SiteLink", "SiteLogo", "SiteTexts", "SocialNetwork",
   // §5.4
   "ShapeTokenKey", "ShapeTokenName", "ShapeTokenSpec", "ShapeTokens", "StyleId",

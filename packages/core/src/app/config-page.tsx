@@ -1,28 +1,30 @@
 import { notFound } from "next/navigation";
+import { loadPage, loadPages } from "@cbjk_iris/engine/content";
 import { siteConfig } from "../lib/config";
 import { RenderSections } from "../sections/RenderSections";
 
-// Páginas montadas com seções a partir de siteConfig.pages (ex.: /sobre, /contato).
+// Páginas montadas com seções a partir de content/pages/<slug>.json (ex.: /sobre, /contato),
+// lidas e validadas pelos loaders do engine (SPEC §5.3).
 // Rotas fixas (/produtos, /servicos...) têm prioridade sobre esta.
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return (siteConfig.pages ?? []).map((page) => ({ slug: page.slug }));
+export async function generateStaticParams() {
+  return (await loadPages({ modules: siteConfig.modules })).map((page) => ({ slug: page.slug }));
 }
 
 type PageProps = { params: Promise<{ slug: string }> };
 
 function findPage(slug: string) {
-  return siteConfig.pages?.find((page) => page.slug === slug);
+  return loadPage(slug, { modules: siteConfig.modules });
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const page = findPage((await params).slug);
+  const page = await findPage((await params).slug);
   return page ? { title: page.title, description: page.description } : {};
 }
 
 export default async function ConfigPage({ params }: PageProps) {
-  const page = findPage((await params).slug);
+  const page = await findPage((await params).slug);
   if (!page) notFound();
 
   return (

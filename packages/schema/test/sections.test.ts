@@ -8,7 +8,6 @@ import {
   sectionSchema,
   sectionsOfModule,
 } from "../src";
-import { siteConfig } from "../../../apps/site/site.config";
 
 const CORE = ["hero", "benefits", "text-image", "cta-banner", "testimonials", "stats", "faq", "contact", "lead-form", "widget"];
 
@@ -39,14 +38,6 @@ describe("definições de seção", () => {
 
   it("getSectionDefinition falha para tipo desconhecido", () => {
     expect(() => getSectionDefinition("nao-existe" as never)).toThrow(/nao-existe/);
-  });
-
-  it("as seções de hoje (home e páginas do apps/site) validam", () => {
-    const sections: { type: string }[] = [...siteConfig.home.sections, ...siteConfig.pages.flatMap((p): { type: string }[] => [...p.sections])];
-    for (const s of sections) {
-      const r = sectionSchema.safeParse(s);
-      expect(r.success, `${s.type}: ${JSON.stringify(r.error?.issues)}`).toBe(true);
-    }
   });
 
   it("hero não aceita title (sectionBase menos o hero)", () => {

@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../packages/schema/json/service.schema.json",
+  "name": "Instalação Elétrica",
+  "shortDescription": "Pontos de luz, tomadas, quadro de disjuntores e adequação às normas vigentes.",
+  "description": "Instalação e adequação de sistemas elétricos residenciais e comerciais, com dimensionamento correto de fiação, disjuntores e aterramento. Inclui criação de novos pontos, substituição de quadro de distribuição e laudos técnicos quando necessário.",
+  "images": [
+    "/services/instalacao-eletrica-1.jpg",
+    "/services/instalacao-eletrica-2.jpg"
+  ],
+  "specs": [
+    {
+      "label": "Prazo médio",
+      "value": "2 a 5 dias, conforme escopo"
+    },
+    {
+      "label": "Garantia do serviço",
+      "value": "12 meses"
+    },
+    {
+      "label": "Normas",
+      "value": "NBR 5410"
+    }
+  ],
+  "order": 30
+}

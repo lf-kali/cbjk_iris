@@ -1,0 +1,131 @@
+{
+  "$schema": "../../../packages/schema/json/home.schema.json",
+  "sections": [
+    {
+      "type": "hero",
+      "height": "lg",
+      "slides": [
+        {
+          "image": "/home/slide-1.jpg",
+          "alt": "Sala de estar reformada",
+          "title": "Sua casa do jeito que você imaginou",
+          "subtitle": "Produtos selecionados e equipe própria, do projeto à entrega.",
+          "cta": {
+            "label": "Pedir orçamento",
+            "whatsapp": true
+          },
+          "secondaryCta": {
+            "label": "Conheça a cbjk",
+            "href": "/sobre"
+          }
+        },
+        {
+          "image": "/home/slide-2.jpg",
+          "alt": "Sala com parede de tijolos e piso de madeira",
+          "title": "Visita técnica sem custo",
+          "subtitle": "Agende pelo WhatsApp e receba um orçamento detalhado.",
+          "cta": {
+            "label": "Agendar visita",
+            "whatsapp": "Olá! Gostaria de agendar uma visita técnica."
+          },
+          "align": "center"
+        }
+      ]
+    },
+    {
+      "type": "benefits",
+      "title": "Por que escolher a cbjk",
+      "items": [
+        {
+          "icon": "shield-check",
+          "title": "Garantia de 12 meses",
+          "text": "Todos os serviços com garantia por escrito."
+        },
+        {
+          "icon": "clock",
+          "title": "Prazo cumprido",
+          "text": "Cronograma combinado antes de começar a obra."
+        },
+        {
+          "icon": "hand-coins",
+          "title": "Orçamento sem custo",
+          "text": "Visita técnica e orçamento detalhado grátis."
+        },
+        {
+          "icon": "users",
+          "title": "Equipe própria",
+          "text": "Profissionais treinados, sem terceirização."
+        }
+      ]
+    },
+    {
+      "type": "products",
+      "title": "Destaques da loja"
+    },
+    {
+      "type": "services",
+      "title": "Nossos serviços",
+      "subtitle": "Do reparo pontual à reforma completa."
+    },
+    {
+      "type": "stats",
+      "items": [
+        {
+          "value": "10+",
+          "label": "anos de experiência"
+        },
+        {
+          "value": "500+",
+          "label": "obras entregues"
+        },
+        {
+          "value": "4,9",
+          "label": "nota média dos clientes"
+        },
+        {
+          "value": "12",
+          "label": "meses de garantia"
+        }
+      ]
+    },
+    {
+      "type": "testimonials",
+      "title": "O que dizem nossos clientes",
+      "items": [
+        {
+          "name": "Mariana Souza",
+          "role": "Reforma de banheiro",
+          "rating": 5,
+          "text": "Equipe pontual e cuidadosa. Entregaram antes do prazo e deixaram tudo limpo."
+        },
+        {
+          "name": "Carlos Lima",
+          "role": "Instalação elétrica",
+          "rating": 5,
+          "text": "Explicaram cada etapa e o orçamento bateu com o valor final. Recomendo."
+        },
+        {
+          "name": "Fernanda Alves",
+          "role": "Piso porcelanato",
+          "rating": 5,
+          "text": "Acabamento impecável. Já chamei de novo para a cozinha."
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "title": "Projetos recentes",
+      "limit": 6
+    },
+    {
+      "type": "cta-banner",
+      "title": "Pronto para começar?",
+      "text": "Fale com a gente pelo WhatsApp e receba seu orçamento em até 24 horas.",
+      "cta": {
+        "label": "Falar no WhatsApp",
+        "whatsapp": true
+      },
+      "tone": "primary"
+    }
+  ]
+}

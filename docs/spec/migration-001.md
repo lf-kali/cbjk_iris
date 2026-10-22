@@ -153,3 +153,54 @@ Controle negativo: com `packages/core/src/lib/zz-violacao.ts` importando `../pro
 | Licença e acesso | `grep -L '"license": "MIT"' packages/*/package.json`, `grep -L '"access": "public"' packages/*/package.json` | vazios |
 | `.gitignore` do site | `grep -nE '^(node_modules\|\.next)$' apps/site/.gitignore` | as duas linhas |
 | `schema` pelo Node | `node --input-type=module -e "import('@cbjk_iris/schema').then(m => console.log(Object.keys(m).length))"` em `apps/site` | `2` (Node 24.18; o 22.18 não foi testado) |
+
+## 6. E5: conteúdo em JSON (2026-10-21)
+
+`packages/core/src/catalog/data/{products,services}.ts` e as chaves `home` e `pages` do `apps/site/site.config.ts` viraram 11 arquivos em `apps/site/content/`: `home.json`, `pages/{sobre,contato}.json`, 4 em `products/` e 4 em `services/`. Os arquivos foram gerados por um script de uma vez (não commitado), com estas regras: sem `kind` e sem `slug`; sem `whatsappButton` (o padrão `true` do schema dá o mesmo resultado que o `?? true` antigo); `order` de 10 em 10 na ordem do array; `$schema` relativo, calculado por `createRequire(apps/site).resolve("@cbjk_iris/schema/json/<tipo>.schema.json")`. Perdeu-se só um comentário: o exemplo de widget do TripAdvisor que ficava em `pages[sobre]`, porque JSON não aceita comentário.
+
+### Equivalência, provada antes de apagar as fontes antigas
+
+O teste temporário `packages/engine/test/migration-e5.test.ts` comparou a saída dos loaders com os objetos antigos, por `toEqual`:
+- produtos e serviços iguais a `data/*.ts`, mais `order: (i + 1) * 10`;
+- home igual a `siteConfig.home`;
+- páginas iguais a `siteConfig.pages`, ordenadas por slug.
+
+```
+$ npx vitest run test/migration-e5.test.ts --reporter=verbose      # em packages/engine; exit 0
+ ✓ produtos: iguais aos de data/products.ts, com order de 10 em 10 na ordem do array
+ ✓ serviços: iguais aos de data/services.ts, com order de 10 em 10 na ordem do array
+ ✓ home: igual a siteConfig.home
+ ✓ páginas: iguais a siteConfig.pages (ordenadas por slug)
+      Tests  4 passed (4)
+```
+
+Controle negativo: trocar "Sobre nós" por "Sobre nos" em `content/pages/sobre.json` faz o teste de páginas falhar (1 failed | 3 passed). Depois disso, o teste e as fontes antigas foram apagados.
+
+**Como refazer:** recrie os dois arquivos com `git show main:packages/core/src/catalog/data/products.ts` (e `services.ts`) no caminho antigo e o `home`/`pages` com `git show main:apps/site/site.config.ts`, e rode o mesmo teste.
+
+### HTML pré-renderizado igual ao do `main`
+
+Cada build passa por um script de uma vez, que tira de cada `.next/server/app/**/*.html` o texto visível e os atributos `href`, `src`, `alt`, `srcset`, `aria-label` e `content`. Ele ignora scripts e estilos, descarta as URLs de `/_next/static/` e normaliza o `BUILD_ID`. Os dois builds foram feitos com `npm run build`: o do `main` (63b4012) antes de qualquer edição e o do branch.
+
+```
+$ diff html-main.txt html-e5.txt      # 16 páginas (index, sobre, contato, 4 produtos, 4 serviços, listas, galeria, 404); exit 0, sem diferença
+```
+
+### Tabela de rotas
+
+O conjunto de rotas e os símbolos (`○` estático, `●` SSG) são iguais aos do `main`. Só mudou a ordem de listagem dos parâmetros de `/[slug]`: antes `/sobre`, `/contato` (ordem do array), agora `/contato`, `/sobre` (o `loadPages` ordena por slug). A ordem do `generateStaticParams` não afeta nada no site. `/produto/[slug]` e `/servico/[slug]` ganharam `dynamicParams = false`: com isso nenhuma rota lê `content/` em tempo de execução, e o slug desconhecido continua dando 404.
+
+### Achado: aviso de tracing do Turbopack
+
+No monorepo, o Turbopack empacota o engine (seção 2). Com o `path.resolve(root ?? process.cwd())` dos loaders, o build passou a mostrar `Encountered unexpected file in NFT list ... the whole project was traced unintentionally`. A correção foi o comentário `/* turbopackIgnore: true */` dentro do `path.resolve`, que a doc do Next oferece (`08-turbopack.md`, tabela de comentários mágicos) e que o tsdown preserva no `dist`. Depois disso, o build não tem mais esse aviso. No projeto do cliente, o engine é externo (`serverExternalPackages`) e o Turbopack não o analisa.
+
+### Outras medições
+
+| O quê | Comando | Resultado |
+|---|---|---|
+| Linha de base v0 | `npm run e2e -- baseline` | 34 passaram, 2 pulados (hidratação no celular, por desenho); exit 0 |
+| gzip dos chunks do cliente | soma de `gzip -9` de `apps/site/.next/static/chunks/**/*.js` | `main` 279,6 KB → E5 278,1 KB (−1,5 KB: o `site.config.ts`, que vai ao navegador, perdeu `home` e `pages`) |
+| Engine e zod fora do navegador | `grep -rlE "ZodError\|ContentError\|readdirSync" apps/site/.next/static` | vazio |
+| Erro de conteúdo no build | cópia com `answer` faltando em `content/pages/sobre.json`, `next build` | exit 1: `content/pages/sobre.json → sections[2].items[0].answer: Entrada inválida: esperava um texto, recebeu um valor "undefined"` |
+| Catálogo vazio | cópia com só `content/products/.gitkeep`, `next build` | exit 0; `● /produto/[slug]` sem páginas |
+| `next dev` | `curl /sobre`, editar o JSON, `curl /sobre` de novo | o texto novo aparece sem reiniciar (não há recarga automática no navegador) |

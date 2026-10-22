@@ -5,8 +5,8 @@
     {
       "id": "products",
       "name": "Produtos",
-      "paths": ["app/(iris)/produtos", "app/(iris)/produto", "public/products"],
-      "corePaths": ["app/products", "products", "catalog/products.ts", "catalog/data/products.ts", "sections/products.tsx"],
+      "paths": ["app/(iris)/produtos", "app/(iris)/produto", "public/products", "content/products"],
+      "corePaths": ["app/products", "products", "catalog/products.ts", "sections/products.tsx"],
       "menu": ["/produtos"],
       "dependencies": [],
       "sections": ["products"]
@@ -14,8 +14,8 @@
     {
       "id": "services",
       "name": "Serviços",
-      "paths": ["app/(iris)/servicos", "app/(iris)/servico", "public/services"],
-      "corePaths": ["app/services", "services", "catalog/services.ts", "catalog/data/services.ts", "sections/services.tsx"],
+      "paths": ["app/(iris)/servicos", "app/(iris)/servico", "public/services", "content/services"],
+      "corePaths": ["app/services", "services", "catalog/services.ts", "sections/services.tsx"],
       "menu": ["/servicos"],
       "dependencies": [],
       "sections": ["services"]

@@ -43,7 +43,6 @@ export type {
   FooterConfig,
   LeadsConfig,
   MenuItem,
-  PageConfig,
   SiteConfig,
   SiteConfigInput,
   SiteLogo,

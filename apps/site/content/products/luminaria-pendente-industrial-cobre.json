@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Luminária Pendente Industrial Cobre",
+  "category": "Iluminação",
+  "price": 219.9,
+  "installment": {
+    "count": 4,
+    "value": 54.98,
+    "hasInterest": false
+  },
+  "images": [
+    "/products/luminaria-pendente-1.jpg"
+  ],
+  "shortDescription": "Estilo industrial, cúpula em metal cobre escovado.",
+  "description": "Pendente com cúpula em metal cobre escovado, indicado para mesas de jantar, balcões e bancadas. Compatível com lâmpadas E27 (não inclusas).",
+  "specs": [
+    {
+      "label": "Material",
+      "value": "Metal escovado"
+    },
+    {
+      "label": "Soquete",
+      "value": "E27"
+    },
+    {
+      "label": "Altura do cabo",
+      "value": "Ajustável até 1,5 m"
+    }
+  ],
+  "stockQty": 0,
+  "order": 30
+}

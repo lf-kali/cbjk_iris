@@ -7,7 +7,8 @@
 //    Nenhum arquivo do core importa o próprio core por "@cbjk_iris/core/..." (escaparia da checagem).
 // 2. Para cada módulo desligado sozinho, e para todos juntos: copia apps/site para
 //    apps/.modules-check-<cenário>/ (mesma profundidade, então tsconfig e @source continuam valendo),
-//    apaga as rotas e o conteúdo do módulo, tira menu e seções do site.config.ts, regenera o registro,
+//    apaga as rotas e o conteúdo do módulo, tira o menu do site.config.ts e grava nele os modules que
+//    sobraram, tira as seções do módulo de content/home.json e content/pages/*.json, regenera o registro,
 //    roda tsc e next build e confere que o HTML gerado não tem link para rota removida.
 // Use --keep para manter as cópias.
 import { execFileSync } from "node:child_process";
@@ -15,6 +16,7 @@ import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } 
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { removeSectionsFromContent } from "./lib/modules-check-content.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = path.join(ROOT, "apps/site");
@@ -76,7 +78,7 @@ function checkCoreIsolation(modules) {
   return problems;
 }
 
-function removeModules(dir, mods) {
+function removeModules(dir, mods, allModules) {
   const configPath = path.join(dir, "site.config.ts");
   let config = readFileSync(configPath, "utf8");
   for (const mod of mods) {
@@ -85,11 +87,13 @@ function removeModules(dir, mods) {
     for (const route of mod.menu) {
       config = config.replace(new RegExp(`^.*path: "${route}".*\\n`, "m"), "");
     }
-    for (const type of mod.sections) {
-      config = config.replace(new RegExp(`\\{\\s*type: "${type}"[^}]*\\},?\\s*`, "g"), "");
-    }
   }
+  // siteConfig.modules = os que sobraram: os loaders recusam seção de módulo desligado
+  const remaining = allModules.filter((m) => !mods.includes(m)).map((m) => JSON.stringify(m.id));
+  if (/^\s*modules:/m.test(config)) throw new Error("site.config.ts já tem modules: o modules:check de transição não sabe editá-lo");
+  config = config.replace(/^(\s*)currency: (.*)$/m, `$1currency: $2\n$1modules: [${remaining.join(", ")}],`);
   writeFileSync(configPath, config);
+  removeSectionsFromContent(dir, mods.flatMap((m) => m.sections));
   syncRegistry(dir);
 }
 
@@ -112,7 +116,7 @@ function checkScenario(mods) {
   rmSync(dir, { recursive: true, force: true });
   try {
     cpSync(SITE, dir, { recursive: true, filter: (src) => !SKIP.has(path.basename(src)) || src === SITE });
-    removeModules(dir, mods);
+    removeModules(dir, mods, modules);
 
     for (const [bin, args] of [[BIN.tsc, ["--noEmit", "-p", "tsconfig.json"]], [BIN.next, ["build"]]]) {
       try {
