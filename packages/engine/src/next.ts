@@ -41,7 +41,20 @@ function assertDisjoint(transpile: readonly string[], external: readonly string[
   }
 }
 
+// P-3 (dono, 2026-10-22): o Iris nunca liga images.dangerouslyAllowLocalIP. Se o next.config do projeto
+// ligar, é escolha dele: o withIris não bloqueia, mas avisa a cada build, porque o otimizador de imagens
+// passa a aceitar endereço de rede interna (defesa principal contra imagem de IP local, SPEC §5.3).
+function warnLocalIP(nextConfig: NextConfig) {
+  // qualquer valor verdadeiro: o Next testa a opção como truthy
+  if (!nextConfig.images?.dangerouslyAllowLocalIP) return;
+  console.warn(
+    "Aviso do Iris: o next.config.ts liga images.dangerouslyAllowLocalIP. O otimizador de imagens passa a buscar " +
+      "endereços de rede interna (127.0.0.1, 10.x, 192.168.x...). Mantenha só se você precisa disso e confia em todos os hosts de images.remoteHosts.",
+  );
+}
+
 export function withIris(siteConfig: SiteConfigInput, nextConfig: NextConfig = {}): NextConfig {
+  warnLocalIP(nextConfig);
   // lança SiteConfigError ("site.config.ts tem erros: ...") se o config for inválido
   const { images } = resolveSiteConfig(siteConfig);
   const transpilePackages = withPackage(nextConfig.transpilePackages, CORE);

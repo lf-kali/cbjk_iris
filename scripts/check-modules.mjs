@@ -15,7 +15,6 @@ import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "no
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { removeSectionsFromContent } from "./lib/modules-check-content.mjs";
 import { builtRouteProblems, copyDirFor, generatedRouteProblems, removeCopy, removeMenuRoutes, setModules } from "./lib/modules-check.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -39,8 +38,8 @@ if (!["schema", "engine"].every((p) => existsSync(path.join(ROOT, "packages", p,
   console.error("Pacotes não compilados. Rode antes: npm run build:packages");
   process.exit(1);
 }
-const { MODULES, sectionsOfModule } = await import("@cbjk_iris/schema");
-const { sync, formatDiagnostic, ROUTE_PAGES } = await import("@cbjk_iris/engine");
+const { MODULES } = await import("@cbjk_iris/schema");
+const { sync, formatDiagnostic, removeModuleContent, ROUTE_PAGES } = await import("@cbjk_iris/engine");
 
 function walk(dir, pattern) {
   if (!existsSync(dir)) return [];
@@ -104,7 +103,8 @@ function disableModules(dir, off) {
   let config = setModules(readFileSync(configPath, "utf8"), remaining);
   config = removeMenuRoutes(config, off.flatMap((m) => m.menu));
   writeFileSync(configPath, config);
-  removeSectionsFromContent(dir, off.flatMap((m) => sectionsOfModule(m.id)));
+  // o mesmo RemoveModuleContent que o "iris module remove" vai usar
+  for (const m of off) removeModuleContent(dir, m.id);
   return syncProblems(dir, false);
 }
 

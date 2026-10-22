@@ -245,3 +245,18 @@ Conferido com `--keep`: na cópia sem os três módulos, `app/(iris)/` só tem `
 ### Leitura do config num processo filho
 
 Testado no Node 22.18 (binário oficial `node-linux-x64@22.18.0`) e no 24.18: `require()` e `import()` do `site.config.ts` funcionam sem flag, mas nenhum dos dois relê o arquivo editado no mesmo processo (nem com `delete require.cache`). Só o `import()` com query nova relê, e assim mesmo não relê os arquivos que o config importa. Por isso o `loadSiteConfig` usa um processo filho a cada chamada (§5.6).
+
+## 8. E6b: conteúdo e Next (2026-10-22)
+
+`checkContent` e `removeModuleContent` entraram no engine (§5.6), só pela raiz. Os loaders ganharam um núcleo síncrono que devolve dados e diagnostics sem lançar (`collectHome`, `collectPages`, `collectProducts`, `collectServices`). A API pública deles não mudou. O `scripts/lib/modules-check-content.mjs` saiu: o `modules:check` usa o `removeModuleContent` do engine, o mesmo que o `iris module remove` vai usar.
+
+| O quê | Comando | Resultado |
+|---|---|---|
+| HTML pré-renderizado | build de `git archive 9cbf17f` (o `main`) num diretório à parte, com `npm ci` e `npm run build`; o mesmo extrator da E5; `diff` com o build do branch | 16 páginas, exit 0, sem diferença |
+| Tabela de rotas | `diff` do trecho `Route (app)` das duas saídas do `next build` | exit 0 |
+| Linha de base v0 | `npm run e2e -- baseline` | 34 passaram, 2 pulados (por desenho); exit 0 |
+| Código de Node fora do navegador | `grep -rlE "spawnSync\|SiteConfigLoadError\|child_process\|checkContent\|removeModuleContent" apps/site/.next/static` | vazio (exit 1) |
+| Entradas que o core importa | `grep -l child_process` em `dist/content.mjs`, `dist/theme.mjs` e nos chunks que eles importam (`loaders-*.mjs`, `brand-*.mjs`) | vazio; só `codegen-*.mjs` tem `child_process` |
+| gzip dos chunks do cliente | soma de `gzip -9` de `apps/site/.next/static/chunks/**/*.js` | `main` 284.531 bytes, E6b 284.516 bytes |
+| `sync:check` | `npm run sync:check` | exit 0 |
+| `modules:check` | `npm run modules:check` | exit 0: isolamento e os 4 cenários ✓ |
