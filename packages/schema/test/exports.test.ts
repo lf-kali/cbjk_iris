@@ -12,7 +12,7 @@ const ROOT_VALUES = [
   "COLOR_TOKENS", "DEFAULT_BUTTON_ORDER", "DEFAULT_MODULES", "DEFAULT_STYLE_ID", "DEFAULT_TEXTS", "EXIT_CODES",
   "FROZEN_UTILITIES", "IRIS_STYLE_VAR", "MODULES", "MODULE_IDS", "PLATFORM_HOSTS", "PURCHASE_PLATFORMS",
   "RESERVED_PAGE_SLUGS", "SECTION_ICONS", "SECTION_TYPES", "SHAPE_TOKENS", "SHAPE_TOKEN_KEYS", "STYLE_IDS",
-  "SiteConfigError", "applySiteConfigDefaults", "catalogItemBase", "cliResultSchema", "defineSection", "fieldAsk",
+  "SiteConfigError", "applySiteConfigDefaults", "catalogItemBase", "cliResultSchema", "cssValue", "defineSection", "fieldAsk",
   "fieldMeta", "fieldMetaSchema", "formatIssuePath", "getSectionDefinition", "homeSchema", "httpsUrl",
   "installmentSchema", "pageSchema", "pageSlugSchema", "platformUrl", "productContentSchema", "productSchema",
   "ptBRError", "resolveSiteConfig", "resolveTexts", "sectionBase", "sectionDefinitions", "sectionSchema",

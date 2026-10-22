@@ -9,3 +9,6 @@ export { ROUTE_PAGES, sync, syncBrand, syncRegistry, syncRoutes, type RoutePage 
 export { ContentError, formatDiagnostic } from "./content/errors";
 export { checkContent } from "./content/check";
 export { removeModuleContent } from "./modules";
+// tema mínimo (E6c): fora do ./theme, que o core importa (importTheme usa a rede)
+export { listStyles, listThemes, validateTheme } from "./theme/api";
+export { importTheme, writeThemeFile } from "./theme/import";
