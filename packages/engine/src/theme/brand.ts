@@ -98,8 +98,10 @@ function applyBrand(theme: ThemeVars, brand: BrandConfig, mode: Mode): ColorToke
   return { ...tokens, ...brand.overrides?.[mode] };
 }
 
-export function resolveSiteTheme(themeName: string, brand: BrandConfig): SiteTheme {
-  const theme = readThemeFile(themeName);
+// root: raiz do projeto, para achar themes/ (padrão process.cwd(), como antes). Acrescentado na E6a
+// para o SyncBrand ler o tema da raiz pedida; o layout continua chamando sem ele.
+export function resolveSiteTheme(themeName: string, brand: BrandConfig, root?: string): SiteTheme {
+  const theme = readThemeFile(themeName, root);
   const extra = (vars: ThemeVars) =>
     Object.fromEntries(EXTRA_VARS.map((k) => [k, vars[k] ?? DEFAULT_SHADOWS[k] ?? "0em"]));
 

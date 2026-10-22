@@ -1,5 +1,5 @@
 // Gerado por iris sync. Não edite à mão.
-// Até a CLI existir, quem gera é "npm run brand:sync" (roda sozinho antes de dev e build), a partir de siteConfig.brand.fonts.
+// Fonte: siteConfig.brand.fonts (ou a --font-sans do tema). Para regenerar: npm run sync (depois, iris sync).
 import { Geist } from "next/font/google";
 
 const sans = Geist({ subsets: ["latin"], variable: "--font-brand-sans", display: "swap" });

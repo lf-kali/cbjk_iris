@@ -1,3 +1,5 @@
-// @cbjk_iris/engine/codegen: SyncRegistry, SyncRoutes e Sync (SPEC §5.6). Chega na E6.
-// Até lá, os geradores são os scripts de apps/site/scripts/.
-export {};
+// @cbjk_iris/engine/codegen: Sync, SyncBrand, SyncRegistry e SyncRoutes (SPEC §5.6), e a tabela de rotas
+// geradas (§5.1.3). Só para Node (CLI e scripts): o core não importa este subpath.
+export { sync, syncBrand, syncRegistry, syncRoutes } from "./sync";
+export { ROUTE_PAGES, type RoutePage } from "./routes";
+export { GENERATED_HEADER } from "./files";

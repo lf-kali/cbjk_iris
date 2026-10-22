@@ -5,6 +5,9 @@ export const siteConfig = {
   name: "cbjk",
   locale: "pt-BR",
   currency: "BRL",
+  // módulos opcionais ligados (products, services, gallery). Desligar um tira as rotas e as seções dele
+  // no próximo sync. A CLI muda esta lista com "iris module add/remove".
+  modules: ["products", "services", "gallery"],
   theme: {
     // arquivo em themes/: neutral, stone, zinc, slate, gray, taupe (shadcn),
     // modern-minimal, ocean-breeze, caffeine, elegant-luxury (tweakcn) ou um colado à mão
