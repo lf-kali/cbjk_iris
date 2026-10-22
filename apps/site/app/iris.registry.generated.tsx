@@ -1,5 +1,5 @@
 // Gerado por iris sync. Não edite à mão.
-// Até a CLI existir, quem gera é "npm run modules:sync" (apps/site/scripts/sync-modules.mjs), a partir de modules.json.
+// Fonte: sectionDefinitions do @cbjk_iris/schema e siteConfig.modules. Para regenerar: npm run sync (depois, iris sync).
 import type { SectionRegistry } from "@cbjk_iris/schema";
 import HeroSection from "@cbjk_iris/core/sections/hero";
 import BenefitsSection from "@cbjk_iris/core/sections/benefits";

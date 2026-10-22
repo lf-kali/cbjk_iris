@@ -320,9 +320,28 @@ Arquivos gerados pelo sync, todos com o cabeçalho "Gerado por iris sync. Não e
 | Arquivo | Conteúdo |
 |---|---|
 | `app/layout.tsx` | `export { irisMetadata as metadata }` + `RootLayout` que renderiza `<IrisRootLayout fontClassName={fontClassName}>` |
-| `app/(iris)/<rota>/page.tsx` | Reexporta `default`, `generateStaticParams` e `generateMetadata` da página do core. Config de segmento (`dynamicParams = false`) escrito literal, porque a doc do Next só garante exports diretos |
+| `app/(iris)/<rota>/page.tsx` | Reexporta da página do core os nomes da tabela `ROUTE_PAGES`, abaixo. Config de segmento (`dynamicParams = false`) escrito literal nas rotas com `[slug]`, porque a doc do Next só garante exports diretos |
 | `app/iris.registry.generated.tsx` | Seções `module: "core"` e as dos módulos em `siteConfig.modules`, importadas de `@cbjk_iris/core/sections/<type>` |
 | `app/fonts.generated.ts` | Igual ao de hoje |
+
+**Rotas geradas (`ROUTE_PAGES`, exportada por `@cbjk_iris/engine/codegen`):** cada página do core precisa exportar os nomes listados. Mudar um nome é mudança de contrato. O `SyncRoutes` gera só as rotas do núcleo e as dos módulos em `siteConfig.modules`.
+
+| Rota em `app/(iris)/` | Módulo | Página (`@cbjk_iris/core/app/…`) | Exports reexportados | `dynamicParams = false` |
+|---|---|---|---|---|
+| (home) | core | `home` | `default` | não |
+| `[slug]` | core | `config-page` | `default`, `generateStaticParams`, `generateMetadata` | sim |
+| `produtos` | products | `products/list` | `default`, `metadata` | não |
+| `produto/[slug]` | products | `products/detail` | `default`, `generateStaticParams`, `generateMetadata` | sim |
+| `servicos` | services | `services/list` | `default`, `metadata` | não |
+| `servico/[slug]` | services | `services/detail` | `default`, `generateStaticParams`, `generateMetadata` | sim |
+| `ultimos-projetos` | gallery | `gallery/page` | `default`, `metadata` | não |
+
+**Regras de escrita do sync** (`packages/engine/src/codegen/files.ts`):
+- Arquivo sem o cabeçalho num caminho gerado é **erro** e não é sobrescrito (foi escrito à mão; a mensagem manda apagar e rodar o sync de novo).
+- Nenhuma gravação com erro: com qualquer erro no plano (config inválido, fonte inexistente, link simbólico), nada é escrito nem apagado. Cada arquivo é gravado de forma atômica, mas o conjunto não: uma falha de E/S no meio (disco cheio, permissão) pode deixar parte dos arquivos atualizada; rodar o sync de novo completa.
+- Nenhum link simbólico entre a raiz e o arquivo (`app/`, `app/(iris)/`...). A própria raiz pode ser um link.
+- Escrita atômica (temporário + `rename`). A rota de um módulo desligado é apagada só se tiver o cabeçalho, e as pastas que ficarem vazias saem junto. Uma rota de módulo desligado escrita à mão fica, com aviso.
+- O `--check` compara byte a byte `app/fonts.generated.ts`, `app/iris.registry.generated.tsx`, `app/layout.tsx` e cada rota esperada, e acusa rota gerada de módulo desligado que ainda existe. Não compara `app/globals.css` (gerado só na criação). Erro sempre falha; aviso nunca.
 
 O `app/globals.css` é gerado só na criação do projeto: `@import "@cbjk_iris/core/styles/iris.css";` e `@source "../node_modules/@cbjk_iris/core/src";`. O cliente pode acrescentar CSS depois dessas linhas.
 
@@ -517,7 +536,7 @@ export type PurchaseButtonTexts = SiteTexts["products"]["buttons"]; // definido 
 - `texts` é parcial em todos os níveis, mas strict: chave de texto desconhecida é erro de validação (pega erro de digitação).
 - `resolveSiteConfig` lança `SiteConfigError` (com `issues`), mensagem `site.config.ts tem erros:` e uma linha `caminho: mensagem` por erro. As mensagens padrão do zod saem em pt-BR (locale `ptBR` do zod, passado em cada parse, sem mudar a config global).
 - **No core, ninguém importa o alias direto.** Só `packages/core/src/lib/config.ts` importa `@cbjk_iris/site-config` e exporta `export const siteConfig: SiteConfig = applySiteConfigDefaults(raw)`, de `@cbjk_iris/schema/defaults`. Os 53 acessos de hoje a `siteConfig.texts.*` continuam iguais; muda só o import, que o arquiteto troca na migração.
-- **Onde o config é validado (R-1 da E4, decisão do dono em 2026-10-21):** `lib/config.ts` vai para o navegador (componentes `"use client"` o importam), e o zod no bundle somava cerca de 62 KB gzip. Por isso o core só preenche os padrões, com `applySiteConfigDefaults` (subpath `@cbjk_iris/schema/defaults`, que não importa zod nem de forma indireta; um teste confere o fonte e o `dist`). A validação completa (`resolveSiteConfig`) roda no Node: no `withIris` (o `next.config` carrega o config, então o build falha antes de renderizar) e, a partir da E6, em `LoadSiteConfig`, `Sync` e `iris check`. Um teste garante que `applySiteConfigDefaults(x)` é igual a `siteConfigSchema.parse(x)` para configs válidos.
+- **Onde o config é validado (R-1 da E4, decisão do dono em 2026-10-21):** `lib/config.ts` vai para o navegador (componentes `"use client"` o importam), e o zod no bundle somava cerca de 62 KB gzip. Por isso o core só preenche os padrões, com `applySiteConfigDefaults` (subpath `@cbjk_iris/schema/defaults`, que não importa zod nem de forma indireta; um teste confere o fonte e o `dist`). A validação completa (`resolveSiteConfig`) roda no Node: no `withIris` (o `next.config` carrega o config, então o build falha antes de renderizar) e, a partir da E6, em `LoadSiteConfig`, `Sync` e `iris check`. Um teste garante que `applySiteConfigDefaults(x)` é igual a `siteConfigSchema.parse(x)` para configs válidos. **Limite no `next dev` (conferido na E6a):** o Next só observa os arquivos `next.config.*` (`next/dist/server/lib/start-server.js`, `watchConfigFiles(CONFIG_FILES)`), então editar o `site.config.ts` com o servidor rodando não roda o `withIris` de novo: a página recarrega com o config sem validação, só com os padrões. O `predev` (sync) valida na partida, e o `next build` sempre valida. Um observador que revalide durante o `dev` fica para a CLI (`iris dev`, backlog).
 - **Validações de segurança do config e das seções** (`packages/schema/src/fields.ts`):
   - **Valor cru primeiro:** link, caminho e imagem recusam, antes de qualquer outra regra, caractere de controle (C0, DEL, C1), espaço, espaço e marca invisível (NBSP, soft hyphen U+00AD, U+200B a U+200F, U+2028, U+2029, controles bidi U+202A a U+202E, U+2060 a U+206F, CGJ U+034F, ALM U+061C, MVS U+180E, BOM), a barra invertida e os pontos unicode `\u3002`, `\uff0e` e `\uff61`. O navegador e o `new URL()` removem ou reinterpretam esses caracteres: `"/\t/evil.com"` vira `//evil.com`, e `"https://mercadolivre.com.br\\@evil.com"` aponta para `evil.com`.
   - **Links** de botão e de menu (`href`, `path`): só rota (`/`, nunca `//`), âncora (`#`), `https:`, `mailto:` e `tel:` (sem espaço). O `mailto:` aceita um único e-mail válido (formato do `z.email()`) e, na query, só `subject` e `body`: `cc`, `bcc`, `to` e outros parâmetros são recusados, e `%0d`/`%0a` em qualquer parte também.
@@ -830,13 +849,22 @@ export type CheckContent = (root: string) => Diagnostic[];
 export type RemoveModuleContent = (root: string, id: ModuleId) => { changes: FileChange[] };
 ```
 
-`LoadSiteConfig` usa o type stripping do Node, como o `brand:sync` já faz hoje. Por isso o `site.config.ts` só pode usar sintaxe apagável (sem `enum`, sem `namespace`) e `import type` para tipos. O `iris check` avisa se não for o caso.
+`LoadSiteConfig` usa o type stripping do Node. Por isso o `site.config.ts` só pode usar sintaxe apagável (sem `enum`, sem `namespace`) e `import type` para tipos. O `iris check` avisa se não for o caso.
+
+**Como o config é lido (E6a, P-1 = A, dono em 2026-10-22):** num processo filho do Node, a cada chamada (`process.execPath --input-type=module -e …`, `cwd` na raiz, até 30 s e até 4 MiB de saída por canal (`maxBuffer`), resultado em JSON pelo descritor 3). Mensagens e stderr do filho entram nos diagnósticos sem sequências ANSI nem caracteres de controle, com até 200 caracteres. O Node guarda o módulo importado em cache, e nem `import()` nem `require()` releem um arquivo editado no mesmo processo (testado no 22.18 e no 24.18). Sem o filho, a CLI que edita o config e roda o sync usaria o config velho. As funções síncronas do §5.6 (`Sync`, `SyncBrand`, `SyncRegistry`, `SyncRoutes`, `CheckContent`, `RemoveModuleContent`) usam o mesmo carregador. Consequências:
+- **O `siteConfig` precisa ser só dados que viram JSON:** texto, número finito, booleano, `null`, lista e objeto simples. Função, classe, `Date`, `Map`, símbolo, `bigint` e referência circular são erro, com o caminho do valor.
+- Erros de carga lançam `SiteConfigLoadError` (do `@cbjk_iris/engine`, com `diagnostics: Diagnostic[]`, `file: "site.config.ts"`): arquivo ausente, sintaxe não apagável, exceção ao executar, sem `export const siteConfig`, valor que não é dado, tempo esgotado. Config carregado mas inválido continua lançando `SiteConfigError`. `configDiagnostics(error)` converte os dois em `Diagnostic[]`.
+- As funções que devolvem `SyncResult` nunca lançam erro por problema do projeto: tudo vira `diagnostics`.
+
+**Semântica do `SyncResult`:** com `check: true`, `changed` lista o que mudaria e nada é escrito. Com `check: false`, `changed` lista o que mudou (vazio se houve erro, porque nada é escrito). `upToDate` é `true` só sem nenhuma mudança pendente e sem erro. Avisos (contraste baixo, estilo sem preset, fonte do tema fora do Google) não mudam `upToDate`.
+
+**Nomes e onde ficam:** as funções têm o nome do tipo em camelCase (`loadSiteConfig: LoadSiteConfig`, `sync: Sync`...). A raiz `@cbjk_iris/engine` é a API da CLI e exporta todas, mais `SiteConfigLoadError`, `configDiagnostics`, `formatDiagnostic` e `withIris`. `./codegen` exporta `sync`, `syncBrand`, `syncRegistry`, `syncRoutes`, `ROUTE_PAGES` e `GENERATED_HEADER`. `./theme` (motor de tema) e `./content` (loaders) são as únicas entradas que o core importa e não levam `child_process` nem rede (R-1).
 
 `SyncBrand` resolve o `font-data.json` do Next com `createRequire(root).resolve("next/dist/compiled/@next/font/dist/google/font-data.json")`, nunca com caminho fixo de `node_modules`, porque no monorepo ele fica na raiz.
 
 **Implementação mínima do arquiteto:** antes do congelamento, o arquiteto entrega todas as funções desta seção, inclusive as de tema: `ListThemes`, `ValidateTheme` (só parse e faixas), `ListStyles` (devolve os 4 ids de `STYLE_IDS`; enquanto o preset de um estilo não existe, o sync usa os valores do `sera`, emite o `data-style` pedido e dá um aviso), `SyncBrand` e `ImportTheme` (já com as regras de segurança: só `https:`, e só variáveis CSS dentro de `:root` e `.dark`, o resto descartado). Depois da tag, o `iris-theme` evolui as de tema sem mudar a assinatura. Assim a CLI nunca espera o tema.
 
-Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funções (um `.mjs` de uma linha). É isso que `npm run sync:check` roda.
+Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funções por um `.mjs` fino: `predev`, `prebuild` e `sync` rodam `node scripts/sync.mjs`, e `sync:check` roda `node scripts/sync.mjs --check` (P-6). O script imprime os diagnostics, sai com 1 em erro ou, no `--check`, se algo estiver desatualizado, e manda rodar `npm run build:packages` quando o engine não está compilado. É isso que `npm run sync:check` roda. Os antigos `brand:sync` e `modules:sync` saíram, com o `apps/site/modules.json`. O `apps/site/site.config.ts` declara `modules` explicitamente (P-7).
 
 **Subpaths de `exports`, já declarados pelo arquiteto:**
 
@@ -1040,7 +1068,7 @@ O arquiteto cria estes scripts na raiz, com as dependências de teste (vitest, P
 | `npm test` | `build:packages` e depois vitest em todos os pacotes (`npm test -w <pacote>` para um só) |
 | `npm run build` | build dos pacotes e `next build` do `apps/site` |
 | `npm run sync:check` | Roda `npm run sync:check -w apps/site`. O script do `apps/site` chama `Sync(root, { check: true })`; quando o `iris-cli` o trocar por `iris sync --check`, o nome do script continua o mesmo |
-| `npm run modules:check` | Matriz de módulos: gera cópias do `apps/site` em `<raiz>/apps/.modules-check-<cenário>/` (mesma profundidade do `apps/site`, então os caminhos relativos de `tsconfig` e `@source` continuam valendo; o padrão `apps/.*` vai no `.gitignore`), com cada módulo desligado, um de cada vez, e com todos desligados, e roda `tsc` e `next build` em cada uma |
+| `npm run modules:check` | Matriz de módulos: gera cópias do `apps/site` em `<raiz>/apps/.modules-check-<cenário>/` (mesma profundidade do `apps/site`, então os caminhos relativos de `tsconfig` e `@source` continuam valendo; o padrão `apps/.*` vai no `.gitignore`), com cada módulo desligado, um de cada vez, e com todos desligados. Em cada cópia grava `siteConfig.modules`, tira o menu e as seções do módulo, roda o `Sync` (que apaga as rotas do módulo e regenera o registro), depois `tsc` e `next build`, e confere que o HTML não tem link para rota do módulo |
 | `npm run e2e -- <pasta>` | Playwright em `apps/site/e2e/<pasta>`, contra o `next start` do `apps/site` |
 | `npm run e2e:docker -- <pasta>` | O mesmo, dentro do container oficial do Playwright (usado para gerar e conferir capturas) |
 | `npm run build:packages` | tsdown de `schema`, `engine`, `cli` e `create` |

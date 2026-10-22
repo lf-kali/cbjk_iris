@@ -1,11 +1,7 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { MODULES, MODULE_IDS, sectionsOfModule } from "../src";
 
-// Até a E6, o apps/site/modules.json de transição ainda decide quais rotas existem.
-// As duas listas precisam concordar.
-const legacy = JSON.parse(readFileSync(path.resolve(__dirname, "../../../apps/site/modules.json"), "utf8"));
+// O apps/site/modules.json de transição saiu na E6a: os valores que ele tinha ficam congelados aqui.
 
 describe("MODULES (§5.5)", () => {
   it("ids, nomes, rotas e diretórios de conteúdo da spec", () => {
@@ -14,14 +10,14 @@ describe("MODULES (§5.5)", () => {
     expect(MODULES.find((m) => m.id === "gallery")?.routes).toEqual(["ultimos-projetos"]);
   });
 
-  it("concorda com o modules.json de transição (ids, nomes, menu e seções)", () => {
-    expect(legacy.modules.map((m: { id: string }) => m.id)).toEqual([...MODULE_IDS]);
-    for (const mod of legacy.modules) {
-      const m = MODULES.find((x) => x.id === mod.id)!;
-      expect(m.name).toBe(mod.name);
-      expect([...m.menu]).toEqual(mod.menu);
-      expect(sectionsOfModule(m.id)).toEqual(mod.sections);
-    }
-    expect(sectionsOfModule("core")).toEqual(legacy.coreSections);
+  it("nomes, menu e seções de cada módulo (os do antigo modules.json)", () => {
+    expect(MODULES.map((m) => [m.id, m.name, [...m.menu], sectionsOfModule(m.id)])).toEqual([
+      ["products", "Produtos", ["/produtos"], ["products"]],
+      ["services", "Serviços", ["/servicos"], ["services"]],
+      ["gallery", "Últimos projetos", ["/ultimos-projetos"], ["gallery"]],
+    ]);
+    expect(sectionsOfModule("core")).toEqual([
+      "hero", "benefits", "text-image", "cta-banner", "testimonials", "stats", "faq", "contact", "lead-form", "widget",
+    ]);
   });
 });

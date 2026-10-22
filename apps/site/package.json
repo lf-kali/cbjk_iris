@@ -4,16 +4,15 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "predev": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
+    "predev": "node scripts/sync.mjs",
     "dev": "next dev",
-    "prebuild": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
+    "prebuild": "node scripts/sync.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "sync:check": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs --check && node scripts/sync-modules.mjs --check",
-    "modules:sync": "node scripts/sync-modules.mjs",
-    "brand:sync": "node --experimental-strip-types --no-warnings scripts/sync-brand.mjs",
+    "sync": "node scripts/sync.mjs",
+    "sync:check": "node scripts/sync.mjs --check",
     "theme:add": "node scripts/add-theme.mjs"
   },
   "dependencies": {

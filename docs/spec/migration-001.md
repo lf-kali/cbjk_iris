@@ -204,3 +204,44 @@ No monorepo, o Turbopack empacota o engine (seção 2). Com o `path.resolve(root
 | Erro de conteúdo no build | cópia com `answer` faltando em `content/pages/sobre.json`, `next build` | exit 1: `content/pages/sobre.json → sections[2].items[0].answer: Entrada inválida: esperava um texto, recebeu um valor "undefined"` |
 | Catálogo vazio | cópia com só `content/products/.gitkeep`, `next build` | exit 0; `● /produto/[slug]` sem páginas |
 | `next dev` | `curl /sobre`, editar o JSON, `curl /sobre` de novo | o texto novo aparece sem reiniciar (não há recarga automática no navegador) |
+
+## 7. E6a: arquivos gerados pelo sync (2026-10-22)
+
+Os 9 arquivos escritos à mão na E2 (`apps/site/app/layout.tsx` e as 8 rotas de `app/(iris)/`) foram apagados e regenerados por `npm run sync` (`Sync` do engine, §5.6). Junto com `fonts.generated.ts` e `iris.registry.generated.tsx`, a diferença para o `main` está só nos comentários: todos começam com `// Gerado por iris sync. Não edite à mão.` e a segunda linha diz de onde vêm. O `apps/site/modules.json` saiu. `siteConfig.modules` é a fonte de verdade, declarada no `apps/site/site.config.ts`.
+
+### Site igual ao do `main`
+
+A referência é o build de `c269444` (o `main`), feito na mesma worktree **antes de qualquer edição**: é o mesmo código que um `git archive c269444` daria. Depois, o build do branch. Os dois com `npm run build`, e o HTML passou pelo mesmo extrator da E5 (texto visível e `href`, `src`, `alt`, `srcset`, `aria-label` e `content`, sem scripts e estilos, sem URLs de `/_next/static/`, `BUILD_ID` normalizado).
+
+| O quê | Comando | Resultado |
+|---|---|---|
+| Tabela de rotas | `diff` do trecho `Route (app)` das duas saídas do `next build` | exit 0, sem diferença |
+| HTML pré-renderizado | `diff html-main.txt html-e6a.txt` (16 páginas) | exit 0, sem diferença |
+| Linha de base v0 | `npm run e2e -- baseline` (pages, styles, hydration) | 34 passaram, 2 pulados (hidratação no celular, por desenho); exit 0 |
+| Código do sync fora do navegador | `grep -rlE "spawnSync\|SiteConfigLoadError\|child_process" apps/site/.next/static` | vazio (exit 1) |
+| gzip dos chunks do cliente | soma de `gzip -9` de `apps/site/.next/static/chunks/**/*.js` | `main` 284.551 bytes → E6a 284.563 bytes (+12 bytes) |
+| `sync:check` | `npm run sync:check` | exit 0 |
+| Controle negativo | um espaço a mais em `app/(iris)/produtos/page.tsx`, `npm run sync:check` | exit 1: `Desatualizado: app/(iris)/produtos/page.tsx. Rode: npm run sync` |
+
+### `modules:check` no formato final
+
+`scripts/check-modules.mjs`: os 4 cenários gravam `siteConfig.modules` na cópia, tiram o menu e as seções do módulo e rodam o `Sync`, que apaga as rotas do módulo. Não se apaga mais nada à mão. O `rm` da cópia só aceita `apps/.modules-check-<cenário>` e recusa link simbólico. As rotas do menu entram na `RegExp` com escape (`scripts/lib/modules-check.mjs`, com teste).
+
+```
+$ npm run modules:check      # exit 0
+✓ isolamento dos módulos no core
+✓ sem products (10s)
+✓ sem services (11s)
+✓ sem gallery (11s)
+✓ sem products + services + gallery (10s)
+```
+
+**Oráculo por cenário (rodada de correção da E6a):** a busca de `href` sozinha não provava o desligamento da galeria, porque nada linka `/ultimos-projetos`. Agora cada cenário também confere que as rotas geradas dos módulos desligados sumiram da cópia depois do sync e que o `next build` não gerou `.next/server/app/<rota>.html` nem a pasta `<rota>/` (`generatedRouteProblems` e `builtRouteProblems`, em `scripts/lib/modules-check.mjs`, com teste). Controles negativos, com o arquivo restaurado depois de cada um:
+- com `setModules` sabotado (devolve o config sem mudar), os 4 cenários falham, inclusive "sem gallery": `app/(iris)/ultimos-projetos/page.tsx ainda existe com o módulo gallery desligado`;
+- com `setModules` e `generatedRouteProblems` sabotados, os 4 falham no build: `.next/server/app/ultimos-projetos.html foi gerado com o módulo gallery desligado`.
+
+Conferido com `--keep`: na cópia sem os três módulos, `app/(iris)/` só tem `page.tsx` e `[slug]/page.tsx`, `modules: []`, nenhum item de menu de módulo e a home sem as seções de módulo. A busca de link acha `href="/sobre"` no `index.html` dessa cópia e `href="/produtos"` na cópia sem a galeria (a checagem enxerga links reais).
+
+### Leitura do config num processo filho
+
+Testado no Node 22.18 (binário oficial `node-linux-x64@22.18.0`) e no 24.18: `require()` e `import()` do `site.config.ts` funcionam sem flag, mas nenhum dos dois relê o arquivo editado no mesmo processo (nem com `delete require.cache`). Só o `import()` com query nova relê, e assim mesmo não relê os arquivos que o config importa. Por isso o `loadSiteConfig` usa um processo filho a cada chamada (§5.6).
