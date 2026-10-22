@@ -1,20 +1,21 @@
-import { services } from "./data/services";
+import { loadServices } from "@cbjk_iris/engine/content";
 import type { Service } from "@cbjk_iris/schema";
 
 // Contrato da fonte de serviços. Para usar uma API ou banco, implemente-a e troque `serviceCatalog`.
+// A implementação padrão lê content/services/<slug>.json pelo loader do engine (SPEC §5.3): só servidor.
 export interface ServiceRepository {
   list(): Promise<Service[]>;
   get(slug: string): Promise<Service | undefined>;
 }
 
-const mockServices: ServiceRepository = {
+const contentServices: ServiceRepository = {
   async list() {
-    return services;
+    return loadServices();
   },
 
   async get(slug) {
-    return services.find((service) => service.slug === slug);
+    return (await loadServices()).find((service) => service.slug === slug);
   },
 };
 
-export const serviceCatalog: ServiceRepository = mockServices;
+export const serviceCatalog: ServiceRepository = contentServices;

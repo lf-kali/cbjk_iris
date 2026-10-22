@@ -260,7 +260,7 @@ Regras:
 | `ui/*` | `components/ui/*` | `iris-theme` |
 | `sections/*` | `components/sections/*` (menos `registry.tsx`) | `iris-theme` (estilo e JSX); props vêm do schema |
 | `header/*`, `footer/*`, `brand/*`, `theme/*`, `carousel/FadeCarousel.tsx` | `components/{header,footer,brand,theme}/*`, `components/FadeCarousel.tsx` | `iris-theme` |
-| `catalog/*` (inclui `repositories.ts`, `purchase.ts`) | `components/catalog/*`, `lib/catalog/*` | `iris-commerce` |
+| `catalog/*` (inclui os repositórios `products.ts` e `services.ts`, e `purchase.ts`) | `components/catalog/*`, `lib/catalog/*` | `iris-commerce` |
 | `products/*`, `services/*`, `gallery/*` | `components/{products,services,gallery}/*`, `lib/gallery.ts` | `iris-commerce` |
 | `icons/*` | `components/icons/*` | `iris-commerce` (ícones de plataforma e redes) |
 | `lib/{whatsapp,format,routes,links,leads}.ts` | `lib/*` | `iris-commerce` |
@@ -529,16 +529,54 @@ export type PurchaseButtonTexts = SiteTexts["products"]["buttons"]; // definido 
   - **`contact.mapEmbedUrl`** (src do iframe do mapa): passa pelas regras de link https acima, com host exato `www.google.com` e caminho `/maps/embed` (qualquer query) ou `/maps` com `output=embed` na query. Qualquer outro host ou caminho é recusado.
   - **Outros campos:** `contact.email` validado como e-mail (`z.email()`); `contact.social` e `leads.endpoint` só `https:`; `theme.name` em formato de slug; `whatsapp.phone` só dígitos (10 a 15); `currency` ISO 4217; `seo.titleTemplate` com `%s`.
 - **`widget.html` é área de confiança:** o HTML e os `<script>` colados executam no site, com acesso à página inteira. O schema só exige texto não vazio. Quem edita o conteúdo é o dono do site. A CLI (`iris-cli`) deve exigir uma flag explícita para gravar um widget e dar aviso quando o código tiver `<script>`.
-- **Transição até a E5:** `home` e `pages` continuam no `siteConfigSchema`, marcados `@deprecated` (`home` ausente vira `{ sections: [] }`; `pages` com slug não reservado e sem repetição). A E5 os remove, quando o conteúdo passa para `content/`.
+- **`home` e `pages` saíram do config na E5:** passaram para `content/home.json` e `content/pages/<slug>.json`. No `site.config.ts`, as duas chaves agora são chave desconhecida (erro de validação).
 
 Regras de conteúdo:
 - **Slug:** `^[a-z0-9]+(?:-[a-z0-9]+)*$`, até 80 caracteres. O nome do arquivo é o slug, o que impede caminho com `..` ou `/`.
 - **Slugs reservados para páginas:** `produtos`, `produto`, `servicos`, `servico`, `ultimos-projetos`, `api`, `_next`, `home`, mesmo com o módulo desligado.
 - **`$schema` em cada JSON:** caminho relativo para o JSON Schema ([§5.1.4](#514-de-appssite-para-o-starter)). O loader remove a chave `$schema` antes de validar, porque os schemas são `.strict()`.
 - **JSON Schema publicado:** gerado com `z.toJSONSchema(schema, { io: "input" })` (campos com padrão ficam opcionais) e com a propriedade `$schema: { type: "string" }` declarada nas 4 raízes de arquivo (`home`, `page`, `product`, `service`; o `section.schema.json` não é raiz de arquivo). Os metadados de campo viram palavras-chave do JSON Schema: `label` → `title`, `example` → `examples`; `ask`, `input` e `order` são da CLI e não vão para o arquivo. A pasta `packages/schema/json/` é gerada no build (`tsdown && node scripts/write-json.mjs`), fica fora do git e vai no tarball.
-- **Validação no build:** os loaders do `engine` (`loadHome`, `loadPage`, `loadPages`, `loadProducts`, `loadServices`) validam cada arquivo e param o build com `content/pages/sobre.json → sections[2].items[0].answer: obrigatório`.
+- **Validação no build:** os loaders do `engine` (`loadHome`, `loadPage`, `loadPages`, `loadProducts`, `loadServices`) validam cada arquivo e param o build com `content/pages/sobre.json → sections[2].items[0].answer: <mensagem>`.
 - **Seção de módulo desligado:** erro com as duas saídas: `iris module add gallery` ou remover a seção.
-- **Repositórios:** `ProductRepository` e `ServiceRepository` mantêm a assinatura de hoje e ficam em `packages/core/src/catalog/repositories.ts`. A implementação padrão chama `loadProducts` e `loadServices`.
+- **Repositórios:** `ProductRepository` e `ServiceRepository` mantêm a assinatura de hoje e ficam em `packages/core/src/catalog/products.ts` e `catalog/services.ts` (um arquivo por módulo, para o isolamento dos módulos continuar valendo). A implementação padrão chama `loadProducts` e `loadServices`. `get(slug)` procura na lista: o slug da URL nunca vira caminho de arquivo.
+
+#### Loaders de conteúdo
+
+Fonte: `packages/engine/src/content/`, exportados só por `@cbjk_iris/engine/content` (não pela raiz do `engine`, que levaria `fs` e zod a quem importa a raiz). Só em código de servidor: usam `fs` e zod. O core os importa só de server components (um teste do core segue o grafo dos arquivos `"use client"` e falha se algum alcançar o engine, o `@cbjk_iris/schema` raiz, o zod ou um módulo do Node).
+
+```ts
+export interface ContentOptions { root?: string }                // padrão: process.cwd()
+export interface SectionContentOptions extends ContentOptions {
+  modules: readonly ModuleId[];                                   // siteConfig.modules: seção de módulo fora da lista é erro
+}
+export type LoadedPage = Page & { slug: string };
+
+export function loadHome(opts: SectionContentOptions): Promise<Home>;
+export function loadPage(slug: string, opts: SectionContentOptions): Promise<LoadedPage | undefined>;
+export function loadPages(opts: SectionContentOptions): Promise<LoadedPage[]>;
+export function loadProducts(opts?: ContentOptions): Promise<Product[]>;
+export function loadServices(opts?: ContentOptions): Promise<Service[]>;
+export class ContentError extends Error { readonly diagnostics: Diagnostic[] }
+export function formatDiagnostic(d: Diagnostic): string;        // "arquivo → caminho: mensagem"
+export const MAX_CONTENT_FILE_BYTES: number;                     // 1 MiB
+```
+
+| Regra | Comportamento |
+|---|---|
+| Raiz | `root` ou `process.cwd()`. Sem a pasta `content/`, `ContentError` ("pasta content/ não encontrada"): um `cwd` errado não vira um site vazio |
+| Ausentes | `home.json` ausente = `{ sections: [] }`; pasta `products/`, `services/` ou `pages/` ausente = `[]`; `loadPage` de arquivo ausente = `undefined` |
+| Nome de arquivo | Entradas que começam com `.` são ignoradas (`.gitkeep`). O resto precisa ser um arquivo regular `<slug>.json`; subpasta e nome fora do padrão são erro. Em `pages/`, slug reservado é erro |
+| Links simbólicos | Recusados dentro de `content/` (arquivo ou pasta), sem ler o alvo: `lstat`, `O_NOFOLLOW` e `realpath` dentro de `content/`. O próprio `content/` pode ser um link, por desenho: ele vira a base, e quem cria esse link é o dono do projeto |
+| Arquivos especiais | Só arquivo regular. FIFO, socket e dispositivo são recusados no `lstat`, antes de abrir (o `open` de um FIFO travaria o build); `O_NONBLOCK` é a segunda barreira. Hard link (`nlink > 1`) é recusado |
+| `loadPage(slug)` | Slug inválido ou reservado devolve `undefined` sem tocar no disco (o slug pode vir da URL) |
+| Leitura | Até 1 MiB por arquivo (o `fstat` recusa antes, e a leitura para em 1 MiB + 1 byte); BOM inicial removido; a raiz do JSON precisa ser um objeto. `$schema`, se existir, precisa ser texto e é removido antes de validar. JSON inválido dá só linha e coluna e um texto fixo, sem repetir nada do arquivo |
+| Validação | `productContentSchema`, `serviceContentSchema`, `homeSchema`, `pageSchema`, com as mensagens do zod em pt-BR (`ptBRError`). O loader acrescenta `kind` e `slug` |
+| Ordem | Produtos e serviços: `order` crescente, sem `order` no fim, empate pelo slug (ordem de code unit, sem depender do locale). Páginas: pelo slug |
+| Erros | Juntos, de todos os arquivos lidos: `content/ tem erros:` e uma linha por erro, `arquivo → caminho: mensagem` (ou `arquivo: mensagem` quando o erro é do arquivo inteiro). `diagnostics` usa o tipo `Diagnostic` do §5.6; seção de módulo desligado tem `hint: "iris module add <id>"`. Cada mensagem e cada caminho com até 200 caracteres (com "…"), porque o zod repete o nome de chave desconhecida; o campo `file` não é truncado (é o caminho relativo, limitado pelo nome no sistema de arquivos); a mensagem do erro lista até 50 linhas e termina em "… e mais N erros", e `diagnostics` guarda todos |
+| `modules` | Obrigatório em `loadHome`, `loadPage` e `loadPages`, como lista de `ModuleId`. Faltando ou inválido, `ContentError` com mensagem clara |
+| Cache | Nenhum: cada chamada lê de novo. No `next dev`, a edição de um JSON aparece ao recarregar a página (não há recarga automática, porque o JSON não entra no grafo de módulos) |
+
+As rotas de detalhe (`produto/[slug]`, `servico/[slug]`) e as páginas (`[slug]`) têm `dynamicParams = false`: todo o conteúdo é lido no `next build`, e nada de `content/` é lido em tempo de execução.
 
 ### 5.4 Tokens de forma e estilos
 
@@ -813,7 +851,7 @@ Até a CLI existir, `apps/site/package.json` tem scripts que chamam essas funç�
 | Grupo | Valores | Tipos |
 |---|---|---|
 | §5.2 catálogo | `productSchema`, `serviceSchema`, `catalogItemBase`, `installmentSchema`, `productContentSchema` e `serviceContentSchema` (formato de `content/<tipo>/<slug>.json`, sem `kind` e `slug`, para os loaders e a CLI), `PLATFORM_HOSTS`, `platformUrl`, `httpsUrl`, `PURCHASE_PLATFORMS`, `DEFAULT_BUTTON_ORDER` | `Product`, `ProductInput`, `Service`, `ServiceInput`, `CatalogItem`, `Spec`, `Installment`, `ProductFilter`, `MarketplacePlatform`, `PurchasePlatform`, `PurchaseContext`, `PurchaseButton`, `ResolvePurchaseButtons` |
-| §5.3 config | `siteConfigSchema`, `resolveSiteConfig`, `SiteConfigError`, `applySiteConfigDefaults`, `COLOR_TOKENS`, `slugSchema` | `SiteConfigInput`, `SiteConfig`, `MenuItem`, `BrandConfig`, `BrandColors`, `BrandFont`, `SiteLogo`, `ContactInfo`, `LeadsConfig`, `FooterConfig`, `CommerceConfig`, `PageConfig` (transição até a E5), `ColorMode`, `ColorToken`, `ColorTokens`, `SocialNetwork`, `SiteLink` |
+| §5.3 config | `siteConfigSchema`, `resolveSiteConfig`, `SiteConfigError`, `applySiteConfigDefaults`, `COLOR_TOKENS`, `slugSchema` | `SiteConfigInput`, `SiteConfig`, `MenuItem`, `BrandConfig`, `BrandColors`, `BrandFont`, `SiteLogo`, `ContactInfo`, `LeadsConfig`, `FooterConfig`, `CommerceConfig`, `ColorMode`, `ColorToken`, `ColorTokens`, `SocialNetwork`, `SiteLink` |
 | §5.3 textos | `DEFAULT_TEXTS`, `resolveTexts` | `SiteTexts`, `PurchaseButtonTexts`, `DeepPartial` |
 | §5.3 conteúdo | `homeSchema`, `pageSchema`, `pageSlugSchema`, `RESERVED_PAGE_SLUGS`, `formatIssuePath` (caminho `sections[2].items[0].answer` das mensagens), `ptBRError` (mensagens do zod em pt-BR, passadas por parse: `{ error: ptBRError }`) | `Home`, `Page` |
 | §5.4 forma | `SHAPE_TOKENS`, `SHAPE_TOKEN_KEYS`, `STYLE_IDS`, `DEFAULT_STYLE_ID`, `IRIS_STYLE_VAR`, `FROZEN_UTILITIES` | `ShapeTokenSpec`, `ShapeTokenName`, `ShapeTokenKey`, `ShapeTokens`, `StyleId` |
@@ -1067,7 +1105,8 @@ iris-architect ──(contratos congelados, tag contracts-v1)──┬── iri
 - [ ] `node scripts/style-inventory.mjs --check` sai com 0.
 - [ ] `npm test -w @cbjk_iris/engine` cobre a API mínima: cada função de [§5.6](#56-api-do-engine-usada-pela-cli) tem pelo menos um teste, e `ImportTheme` rejeita `http:` e descarta `@import` e `url()`.
 - [ ] `npm test -w @cbjk_iris/schema` cobre `resolveTexts` (merge profundo e fallback de `buyOnWhatsapp`).
-- [ ] `npm test -w @cbjk_iris/schema` cobre: campo perguntado sem `label` falha; cada JSON de `apps/site/content` valida; `$schema` é aceito pelo loader; o JSON Schema gerado não exige `whatsappButton`.
+- [ ] `npm test -w @cbjk_iris/schema` cobre: campo perguntado sem `label` falha; cada JSON de `apps/site/content` valida; o JSON Schema gerado não exige `whatsappButton`.
+- [ ] `npm test -w @cbjk_iris/engine` cobre: `$schema` é aceito pelo loader (o `schema` não pode importar o `engine`: grafo `schema ← engine`).
 - [ ] `npm test -w @cbjk_iris/core` tem o teste "toda seção tem componente, e vice-versa".
 - [ ] `node --input-type=module -e "import('@cbjk_iris/schema').then(m => console.log(Object.keys(m).length))"`, rodado em `apps/site`, imprime um número no Node 22.18 sem flag.
 - [ ] A linha de status desta spec diz CONGELADO, e `git tag --list contracts-v1` mostra a tag.

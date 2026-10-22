@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Rodapé em Poliestireno Liso 10cm (barra 2,4m)",
+  "category": "Acabamentos Gerais",
+  "price": 34.9,
+  "images": [
+    "/products/rodape-1.jpg"
+  ],
+  "shortDescription": "Leve, resistente à umidade, fácil instalação com cola.",
+  "description": "Rodapé liso em poliestireno de alta densidade, não empena e não é atacado por cupim. Instalação simples com cola de contato, sem necessidade de furos ou parafusos.",
+  "specs": [
+    {
+      "label": "Altura",
+      "value": "10 cm"
+    },
+    {
+      "label": "Comprimento da barra",
+      "value": "2,40 m"
+    },
+    {
+      "label": "Material",
+      "value": "Poliestireno"
+    }
+  ],
+  "stockQty": 10,
+  "order": 40
+}

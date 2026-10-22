@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../packages/schema/json/page.schema.json",
+  "title": "Contato",
+  "description": "Endereço, horário de atendimento e WhatsApp da cbjk.",
+  "sections": [
+    {
+      "type": "contact",
+      "title": "Fale com a gente",
+      "subtitle": "Atendimento rápido pelo WhatsApp.",
+      "showMap": true
+    },
+    {
+      "type": "lead-form",
+      "title": "Peça seu orçamento",
+      "subtitle": "Preencha os dados e continue a conversa pelo WhatsApp.",
+      "fields": [
+        "name",
+        "phone",
+        "email",
+        "message"
+      ],
+      "consentText": "Concordo em ser contatado pela cbjk sobre este pedido."
+    }
+  ]
+}

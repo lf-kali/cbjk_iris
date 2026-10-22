@@ -24,12 +24,11 @@ describe("siteConfigSchema", () => {
     expect(r.success, JSON.stringify(r.error?.issues)).toBe(true);
   });
 
-  it("preenche os padrões: modules, commerce.buttonOrder, texts e home de transição", () => {
+  it("preenche os padrões: modules, commerce.buttonOrder e texts", () => {
     const c = siteConfigSchema.parse(minimal);
     expect(c.modules).toEqual(["products", "services", "gallery"]);
     expect(c.commerce.buttonOrder).toEqual(DEFAULT_BUTTON_ORDER);
     expect(c.texts.products.buy).toBe(DEFAULT_TEXTS.products.buy);
-    expect(c.home).toEqual({ sections: [] });
     expect(c.theme.style).toBeUndefined();
   });
 
@@ -139,12 +138,11 @@ describe("siteConfigSchema", () => {
     expect(valid(withConfig({ menu: [{ title: "A", children: [{ title: "B", path: "javascript:x" }] }] }))).toBe(false);
   });
 
-  it("pages de transição: slug reservado ou repetido falha", () => {
-    const page = (slug: string) => ({ slug, title: "T", sections: [] });
-    expect(valid(withConfig({ pages: [page("sobre")] }))).toBe(true);
-    expect(valid(withConfig({ pages: [page("produtos")] }))).toBe(false);
-    expect(valid(withConfig({ pages: [page("home")] }))).toBe(false);
-    expect(valid(withConfig({ pages: [page("sobre"), page("sobre")] }))).toBe(false);
+  it("home e pages saíram do config na E5 (agora em content/): são chave desconhecida", () => {
+    expect(valid(withConfig({ home: { sections: [] } }))).toBe(false);
+    expect(valid(withConfig({ pages: [{ slug: "sobre", title: "T", sections: [] }] }))).toBe(false);
+    expect(siteConfigSchema.parse(minimal)).not.toHaveProperty("home");
+    expect(applySiteConfigDefaults(minimal)).not.toHaveProperty("home");
   });
 });
 
@@ -191,10 +189,6 @@ describe("applySiteConfigDefaults (sem zod) é equivalente a siteConfigSchema.pa
     "modules ausente": minimal,
     "modules vazio": withConfig({ modules: [] }),
     "modules parcial": withConfig({ modules: ["gallery"] }),
-    "home e pages de transição": withConfig({
-      home: { sections: [{ type: "faq", items: [{ question: "a", answer: "b" }] }] },
-      pages: [{ slug: "sobre", title: "Sobre", sections: [] }],
-    }),
     "tudo junto": withConfig({
       modules: ["products"],
       commerce: { buttonOrder: ["shopee"] },

@@ -194,6 +194,15 @@ Achados das revisões já mergeadas, distribuídos pela etapa que vai tocar no a
 | E4, security-reviewer (cssValue) | `brand.colors.primary: "#"` passa no schema, mas o motor de tema lança `Cor inválida: "#"` no build (fail-closed, sem a mensagem do `SiteConfigError`) | LOW | iris-theme (motor de tema) ou E6 |
 | E4, adversarial-reviewer (cssValue) | Teste de tempo do `cssValue` exige < 50 ms para 200000 caracteres; pode oscilar em CI lenta. Subir para ~200 ms se falhar | LOW | E7 (CI) |
 | E4, adversarial-reviewer (cssValue) | `UNSAFE_CHARS` não cobre invisíveis raros (U+3164, U+FFA0). Não afeta `cssValue`; só URLs e caminhos | LOW | Backlog |
+| E5, iris-architect | `next dev` não recarrega sozinho ao editar `content/*.json` (o JSON não entra no grafo de módulos); recarregar a página mostra a mudança | LOW | iris-cli / E6 (watcher no `iris sync`) ou backlog |
+| E5, iris-architect | README (e instruções antigas) mandam editar `data/*.ts` e `home`/`pages` no `site.config.ts`; agora é `content/**/*.json` | — | iris-docs |
+| E5, iris-architect | O exemplo de widget do TripAdvisor (comentário em `pages[sobre]` do config) não coube no JSON; levar para a doc, se quiser | — | iris-docs |
+| E5, security-reviewer | O teste transitivo da fronteira cliente/servidor (`packages/core/test/imports.test.ts`) não vê `import()` dinâmico nem `import x = require()`; o `next build` é a segunda barreira (falha com `fs` no cliente) | LOW | E6 ou backlog |
+| E5, security-reviewer | `content/` como link simbólico é aceito por desenho (vira a base; quem cria é o dono do projeto). Documentado no §5.3 | — | Aceito |
+| E5, security-reviewer | Windows não verificado: junctions e reparse points, `O_NOFOLLOW` e `O_NONBLOCK` = 0 (valem o `lstat` e o `realpath`) | LOW | E7 (matriz da CI) |
+| E5, adversarial-reviewer (rodada final) | `modules-check-content.mjs`: se a escrita ou o `rename` falhar no meio, o `<arquivo>.<pid>.tmp` fica para trás (some com a cópia descartável) | LOW | E6 (reescrita do `modules:check`) |
+| E5, adversarial-reviewer (rodada final) | `readCapped`, `readText` e `jsonErrorMessage` são exportados de `read.ts` só para teste; nenhum teste congela as chaves públicas de `@cbjk_iris/engine/content` | LOW | E6 (junto com a API do engine) |
+| E5, coordenador | Ordem de listagem de `/[slug]` na saída do `next build` mudou (`/contato, /sobre`), porque `loadPages` ordena por slug. HTML idêntico; nada visível muda | Aceito | — |
 
 ## 7. Fatos conferidos para este plano
 

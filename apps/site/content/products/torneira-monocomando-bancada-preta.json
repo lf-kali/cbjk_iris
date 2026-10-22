@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Torneira Monocomando de Bancada Preto Fosco",
+  "category": "Metais e Louças",
+  "price": 349,
+  "installment": {
+    "count": 6,
+    "value": 58.16,
+    "hasInterest": false
+  },
+  "images": [
+    "/products/torneira-1.jpg",
+    "/products/torneira-2.jpg"
+  ],
+  "shortDescription": "Design minimalista, acabamento preto fosco, bica alta.",
+  "description": "Torneira monocomando para bancada com bica alta, ideal para cubas de apoio. Estrutura em metal cromado com pintura preto fosco de alta durabilidade, arejador removível para fácil limpeza.",
+  "specs": [
+    {
+      "label": "Material",
+      "value": "Metal cromado"
+    },
+    {
+      "label": "Acabamento",
+      "value": "Preto fosco"
+    },
+    {
+      "label": "Tipo",
+      "value": "Monocomando"
+    },
+    {
+      "label": "Garantia",
+      "value": "5 anos"
+    }
+  ],
+  "stockQty": 10,
+  "order": 20
+}

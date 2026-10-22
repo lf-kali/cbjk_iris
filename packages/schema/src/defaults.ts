@@ -25,7 +25,6 @@ export function applySiteConfigDefaults(input: SiteConfigInput): SiteConfig {
     ...input,
     modules: [...(input.modules ?? DEFAULT_MODULES)],
     commerce: { ...input.commerce, buttonOrder: completeButtonOrder(input.commerce?.buttonOrder) },
-    home: input.home ?? { sections: [] },
     texts: resolveTexts(input.texts),
   } as SiteConfig;
 }

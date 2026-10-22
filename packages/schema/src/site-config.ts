@@ -10,7 +10,6 @@ import { cssValue, hostnameSchema, httpsUrl, imageSrc, ptBRError, siteHref, slug
 import { formatIssuePath } from "./issues";
 import { siteLinkSchema } from "./links";
 import { MODULE_IDS, type ModuleId } from "./modules";
-import { homeSchema, pageSchema, pageSlugSchema } from "./page";
 import { resolveTexts } from "./texts-defaults";
 import { siteTextsInputSchema } from "./texts";
 import { SHAPE_TOKEN_KEYS, STYLE_IDS } from "./theme/tokens";
@@ -139,11 +138,6 @@ export const footerSchema = z.strictObject({
 
 const buttonOrderSchema = z.array(z.enum(PURCHASE_PLATFORMS)).superRefine(uniqueItems("plataforma"));
 
-/** @deprecated transição até a E5: páginas passam para content/pages/<slug>.json */
-const legacyPagesSchema = z
-  .array(pageSchema.extend({ slug: pageSlugSchema }))
-  .superRefine((pages, ctx) => uniqueItems("slug de página")(pages.map((p) => p.slug), ctx));
-
 export const siteConfigSchema = z.strictObject({
   name: z.string().min(1),
   locale: z.string().regex(/^[a-z]{2,3}(?:-[A-Z]{2})?$/, { error: 'use um código de idioma, ex.: "pt-BR"' }),
@@ -189,10 +183,6 @@ export const siteConfigSchema = z.strictObject({
     .strictObject({ buttonOrder: buttonOrderSchema.optional() })
     .optional()
     .transform((c) => ({ ...c, buttonOrder: completeButtonOrder(c?.buttonOrder) })),
-  /** @deprecated transição até a E5: a home passa para content/home.json */
-  home: homeSchema.optional().transform((h) => h ?? { sections: [] }),
-  /** @deprecated transição até a E5: as páginas passam para content/pages/<slug>.json */
-  pages: legacyPagesSchema.optional(),
   /** textos da interface; parcial, mesclado com DEFAULT_TEXTS */
   texts: siteTextsInputSchema.optional().transform((t) => resolveTexts(t)),
 });
@@ -210,8 +200,6 @@ export type ContactInfo = z.output<typeof contactSchema>;
 export type LeadsConfig = z.output<typeof leadsSchema>;
 export type FooterConfig = z.output<typeof footerSchema>;
 export type CommerceConfig = SiteConfig["commerce"];
-/** @deprecated transição até a E5 */
-export type PageConfig = NonNullable<SiteConfig["pages"]>[number];
 
 /** Config inválido: a mensagem lista cada erro com o caminho do campo. */
 export class SiteConfigError extends Error {
