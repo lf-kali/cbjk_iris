@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../packages/schema/json/service.schema.json",
+  "name": "Troca de tela",
+  "shortDescription": "Tela trincada, manchada ou sem toque: trocamos o conjunto de tela e testamos antes da entrega.",
+  "description": "Substituímos o conjunto de tela (vidro, display e touch) de celulares Android e iPhone. Antes do reparo, conferimos se o defeito é mesmo da tela e informamos o valor da peça disponível para o seu modelo. Depois da troca, testamos toque, brilho, cores, sensor de proximidade e câmera frontal.",
+  "images": [
+    "/services/troca-de-tela-1.jpg",
+    "/services/troca-de-tela-2.jpg"
+  ],
+  "specs": [
+    {
+      "label": "Prazo",
+      "value": "Informado no orçamento, conforme o modelo e a peça em estoque"
+    },
+    {
+      "label": "Garantia",
+      "value": "Termo por escrito entregue com o aparelho"
+    },
+    {
+      "label": "Diagnóstico",
+      "value": "Sem custo"
+    }
+  ],
+  "order": 10
+}

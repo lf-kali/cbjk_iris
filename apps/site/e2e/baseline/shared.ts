@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 export const PAGES = [
   { name: "home", path: "/" },
   { name: "produtos", path: "/produtos" },
-  { name: "produto", path: "/produto/porcelanato-marmo-carrara-90x90" },
+  { name: "produto", path: "/produto/capa-antichoque" },
   { name: "sobre", path: "/sobre" },
 ] as const;
 

@@ -26,11 +26,35 @@ function files(): Kind[] {
   ];
 }
 
+type ProductContent = z.output<typeof productContentSchema>;
+
+/** Classifica um produto pela combinação de botões (o externalLink conta como loja externa). */
+function buttonCombo(p: ProductContent): "whatsapp" | "marketplaces" | "todos" | "nenhum" | "misto" {
+  const markets = [p.mercadoLivreLink, p.shopeeLink, p.amazonLink].filter(Boolean).length;
+  if (p.whatsappButton && markets === 3) return "todos";
+  if (p.whatsappButton && markets === 0 && !p.externalLink) return "whatsapp";
+  if (!p.whatsappButton && markets > 0 && !p.externalLink) return "marketplaces";
+  if (!p.whatsappButton && markets === 0 && !p.externalLink) return "nenhum";
+  return "misto";
+}
+
 describe("apps/site/content", () => {
   const all = files();
 
-  it("tem a home, 2 páginas, 4 produtos e 4 serviços", () => {
-    expect(all.map((f) => f.type).sort()).toEqual(["home", "page", "page", ...Array(4).fill("product"), ...Array(4).fill("service")]);
+  it("tem a home, 2 páginas, 5 produtos e 4 serviços", () => {
+    expect(all.map((f) => f.type).sort()).toEqual(["home", "page", "page", ...Array(5).fill("product"), ...Array(4).fill("service")]);
+  });
+
+  // SPEC §6.1.1: os produtos de exemplo cobrem as combinações de botões de compra
+  it("os produtos cobrem só WhatsApp, só marketplaces, todos os botões e nenhum botão", () => {
+    const combos = all
+      .filter((f) => f.type === "product")
+      .map((f) => {
+        const { $schema, ...data } = JSON.parse(readFileSync(f.file, "utf8"));
+        expect($schema).toBeTypeOf("string");
+        return buttonCombo(productContentSchema.parse(data));
+      });
+    expect(combos).toEqual(expect.arrayContaining(["whatsapp", "marketplaces", "todos", "nenhum"]));
   });
 
   it.each(all.map((f) => [path.relative(SITE, f.file), f] as const))("%s valida (sem o $schema)", (_rel, { file, schema, type }) => {

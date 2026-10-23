@@ -2,7 +2,7 @@
 
 Template de site comercial (vitrine) em Next.js: catálogo de produtos e serviços, galeria, páginas montadas por seções e atendimento pelo WhatsApp. Quase tudo se configura num único arquivo, o `site.config.ts`, sem mexer em componentes.
 
-O site de exemplo usa a marca fictícia **cbjk** e conteúdo de uma empresa de reformas. Troque pelos dados do cliente.
+O site de exemplo usa a marca fictícia **cbjk** e conteúdo de uma assistência técnica de celulares. Troque pelos dados do cliente.
 
 ---
 
@@ -442,6 +442,6 @@ Em outra hospedagem, use `npm run build` e `npm run start` (Node 22.6+).
 ## Créditos
 
 Imagens de exemplo, temas e ícones têm origem e licença listadas em [`CREDITS.md`](./CREDITS.md). Em resumo:
-- fotos CC0 do StockSnap;
+- fotos CC0 do Wikimedia Commons;
 - temas do shadcn/ui (MIT) e do tweakcn (Apache-2.0);
 - ícones do lucide e do simple-icons (CC0).

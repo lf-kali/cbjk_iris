@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Capa antichoque com alça",
+  "category": "Capas",
+  "price": 89.9,
+  "originalPrice": 109.9,
+  "installment": {
+    "count": 3,
+    "value": 29.97,
+    "hasInterest": false
+  },
+  "images": [
+    "/products/capa-1.jpg"
+  ],
+  "shortDescription": "Bordas reforçadas, proteção para as câmeras e alça de mão.",
+  "description": "Capa de material emborrachado com bordas reforçadas e moldura elevada em volta das câmeras. Acompanha alça de mão removível. Consulte os modelos disponíveis.",
+  "specs": [
+    {
+      "label": "Material",
+      "value": "Policarbonato e borracha"
+    },
+    {
+      "label": "Alça",
+      "value": "Removível"
+    },
+    {
+      "label": "Compatibilidade",
+      "value": "Consulte o seu modelo"
+    }
+  ],
+  "stockQty": 10,
+  "whatsappButton": true,
+  "mercadoLivreLink": "https://lista.mercadolivre.com.br/capa-antichoque-celular",
+  "shopeeLink": "https://shopee.com.br/search?keyword=capa%20antichoque%20celular",
+  "amazonLink": "https://www.amazon.com.br/s?k=capa+antichoque+celular",
+  "order": 10
+}

@@ -49,6 +49,9 @@ jobs:
       # antes dos testes: o defaults-isolation do schema lê o dist
       - run: npm run build:packages
 
+      # SPEC §6.1: toda foto de exemplo com crédito no CREDITS.md, e nenhuma acima de 300 KB
+      - run: npm run check:credits
+
       - run: npm test
 
       - run: npm run typecheck

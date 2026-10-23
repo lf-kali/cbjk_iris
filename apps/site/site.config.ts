@@ -20,17 +20,17 @@ export const siteConfig = {
     colors: {},
   },
   seo: {
-    title: "cbjk | Soluções completas para sua casa",
+    title: "cbjk | Assistência técnica de celulares",
     titleTemplate: "%s | cbjk",
-    description: "Produtos e serviços para construir, reformar e cuidar da sua casa, com atendimento direto pelo WhatsApp.",
+    description: "Conserto de celulares e acessórios: troca de tela, bateria e conector de carga, com orçamento pelo WhatsApp.",
   },
   whatsapp: {
     // formato internacional, só dígitos
     phone: "5511999999999",
     messages: {
-      general: "Olá! Gostaria de fazer um orçamento.",
+      general: "Olá! Gostaria de um orçamento para o conserto do meu celular.",
       product: "Olá! Tenho interesse no produto abaixo:\n\n*{name}*\nValor: {price}\n\nPodem me passar mais informações e condições?",
-      service: "Olá! Gostaria de pedir um orçamento para o serviço abaixo:\n\n*{name}*\n\nPodem me passar mais informações sobre prazo e valores?",
+      service: "Olá! Gostaria de um orçamento para o serviço abaixo:\n\n*{name}*\n\nPodem me passar o prazo e o valor para o meu modelo de celular?",
     },
   },
   images: {
@@ -41,7 +41,7 @@ export const siteConfig = {
     phone: "(11) 99999-9999",
     email: "contato@cbjk.com.br",
     address: "Av. Paulista, 1000 - Bela Vista, São Paulo - SP",
-    hours: ["Segunda a sexta: 8h às 18h", "Sábado: 8h às 12h"],
+    hours: ["Segunda a sexta: 9h às 18h", "Sábado: 9h às 13h"],
     mapEmbedUrl: "https://www.google.com/maps?q=Av.+Paulista,+1000,+S%C3%A3o+Paulo&output=embed",
     social: {
       instagram: "https://instagram.com/",
@@ -50,7 +50,7 @@ export const siteConfig = {
     },
   },
   footer: {
-    text: "Produtos e serviços para construir, reformar e cuidar da sua casa.",
+    text: "Conserto de celulares e acessórios, com orçamento antes de qualquer reparo.",
   },
   // destino do formulário de lead. Para um serviço de formulários:
   // leads: { provider: "endpoint", endpoint: "https://formspree.io/f/SEU_ID" },
@@ -60,7 +60,7 @@ export const siteConfig = {
     { title: "Início", path: "/" },
     { title: "Produtos", path: "/produtos" },
     { title: "Serviços", path: "/servicos" },
-    { title: "Projetos", path: "/ultimos-projetos" },
+    { title: "Reparos recentes", path: "/ultimos-projetos" },
     { title: "Sobre", path: "/sobre" },
     { title: "Contato", path: "/contato" },
   ],
@@ -95,8 +95,8 @@ export const siteConfig = {
       specs: "Especificações",
     },
     gallery: {
-      title: "Últimos projetos",
-      empty: "Em breve, fotos dos nossos projetos.",
+      title: "Reparos recentes",
+      empty: "Em breve, fotos dos nossos reparos.",
     },
     sections: {
       seeAll: "Ver todos",
@@ -118,7 +118,7 @@ export const siteConfig = {
       sending: "Enviando...",
       success: "Recebemos sua mensagem! Entraremos em contato em breve.",
       error: "Não foi possível enviar agora. Tente de novo ou fale com a gente pelo WhatsApp.",
-      whatsappIntro: "Olá! Vim pelo site e gostaria de um orçamento.",
+      whatsappIntro: "Olá! Vim pelo site e gostaria de um orçamento para o meu celular.",
     },
     footer: {
       menu: "Navegação",

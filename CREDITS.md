@@ -1,38 +1,40 @@
 # Créditos das imagens de exemplo
 
-As fotos em `public/products/`, `public/services/`, `public/home/` e `public/ultimos_projetos/` são de exemplo, do [StockSnap.io](https://stocksnap.io), sob licença [CC0](https://creativecommons.org/publicdomain/zero/1.0/) (uso livre, inclusive comercial, sem atribuição obrigatória). Troque pelas fotos reais de cada cliente.
+## Fotos
 
-| Arquivo | Origem |
-|---|---|
-| `public/products/porcelanato-marmore-1.jpg` | https://stocksnap.io/photo/white-marble-ESDCTK2C7Z |
-| `public/products/porcelanato-marmore-2.jpg` | https://stocksnap.io/photo/hallway-tiles-C06C0E2718 |
-| `public/products/porcelanato-marmore-3.jpg` | https://stocksnap.io/photo/tile-marble-IZ26V0WYPT |
-| `public/products/torneira-1.jpg` | https://stocksnap.io/photo/bathroom-sink-D3901L7G93 |
-| `public/products/torneira-2.jpg` | https://stocksnap.io/photo/sink-faucet-XVEZZZGCXA |
-| `public/products/luminaria-pendente-1.jpg` | https://stocksnap.io/photo/light-lamp-59EKVT8ZF3 |
-| `public/products/rodape-1.jpg` | https://stocksnap.io/photo/wood-floor-DB76C7C65B |
-| `public/services/instalacao-porcelanato-1.jpg` | https://stocksnap.io/photo/level-construction-5HW69DS6ER |
-| `public/services/instalacao-porcelanato-2.jpg` | https://stocksnap.io/photo/tools-level-0AD8F7B5B6 |
-| `public/services/instalacao-porcelanato-3.jpg` | https://stocksnap.io/photo/wall-tiles-SLNDPAXVQG |
-| `public/services/instalacao-hidraulica-1.jpg` | https://stocksnap.io/photo/white-pipe-6DB609DF59 |
-| `public/services/instalacao-hidraulica-2.jpg` | https://stocksnap.io/photo/wrench-tools-F91K0WLE2D |
-| `public/services/instalacao-eletrica-1.jpg` | https://stocksnap.io/photo/electrician-electricity-QJ55PI34SY |
-| `public/services/instalacao-eletrica-2.jpg` | https://stocksnap.io/photo/electricity-switches-81EG7NOR4G |
-| `public/services/gesso-drywall-1.jpg` | https://stocksnap.io/photo/construction-renovation-MF4PFAS13H |
-| `public/services/gesso-drywall-2.jpg` | https://stocksnap.io/photo/lights-ceiling-KTTLY7R80V |
-| `public/home/slide-1.jpg` | https://stocksnap.io/photo/interior-design-HIH67XC5G0 |
-| `public/home/slide-2.jpg` | https://stocksnap.io/photo/house-interior-NF6P1OX124 |
-| `public/ultimos_projetos/projeto-1.jpg` | https://stocksnap.io/photo/house-interior-XCOZ3XTV7M |
-| `public/ultimos_projetos/projeto-2.jpg` | https://stocksnap.io/photo/interior-living-6SMA09U7Y8 |
-| `public/ultimos_projetos/projeto-3.jpg` | https://stocksnap.io/photo/interior-design-D0NOMANBA7 |
-| `public/ultimos_projetos/projeto-4.jpg` | https://stocksnap.io/photo/house-interior-APBDJIC32G |
-| `public/ultimos_projetos/projeto-5.jpg` | https://stocksnap.io/photo/kitchen-interior-3ZX53UFU8B |
-| `public/ultimos_projetos/projeto-6.jpg` | https://stocksnap.io/photo/modern-interior-KWRZNZ6DC6 |
+As fotos em `apps/site/public/home/`, `apps/site/public/services/`, `apps/site/public/products/` e `apps/site/public/ultimos_projetos/` são de exemplo, do [Wikimedia Commons](https://commons.wikimedia.org), todas sob [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) (domínio público: uso livre, inclusive comercial, sem atribuição obrigatória). A licença de cada uma foi conferida na página do arquivo no Commons. Foram redimensionadas e tiveram os metadados EXIF removidos. Troque pelas fotos reais de cada cliente.
+
+A CC0 cobre o direito autoral da foto, não as marcas que aparecem nela (logotipos de fabricantes em alguns aparelhos).
+
+`node scripts/check-credits.mjs` confere que cada foto dessas pastas tem uma linha nesta tabela, que cada linha aponta para um arquivo que existe e que nenhum arquivo passa de 300 KB.
+
+| Arquivo | Título no Commons | Autor | Página | Licença |
+|---|---|---|---|---|
+| `apps/site/public/home/slide-1.jpg` | Man-person-smartphone-technology (24029613340).jpg | www.Pixel.la Free Stock Photos | https://commons.wikimedia.org/wiki/File:Man-person-smartphone-technology_(24029613340).jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/home/slide-2.jpg` | Motorola cell phone disassembly 5.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_5.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/conector-de-carga-1.jpg` | Dead battery (Unsplash).jpg | rawpixel.com rawpixel | https://commons.wikimedia.org/wiki/File:Dead_battery_(Unsplash).jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/recuperacao-liquido-1.jpg` | Microscope close-up of blown step-down regulator on laptop PCB.jpg | Profpcde | https://commons.wikimedia.org/wiki/File:Microscope_close-up_of_blown_step-down_regulator_on_laptop_PCB.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/recuperacao-liquido-2.jpg` | Electronics PCB circuit board 005 (51131208022).jpg | Jan Helebrant | https://commons.wikimedia.org/wiki/File:Electronics_PCB_circuit_board_005_(51131208022).jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/troca-de-bateria-1.jpg` | Motorola cell phone disassembly 3.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_3.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/troca-de-bateria-2.jpg` | Samsung Galaxy S 2 and its removable parts.jpg | YuMaNuMa | https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S_2_and_its_removable_parts.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/troca-de-tela-1.jpg` | Motorola cell phone disassembly 2.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_2.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/services/troca-de-tela-2.jpg` | Shattered phone screen.jpg | Grandmaster Huon | https://commons.wikimedia.org/wiki/File:Shattered_phone_screen.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/products/cabo-usb-c-1.jpg` | USB-C cable 2017 A.jpg | Fructibus | https://commons.wikimedia.org/wiki/File:USB-C_cable_2017_A.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/products/capa-1.jpg` | IPhone 17 Pro Urban Armor Gear Civilian (2025-12-28).jpg | Olgierd Rudak | https://commons.wikimedia.org/wiki/File:IPhone_17_Pro_Urban_Armor_Gear_Civilian_(2025-12-28).jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/products/carregador-1.jpg` | Pisen MF-08EU 12W USB charger-0.jpg | Imgrenb | https://commons.wikimedia.org/wiki/File:Pisen_MF-08EU_12W_USB_charger-0.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/products/fone-1.jpg` | Earbud microphone.jpg | Mx. Granger | https://commons.wikimedia.org/wiki/File:Earbud_microphone.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/products/pelicula-1.jpg` | Smartphone display screen.jpg | Skitterphoto | https://commons.wikimedia.org/wiki/File:Smartphone_display_screen.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-1.jpg` | Motorola cell phone disassembly 1.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_1.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-2.jpg` | Motorola cell phone disassembly 4.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_4.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-3.jpg` | Motorola cell phone disassembly 6.jpg | GALAXY 2018 A7 | https://commons.wikimedia.org/wiki/File:Motorola_cell_phone_disassembly_6.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-4.jpg` | 20250807 200849 Swollen Samsung battery, side.jpg | Saimmx | https://commons.wikimedia.org/wiki/File:20250807_200849_Swollen_Samsung_battery,_side.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-5.jpg` | Oneplus 5T front OLED screen.jpg | Rackham | https://commons.wikimedia.org/wiki/File:Oneplus_5T_front_OLED_screen.jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `apps/site/public/ultimos_projetos/projeto-6.jpg` | Electronics PCB circuit board 001 (51131861296).jpg | Jan Helebrant | https://commons.wikimedia.org/wiki/File:Electronics_PCB_circuit_board_001_(51131861296).jpg | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 
 ## Temas
 
-Os temas em `themes/` vêm das paletas do [shadcn/ui](https://ui.shadcn.com) (MIT) e dos temas do [tweakcn](https://tweakcn.com) (Apache-2.0). A origem de cada um está no comentário no topo do arquivo.
+Os temas em `packages/engine/themes/` vêm das paletas do [shadcn/ui](https://ui.shadcn.com) (MIT) e dos temas do [tweakcn](https://tweakcn.com) (Apache-2.0). A origem de cada um está no comentário no topo do arquivo.
 
 ## Logo
 
-`public/logo.svg` é a marca de exemplo cbjk.
+`apps/site/public/logo.svg` é a marca de exemplo cbjk.

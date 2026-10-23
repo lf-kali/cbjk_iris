@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Cabo USB-C",
+  "category": "Cabos",
+  "price": 29.9,
+  "images": [
+    "/products/cabo-usb-c-1.jpg"
+  ],
+  "shortDescription": "Cabo para carga e transferência de dados, com ponta USB-C.",
+  "description": "Cabo com uma ponta USB-C, para carregar e transferir arquivos. Disponível só na loja física, sem venda pelo site.",
+  "specs": [
+    {
+      "label": "Conector",
+      "value": "USB-C"
+    },
+    {
+      "label": "Uso",
+      "value": "Carga e dados"
+    }
+  ],
+  "stockQty": 0,
+  "whatsappButton": false,
+  "order": 40
+}

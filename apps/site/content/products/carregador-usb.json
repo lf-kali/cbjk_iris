@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Carregador de tomada USB",
+  "category": "Carregadores",
+  "price": 59.9,
+  "installment": {
+    "count": 2,
+    "value": 29.95,
+    "hasInterest": false
+  },
+  "images": [
+    "/products/carregador-1.jpg"
+  ],
+  "shortDescription": "Fonte compacta com saída USB, para usar com o cabo do seu celular.",
+  "description": "Carregador de tomada com uma saída USB e plugue no padrão brasileiro. Use com um cabo compatível com o seu aparelho. Vendido só pelos marketplaces.",
+  "specs": [
+    {
+      "label": "Saída",
+      "value": "1 porta USB"
+    },
+    {
+      "label": "Tensão de entrada",
+      "value": "Bivolt"
+    },
+    {
+      "label": "Cabo",
+      "value": "Não incluso"
+    }
+  ],
+  "stockQty": 10,
+  "whatsappButton": false,
+  "mercadoLivreLink": "https://lista.mercadolivre.com.br/carregador-tomada-usb",
+  "amazonLink": "https://www.amazon.com.br/s?k=carregador+tomada+usb",
+  "order": 30
+}
