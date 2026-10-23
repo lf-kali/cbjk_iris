@@ -25,7 +25,7 @@ Todas as 13 perguntas foram respondidas pelo dono em **2026-10-20**. Nenhuma per
 | Ação | Quando |
 |---|---|
 | Criar a org `cbjk_iris` em npmjs.com, com 2FA obrigatório | Antes da primeira publicação. O nome passa nas regras do npm, e `@cbjk_iris/core` dá 404 no registro em 2026-10-20. Só a criação confirma que a org está livre |
-| Primeiro lançamento, uma vez só: publicar manualmente, da sua máquina e com 2FA, uma versão `0.0.0` de cada pacote, para os pacotes passarem a existir no registro. Depois, configurar o trusted publishing de cada um para `lf-kali/cbjk_iris` e o workflow `release.yml` | Antes da `0.1.0`. A configuração do trusted publisher provavelmente exige que o pacote já exista; isso não foi verificado, e a ordem acima é segura nos dois casos |
+| Primeiro lançamento, uma vez só: publicar manualmente, da sua máquina e com 2FA, uma versão `0.0.0` de cada pacote, para os pacotes passarem a existir no registro. Depois, configurar o trusted publishing de cada um para `lf-kali/cbjk_iris` e o workflow `release.yml` | Antes da `0.1.0`. A configuração do trusted publisher exige que o pacote já exista (`npm help trust`, npm 12.0.1: "Package must exist"). É uma configuração por pacote, nos cinco; os passos estão no cabeçalho do `.github/workflows/release.yml` |
 | Disparar o workflow de release | A cada versão depois da primeira. Nenhum agente publica sozinho |
 
 ---

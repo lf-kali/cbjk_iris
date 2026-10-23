@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "description": "Cria um site Iris: npx create-iris-site@latest. Implementação: frente iris-cli.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lf-kali/cbjk_iris.git",
+    "directory": "packages/create"
+  },
   "type": "module",
   "engines": {
     "node": ">=22.18"

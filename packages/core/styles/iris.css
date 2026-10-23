@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./shadcn-tailwind.css";
 
 /* modo escuro pela classe .dark no <html> (aplicada por lib/theme.ts), não pela mídia do sistema */
 @custom-variant dark (&:where(.dark, .dark *));

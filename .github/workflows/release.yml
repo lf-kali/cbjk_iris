@@ -1,0 +1,221 @@
+# Publicação dos cinco pacotes no npm (SPEC §6.1 passo 8; OPEN-QUESTIONS Q-11 e "Ações do dono").
+#
+# Só roda à mão (workflow_dispatch), a partir do main. Nenhum agente dispara este workflow.
+# Publica com trusted publishing (OIDC): o GitHub entrega um token de curta duração ao npm, que o
+# troca por uma credencial de publicação só deste pacote. Não há NPM_TOKEN nem segredo no repositório.
+#
+# PRÉ-REQUISITO BLOQUEANTE: não rode com "dry_run" desmarcado antes do passo 3.
+# O trusted publisher do npm confere o nome do arquivo do workflow e o ambiente, NÃO o branch. Sem as
+# regras do ambiente "npm-publish", quem tem escrita no repositório pode mudar este arquivo num branch
+# e publicar dali: o "if" de main abaixo também é editável nesse branch. A proteção contra isso só
+# existe com o passo 3 feito.
+# O revisor do ambiente aprova a EXECUÇÃO, não o diff: ele vê qual commit do main vai rodar, mas não
+# revisa o que entrou no main. Por isso o main precisa de branch protection ou ruleset no repositório
+# inteiro (merge só por PR com revisão aprovada, sem push direto), não só em .github/workflows/**:
+# o job "pack" roda npm ci, npm test e npm pack com o código do main, e é esse código que vira o
+# tarball publicado.
+#
+# O QUE O DONO CONFIGURA ANTES DO PRIMEIRO USO (nesta ordem)
+# 1. npmjs.com: org "cbjk_iris" com 2FA obrigatório.
+# 2. Primeira publicação, uma vez só, da máquina do dono, com 2FA: versão 0.0.0 de cada pacote
+#    (@cbjk_iris/schema, @cbjk_iris/engine, @cbjk_iris/core, @cbjk_iris/cli e create-iris-site).
+#    O trusted publisher só pode ser configurado para pacote que já existe (npm help trust,
+#    "Package must exist"). Este workflow recusa a versão 0.0.0.
+# 3. GitHub, ANTES do trusted publisher:
+#    a. Settings → Environments → criar "npm-publish" com "Required reviewers" (o dono), "Prevent
+#       self-review" marcado e "Deployment branches and tags" → "Selected branches" → só "main".
+#       O GitHub criaria o ambiente sozinho no primeiro uso, mas SEM essas regras: sem elas, a
+#       proteção não existe. Feito antes do passo 4, não sobra janela em que o npm já confia no
+#       workflow e o ambiente ainda está aberto.
+#    b. Settings → Rules (ou Branches): ruleset ou branch protection no main exigindo PR com revisão
+#       aprovada para o repositório inteiro, sem push direto nem bypass.
+# 4. Para CADA um dos cinco pacotes, um trusted publisher do GitHub Actions (a troca do token é por
+#    pacote), pelo site (Package → Settings → Trusted publishing) ou pela CLI (npm >= 11.15):
+#      npm trust github <pacote> --repo lf-kali/cbjk_iris --file release.yml --env npm-publish --allow-publish
+#    Campos: organização/usuário "lf-kali", repositório "cbjk_iris", workflow "release.yml" (só o nome
+#    do arquivo), ambiente "npm-publish". O ambiente é obrigatório aqui: é ele que amarra a
+#    publicação às regras do passo 3.
+# 5. Ainda em cada pacote: "Publishing access" → "Require two-factor authentication and disallow
+#    tokens". O trusted publishing continua funcionando, e token clássico deixa de publicar.
+#
+# A CADA LANÇAMENTO
+# 1. Num PR: npx changeset version (os cinco pacotes vão juntos, grupo "fixed" do
+#    .changeset/config.json), revisar versões e CHANGELOG, merge no main.
+# 2. Actions → Release → Run workflow, no main. Primeiro com "dry_run" marcado (padrão): empacota,
+#    confere e roda npm publish --dry-run. Depois de novo, com "dry_run" desmarcado.
+# 3. A tag git (v<versão>) fica com a sessão principal: este workflow só tem leitura no repositório.
+#
+# REEXECUÇÃO: o job "publish" confere todos os tarballs e consulta o registro para os cinco antes de
+# publicar o primeiro, então erro de conteúdo ou de consulta não deixa lançamento pela metade. Uma
+# falha de rede durante um npm publish ainda pode deixar parte publicada; nesse caso, rode o workflow
+# de novo no mesmo commit: o que já tem esta versão no registro é pulado.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Só simular (npm publish --dry-run). Desmarque para publicar de verdade."
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  # nunca interromper uma publicação no meio
+  cancel-in-progress: false
+
+jobs:
+  pack:
+    name: Conferir, testar e empacotar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Recusar disparo fora do main
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "O release só roda a partir do main (disparado em $REF)." >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # sem cache de dependências: o cache pode ser envenenado por outra execução
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          package-manager-cache: false
+
+      - run: npm ci
+
+      # depois do npm ci: o release-check usa o semver (devDependency da raiz)
+      - name: Conferir lockstep, changesets pendentes e metadados dos pacotes
+        run: node scripts/release-check.mjs
+
+      # npm test compila os pacotes (build:packages) antes de testar
+      - run: npm test
+
+      - run: npm run typecheck
+
+      - name: Empacotar na ordem de publicação
+        run: node scripts/release-check.mjs --pack "$RUNNER_TEMP/release"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+          retention-days: 7
+
+  # Job separado e sem npm ci: nenhum script de instalação de dependência roda onde existe id-token.
+  # O checkout só traz os scripts de conferência (Node puro, sem dependência do repositório); o tar e
+  # o pacote que eles usam vêm de dentro do próprio npm que publica.
+  publish:
+    name: Publicar no npm
+    needs: pack
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # o mesmo commit que o job "pack" empacotou
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          path: repo
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          package-manager-cache: false
+          # sem registry-url: ele grava um .npmrc com NODE_AUTH_TOKEN, e aqui não há token
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+
+      - name: Publicar (npm publish --provenance)
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          ART: ${{ runner.temp }}/release
+          REPO: ${{ github.workspace }}/repo
+        run: |
+          set -euo pipefail
+          # lista fixa, fora do artefato: o que pode ser publicado por este workflow
+          expected=("@cbjk_iris/schema" "@cbjk_iris/engine" "@cbjk_iris/core" "@cbjk_iris/cli" "create-iris-site")
+          fail() { echo "$*" >&2; exit 1; }
+
+          # um binário só: o que passa na versão mínima é o que fornece o tar e o pacote da conferência,
+          # roda o dry-run, consulta o registro e publica
+          NPM_BIN=$(command -v npm) || fail "npm não encontrado"
+
+          # pasta vazia e config de usuário vazia: nenhum .npmrc de fora entra no npm
+          workdir=$(mktemp -d)
+          : > "$RUNNER_TEMP/npmrc-vazio"
+          export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/npmrc-vazio"
+          cd "$workdir"
+
+          # 1. artefato e tarballs (scripts/lib/tarball-check.mjs, com teste): npm >= 11.5.1; só
+          #    order.txt e .tgz; cada tarball lido pelo tar e pelo pacote desse npm: só arquivo comum e
+          #    pasta dentro de package/, sem caminho repetido nem binding.gyp; manifesto com name da lista
+          #    fixa, version X.Y.Z (nunca 0.0.0) igual em todos, publishConfig exatamente
+          #    { "access": "public" }, sem script de ciclo de vida, igual ao package.json do repositório
+          #    neste commit; e "npm publish <tgz> --dry-run --json" (com ambiente mínimo, sem OIDC) com o
+          #    mesmo name, version e arquivos. Devolve o sha256 de cada tarball.
+          list=$(node "$REPO/scripts/check-tarballs.mjs" --npm "$NPM_BIN" --repo "$REPO" "$ART" "${expected[@]}") \
+            || fail "Artefato recusado; nada foi publicado"
+          tarballs=()
+          specs=()
+          shas=()
+          while read -r tgz spec sha; do
+            tarballs+=("$tgz")
+            specs+=("$spec")
+            shas+=("$sha")
+          done <<< "$list"
+          [ "${#specs[@]}" -eq "${#expected[@]}" ] || fail "Conferência devolveu ${#specs[@]} pacote(s); esperava ${#expected[@]}"
+          version=${specs[0]##*@}
+
+          # 2. consulta ao registro para os cinco, antes de publicar qualquer um (npm view --json:
+          #    error.code "E404" = publicar; já tem esta versão = pular; qualquer outra coisa = parar)
+          todo=()
+          for i in "${!specs[@]}"; do
+            spec=${specs[$i]}
+            set +e
+            out=$("$NPM_BIN" view "$spec" version --json 2>/dev/null)
+            code=$?
+            set -e
+            state=$(printf '%s' "$out" | node "$REPO/scripts/npm-view-state.mjs" "$code" "$version") \
+              || fail "npm view falhou para $spec; nada foi publicado"
+            if [ "$state" = "published" ]; then
+              echo "Já publicado, pulando: $spec"
+            else
+              todo+=("$i")
+            fi
+          done
+
+          dry=()
+          if [ "$DRY_RUN" != "false" ]; then
+            dry=(--dry-run)
+            echo "Simulação: nada é publicado."
+          fi
+
+          # 3. publicação do tarball conferido (nunca de uma pasta: npm publish <pasta> rodaria scripts),
+          #    na ordem do order.txt
+          for i in "${todo[@]}"; do
+            # o tarball publicado é o mesmo que foi conferido (sha256 de novo, logo antes do publish)
+            now=$(sha256sum -- "$ART/${tarballs[$i]}" | cut -d' ' -f1)
+            [ "$now" = "${shas[$i]}" ] || fail "${tarballs[$i]} mudou depois da conferência; parei aqui"
+            echo "Publicando ${specs[$i]}"
+            "$NPM_BIN" publish "$ART/${tarballs[$i]}" --provenance --access public "${dry[@]}"
+          done

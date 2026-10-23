@@ -37,3 +37,16 @@ specific language governing permissions and limitations under the License.
 Os outros 6 temas de packages/engine/themes/ (gray, neutral, slate, stone, taupe, zinc) são
 paletas do shadcn/ui (https://ui.shadcn.com), sob a MIT License, e não entram
 neste aviso.
+
+--------------------------------------------------------------------------------
+CSS do pacote shadcn
+--------------------------------------------------------------------------------
+
+  packages/core/styles/shadcn-tailwind.css
+
+Cópia sem alterações de dist/tailwind.css do pacote npm shadcn 4.15.0
+(https://github.com/shadcn-ui/ui), sob a MIT License. O aviso de copyright e a
+licença completa estão no comentário do topo do próprio arquivo, que vai junto
+no pacote publicado @cbjk_iris/core (styles/shadcn-tailwind.css).
+
+  MIT License, Copyright (c) 2023 shadcn
