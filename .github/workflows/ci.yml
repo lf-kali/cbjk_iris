@@ -1,0 +1,118 @@
+# Verificação do monorepo (SPEC §6, comandos de verificação; plano da Frente 1, E7).
+# Só leitura no repositório e nenhum segredo. Sem pull_request_target: PR de fork roda sem token
+# de escrita.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # toda segunda, 09:00 UTC: só o job audit (vulnerabilidade nova aparece sem commit novo)
+  schedule:
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  # o evento no nome: o schedule semanal não substitui um push pendente no main
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  # num PR, um push novo cancela a verificação antiga; no main, cada commit é verificado
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  verify:
+    name: Verificação (Node ${{ matrix.node }})
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22.18.0: mínimo declarado em "engines" (Q-05); 24.x: LTS atual
+        node: ["22.18.0", "24.x"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      # antes dos testes: o defaults-isolation do schema lê o dist
+      - run: npm run build:packages
+
+      - run: npm test
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      - run: npm run sync:check
+
+      - run: npm run build
+
+      # R-1: nada de zod nem de código de Node do engine nos chunks do navegador
+      - run: npm run check:client-bundle
+
+      # SPEC §6.1, "Pronto quando": o schema carrega no Node sem flag (vale para o 22.18)
+      - name: Importar @cbjk_iris/schema a partir de apps/site
+        working-directory: apps/site
+        run: node --input-type=module -e "import('@cbjk_iris/schema').then(m => console.log(Object.keys(m).length))"
+
+      # 4 cenários: cada módulo desligado, um de cada vez, e todos desligados
+      - run: npm run modules:check
+
+  windows:
+    # junctions e reparse points, O_NOFOLLOW e O_NONBLOCK valendo 0: o lstat e o realpath do engine
+    name: Testes do schema e do engine (Windows, Node 24)
+    if: github.event_name != 'schedule'
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      # sem conversão para CRLF: os testes comparam texto gerado byte a byte
+      - run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build:packages
+
+      - run: npm run test -w @cbjk_iris/schema -w @cbjk_iris/engine
+
+  audit:
+    # Falha com vulnerabilidade alta ou crítica nas dependências de produção (o que vai para o
+    # projeto do cliente). As de desenvolvimento aparecem no log, sem bloquear.
+    name: npm audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          package-manager-cache: false
+
+      - name: Todas as dependências (informativo)
+        run: npm audit || true
+
+      - name: Dependências de produção, nível high
+        run: npm audit --omit=dev --audit-level=high

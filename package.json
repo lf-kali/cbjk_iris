@@ -20,6 +20,8 @@
     "build": "npm run build:packages && npm run build -w apps/site",
     "sync:check": "npm run sync:check -w apps/site",
     "modules:check": "node scripts/check-modules.mjs",
+    "check:client-bundle": "node scripts/check-client-bundle.mjs",
+    "release:check": "node scripts/release-check.mjs",
     "e2e": "playwright test -c apps/site/playwright.config.ts",
     "e2e:docker": "node scripts/e2e-docker.mjs"
   },
@@ -30,9 +32,11 @@
     "@types/node": "^22",
     "@vitest/coverage-v8": "5.0.5",
     "eslint": "^9",
-    "eslint-config-next": "16.2.11",
+    "eslint-config-next": "16.4.2",
+    "semver": "7.8.5",
     "tsdown": "0.23.1",
     "typescript": "5.9.3",
-    "vitest": "5.0.5"
+    "vitest": "5.0.5",
+    "yaml": "2.9.1"
   }
 }

@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "description": "Lógica de Node do Iris: tema, fontes, codegen, módulos, conteúdo e withIris.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lf-kali/cbjk_iris.git",
+    "directory": "packages/engine"
+  },
   "type": "module",
   "sideEffects": false,
   "engines": {
