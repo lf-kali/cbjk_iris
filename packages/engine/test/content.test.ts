@@ -328,7 +328,7 @@ describe("conteúdo do apps/site", () => {
     const home = await loadHome({ root: site, ...ALL });
     expect(home.sections.length).toBeGreaterThan(0);
     expect((await loadPages({ root: site, ...ALL })).map((p) => p.slug)).toEqual(["contato", "sobre"]);
-    expect(await loadProducts({ root: site })).toHaveLength(4);
+    expect(await loadProducts({ root: site })).toHaveLength(5);
     expect(await loadServices({ root: site })).toHaveLength(4);
   });
 });

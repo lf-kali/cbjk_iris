@@ -1174,7 +1174,7 @@ Decisão do dono ([Q-12](./OPEN-QUESTIONS.md#q-12-conteúdo-de-exemplo-do-starte
 | `content/products/*.json` | Pelo menos 4 acessórios (capa, película, carregador, cabo ou fone), cobrindo as combinações de botões: só WhatsApp, só marketplaces, todos os botões e nenhum botão |
 | Links de marketplace de exemplo | Páginas de busca reais dos hosts permitidos (ex.: `https://lista.mercadolivre.com.br/capinha-iphone-15`), nunca um anúncio inventado |
 | Fotos em `public/{home,products,services,ultimos_projetos}/` | Trocadas por fotos CC0 de celulares, bancada de reparo e acessórios (StockSnap, Unsplash com licença verificada, ou equivalente). Cada uma com origem no `CREDITS.md`. Até ~300KB por arquivo |
-| `public/logo.svg`, `public/cbjk_logo.svg` | Mantidos. Se os dois ficam, o arquiteto confirma no PR qual o `brand.logo` usa |
+| `public/logo.svg`, `public/cbjk_logo.svg` | Mantidos. Se os dois ficam, o arquiteto confirma no PR qual o `brand.logo` usa. *Nota (E8, decisão do dono em 2026-10-23): fica só o `logo.svg`, que é o `brand.logo`; o `cbjk_logo.svg` saiu, porque não renderizava como imagem (ver o §6 do plano da Frente 1).* |
 | Seções `products`, `services`, `gallery` e o comportamento dos módulos | Sem mudança |
 
 Na tag, **todo o conteúdo de exemplo** passa para o `iris-commerce`: `apps/site/content/**`, `apps/site/public/{home,products,services,ultimos_projetos}/**` e as chaves de `apps/site/site.config.ts` que não são `theme`, `brand.shape` nem `modules` (essas ficam com o `iris-theme` e o arquiteto). Os modelos de home do `create` (`loja`, `servicos`, `institucional`, `em-branco`) continuam com textos genéricos e `{name}`, sem depender do ramo de celulares.

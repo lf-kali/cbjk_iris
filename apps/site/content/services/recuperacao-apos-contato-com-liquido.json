@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../packages/schema/json/service.schema.json",
+  "name": "Recuperação após contato com líquido",
+  "shortDescription": "Celular que caiu na água ou molhou: desmontagem, limpeza da placa e avaliação das peças.",
+  "description": "Desligue o aparelho, não tente carregar e traga o quanto antes: a oxidação avança com o tempo. Desmontamos o celular, limpamos a placa e avaliamos quais peças foram afetadas. A recuperação nem sempre é possível, e por isso o orçamento só sai depois dessa avaliação.",
+  "images": [
+    "/services/recuperacao-liquido-1.jpg",
+    "/services/recuperacao-liquido-2.jpg"
+  ],
+  "specs": [
+    {
+      "label": "Prazo",
+      "value": "Informado depois da avaliação da placa"
+    },
+    {
+      "label": "Resultado",
+      "value": "Depende do tempo e do tipo de líquido; avisamos antes de qualquer custo"
+    },
+    {
+      "label": "Diagnóstico",
+      "value": "Sem custo"
+    }
+  ],
+  "order": 40
+}

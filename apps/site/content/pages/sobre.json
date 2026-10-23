@@ -1,15 +1,15 @@
 {
   "$schema": "../../../../packages/schema/json/page.schema.json",
   "title": "Sobre nós",
-  "description": "Conheça a cbjk: história, forma de trabalho e números.",
+  "description": "Conheça a cbjk: assistência técnica de celulares, forma de trabalho e perguntas frequentes.",
   "sections": [
     {
       "type": "text-image",
       "title": "Sobre a cbjk",
-      "subtitle": "Mais de 10 anos cuidando de casas",
-      "text": "Começamos como uma pequena equipe de reformas e hoje atendemos de reparos pontuais a obras completas, com loja própria de acabamentos.\n\nNosso jeito de trabalhar é simples: orçamento claro, cronograma combinado e garantia por escrito em todos os serviços.",
-      "image": "/home/slide-1.jpg",
-      "imageAlt": "Sala de estar reformada pela equipe",
+      "subtitle": "Mais de 10 anos consertando celulares",
+      "text": "Começamos numa bancada pequena, trocando telas e baterias, e hoje atendemos os reparos mais comuns de Android e iPhone, além de uma loja de acessórios.\n\nNosso jeito de trabalhar é simples: diagnóstico antes de tudo, orçamento claro e garantia por escrito em todo reparo.",
+      "image": "/home/slide-2.jpg",
+      "imageAlt": "Celular desmontado na bancada, com a tela trincada ao lado",
       "cta": {
         "label": "Fale com a gente",
         "whatsapp": true
@@ -23,16 +23,16 @@
           "label": "anos de experiência"
         },
         {
-          "value": "500+",
-          "label": "obras entregues"
+          "value": "5 mil+",
+          "label": "aparelhos consertados"
         },
         {
-          "value": "30",
-          "label": "profissionais"
+          "value": "4",
+          "label": "técnicos na bancada"
         },
         {
-          "value": "12",
-          "label": "meses de garantia"
+          "value": "4,9",
+          "label": "nota média dos clientes"
         }
       ]
     },
@@ -41,20 +41,24 @@
       "title": "Perguntas frequentes",
       "items": [
         {
-          "question": "Vocês atendem em quais regiões?",
-          "answer": "Atendemos a capital e a região metropolitana. Consulte outras cidades pelo WhatsApp."
+          "question": "Quanto tempo demora o conserto?",
+          "answer": "Depende do modelo, do reparo e da peça em estoque. O prazo é informado junto com o orçamento, antes de você aprovar."
         },
         {
-          "question": "O orçamento tem custo?",
-          "answer": "Não. A visita técnica e o orçamento detalhado são gratuitos."
+          "question": "O reparo tem garantia?",
+          "answer": "Sim. Todo reparo sai com termo de garantia por escrito, com o prazo e o que ela cobre."
         },
         {
-          "question": "Qual a garantia dos serviços?",
-          "answer": "Todos os serviços têm garantia de 12 meses, com termo por escrito."
+          "question": "Vou perder minhas fotos e conversas?",
+          "answer": "A troca de tela, bateria ou conector normalmente não apaga os dados, mas faça o backup antes de trazer o aparelho sempre que ele ainda ligar. Em reparos com risco para os dados, avisamos antes."
+        },
+        {
+          "question": "O diagnóstico tem custo?",
+          "answer": "Não. Você só paga se aprovar o orçamento."
         },
         {
           "question": "Quais as formas de pagamento?",
-          "answer": "Pix, débito, crédito em até 10x e boleto para empresas."
+          "answer": "Pix, débito e crédito. Consulte o parcelamento pelo WhatsApp."
         }
       ]
     }

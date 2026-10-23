@@ -21,6 +21,7 @@
     "sync:check": "npm run sync:check -w apps/site",
     "modules:check": "node scripts/check-modules.mjs",
     "check:client-bundle": "node scripts/check-client-bundle.mjs",
+    "check:credits": "node scripts/check-credits.mjs",
     "release:check": "node scripts/release-check.mjs",
     "e2e": "playwright test -c apps/site/playwright.config.ts",
     "e2e:docker": "node scripts/e2e-docker.mjs"

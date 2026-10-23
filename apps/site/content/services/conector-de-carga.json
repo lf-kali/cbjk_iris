@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../packages/schema/json/service.schema.json",
+  "name": "Conector de carga",
+  "shortDescription": "Celular que não carrega ou só carrega com o cabo torto: limpeza ou troca do conector.",
+  "description": "Muitas vezes o problema é sujeira acumulada na entrada, e uma limpeza resolve. Quando o conector está gasto ou solto, trocamos a peça ou a placa de carga, conforme o modelo. Testamos com carregador e cabo da bancada antes de devolver o aparelho.",
+  "images": [
+    "/services/conector-de-carga-1.jpg"
+  ],
+  "specs": [
+    {
+      "label": "Prazo",
+      "value": "Informado no orçamento, conforme o modelo e a peça em estoque"
+    },
+    {
+      "label": "Garantia",
+      "value": "Termo por escrito entregue com o aparelho"
+    },
+    {
+      "label": "Diagnóstico",
+      "value": "Sem custo"
+    }
+  ],
+  "order": 30
+}

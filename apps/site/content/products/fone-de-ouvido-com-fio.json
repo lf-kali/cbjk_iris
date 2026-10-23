@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Fone de ouvido com fio e microfone",
+  "category": "Áudio",
+  "price": 49.9,
+  "images": [
+    "/products/fone-1.jpg"
+  ],
+  "shortDescription": "Fone intra-auricular com microfone para chamadas.",
+  "description": "Fone intra-auricular com microfone no cabo, para música e chamadas. Confira se o seu celular tem a entrada compatível antes de comprar.",
+  "specs": [
+    {
+      "label": "Tipo",
+      "value": "Intra-auricular"
+    },
+    {
+      "label": "Microfone",
+      "value": "Sim, no cabo"
+    }
+  ],
+  "stockQty": 10,
+  "shopeeLink": "https://shopee.com.br/search?keyword=fone%20de%20ouvido%20com%20fio",
+  "order": 50
+}

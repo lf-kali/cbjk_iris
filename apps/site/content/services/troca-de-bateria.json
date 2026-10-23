@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../packages/schema/json/service.schema.json",
+  "name": "Troca de bateria",
+  "shortDescription": "Bateria que descarrega rápido, desliga sozinha ou estufou: trocamos e testamos a carga.",
+  "description": "Medimos a saúde da bateria e o consumo do aparelho para confirmar o defeito antes de trocar. Bateria estufada é tratada com prioridade, porque pode empurrar a tela e danificar outras peças. Depois da troca, testamos a carga e a descarga.",
+  "images": [
+    "/services/troca-de-bateria-1.jpg",
+    "/services/troca-de-bateria-2.jpg"
+  ],
+  "specs": [
+    {
+      "label": "Prazo",
+      "value": "Informado no orçamento, conforme o modelo e a peça em estoque"
+    },
+    {
+      "label": "Garantia",
+      "value": "Termo por escrito entregue com o aparelho"
+    },
+    {
+      "label": "Diagnóstico",
+      "value": "Sem custo"
+    }
+  ],
+  "order": 20
+}

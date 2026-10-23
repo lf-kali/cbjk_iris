@@ -7,9 +7,9 @@
       "slides": [
         {
           "image": "/home/slide-1.jpg",
-          "alt": "Sala de estar reformada",
-          "title": "Sua casa do jeito que você imaginou",
-          "subtitle": "Produtos selecionados e equipe própria, do projeto à entrega.",
+          "alt": "Mão segurando um celular de tela preta",
+          "title": "Seu celular funcionando de novo",
+          "subtitle": "Troca de tela, bateria e conector de carga, com orçamento antes de qualquer reparo.",
           "cta": {
             "label": "Pedir orçamento",
             "whatsapp": true
@@ -21,12 +21,12 @@
         },
         {
           "image": "/home/slide-2.jpg",
-          "alt": "Sala com parede de tijolos e piso de madeira",
-          "title": "Visita técnica sem custo",
-          "subtitle": "Agende pelo WhatsApp e receba um orçamento detalhado.",
+          "alt": "Celular desmontado: tampa, tela trincada e corpo com a bateria à mostra",
+          "title": "Diagnóstico sem custo",
+          "subtitle": "Mande o modelo e o defeito pelo WhatsApp e receba o orçamento.",
           "cta": {
-            "label": "Agendar visita",
-            "whatsapp": "Olá! Gostaria de agendar uma visita técnica."
+            "label": "Mandar mensagem",
+            "whatsapp": "Olá! Meu celular está com defeito e gostaria de um diagnóstico."
           },
           "align": "center"
         }
@@ -38,34 +38,34 @@
       "items": [
         {
           "icon": "shield-check",
-          "title": "Garantia de 12 meses",
-          "text": "Todos os serviços com garantia por escrito."
+          "title": "Garantia por escrito",
+          "text": "Todo reparo sai com o termo de garantia."
         },
         {
-          "icon": "clock",
-          "title": "Prazo cumprido",
-          "text": "Cronograma combinado antes de começar a obra."
+          "icon": "timer",
+          "title": "Orçamento na hora",
+          "text": "Você sabe o valor e o prazo antes de aprovar o conserto."
         },
         {
-          "icon": "hand-coins",
-          "title": "Orçamento sem custo",
-          "text": "Visita técnica e orçamento detalhado grátis."
+          "icon": "badge-check",
+          "title": "Peças de qualidade",
+          "text": "Telas, baterias e conectores testados antes da instalação."
         },
         {
-          "icon": "users",
-          "title": "Equipe própria",
-          "text": "Profissionais treinados, sem terceirização."
+          "icon": "wrench",
+          "title": "Bancada própria",
+          "text": "Técnicos da casa, sem enviar seu aparelho para terceiros."
         }
       ]
     },
     {
       "type": "products",
-      "title": "Destaques da loja"
+      "title": "Acessórios em destaque"
     },
     {
       "type": "services",
       "title": "Nossos serviços",
-      "subtitle": "Do reparo pontual à reforma completa."
+      "subtitle": "Os reparos mais pedidos, para Android e iPhone."
     },
     {
       "type": "stats",
@@ -75,16 +75,16 @@
           "label": "anos de experiência"
         },
         {
-          "value": "500+",
-          "label": "obras entregues"
+          "value": "5 mil+",
+          "label": "aparelhos consertados"
         },
         {
           "value": "4,9",
           "label": "nota média dos clientes"
         },
         {
-          "value": "12",
-          "label": "meses de garantia"
+          "value": "4",
+          "label": "técnicos na bancada"
         }
       ]
     },
@@ -94,33 +94,33 @@
       "items": [
         {
           "name": "Mariana Souza",
-          "role": "Reforma de banheiro",
+          "role": "Troca de tela",
           "rating": 5,
-          "text": "Equipe pontual e cuidadosa. Entregaram antes do prazo e deixaram tudo limpo."
+          "text": "Deixei de manhã e busquei no fim da tarde. O touch ficou perfeito."
         },
         {
           "name": "Carlos Lima",
-          "role": "Instalação elétrica",
+          "role": "Troca de bateria",
           "rating": 5,
-          "text": "Explicaram cada etapa e o orçamento bateu com o valor final. Recomendo."
+          "text": "Explicaram o problema antes de mexer e o valor final foi o do orçamento."
         },
         {
           "name": "Fernanda Alves",
-          "role": "Piso porcelanato",
+          "role": "Conector de carga",
           "rating": 5,
-          "text": "Acabamento impecável. Já chamei de novo para a cozinha."
+          "text": "O celular voltou a carregar normal. Atendimento rápido pelo WhatsApp."
         }
       ]
     },
     {
       "type": "gallery",
-      "title": "Projetos recentes",
+      "title": "Reparos recentes",
       "limit": 6
     },
     {
       "type": "cta-banner",
-      "title": "Pronto para começar?",
-      "text": "Fale com a gente pelo WhatsApp e receba seu orçamento em até 24 horas.",
+      "title": "Celular com defeito?",
+      "text": "Fale com a gente pelo WhatsApp, diga o modelo e o problema, e receba o orçamento.",
       "cta": {
         "label": "Falar no WhatsApp",
         "whatsapp": true

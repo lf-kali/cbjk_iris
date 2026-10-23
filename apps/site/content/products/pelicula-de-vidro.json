@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../../packages/schema/json/product.schema.json",
+  "name": "Película de vidro temperado",
+  "category": "Películas",
+  "price": 39.9,
+  "images": [
+    "/products/pelicula-1.jpg"
+  ],
+  "shortDescription": "Protege a tela contra riscos, com aplicação na loja.",
+  "description": "Película de vidro temperado com recorte para o sensor e o alto-falante. Aplicamos na hora, com a tela limpa e sem bolhas. Consulte os modelos disponíveis.",
+  "specs": [
+    {
+      "label": "Material",
+      "value": "Vidro temperado"
+    },
+    {
+      "label": "Aplicação",
+      "value": "Na loja, sem custo extra"
+    },
+    {
+      "label": "Compatibilidade",
+      "value": "Consulte o seu modelo"
+    }
+  ],
+  "stockQty": 10,
+  "order": 20
+}
