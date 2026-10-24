@@ -1,7 +1,7 @@
 # Iris: spec do framework
 
 > **Decisões do dono: respondidas em 2026-10-20** ([`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md)).
-> **Status dos contratos: RASCUNHO.** O `iris-architect` já pode começar. As frentes paralelas só começam quando esta linha mudar para `CONGELADO em <data> (tag contracts-v1)`.
+> **Status dos contratos: CONGELADO em 2026-10-23 (tag contracts-v1).** As frentes paralelas (`iris-theme`, `iris-commerce`, `iris-cli`, depois `iris-docs`) já podem começar, a partir do commit marcado pela tag. Mudança de contrato agora exige ADR novo ([§5](#5-contratos)).
 
 Documentos relacionados:
 - [`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md): as perguntas ao dono e as respostas.
@@ -1061,12 +1061,31 @@ Valor não literal num desses caminhos → saída 7, nada escrito.
 | `modules.json` | `packages/schema/src/modules.ts` |
 | textos fixos de `site.config.ts` | `packages/schema/src/texts.ts` (`SiteTexts`, `DEFAULT_TEXTS`) |
 | — | `packages/schema/src/{theme/tokens.ts,cli.ts,page.ts,engine-api.ts}` |
-| `scripts/modules.mjs`, `sync-modules.mjs`, `check-modules.mjs` | `packages/engine/src/{codegen,modules,content}/**`, `packages/engine/src/next.ts` (`withIris`) |
-| `package.json` raiz | `package.json` raiz, `tsconfig.base.json`, `.changeset/`, `packages/*/package.json` (campos `name`, `version`, `exports`), `.github/workflows/{ci,release}.yml`, `.gitignore` |
-| — | `LICENSE`, `NOTICE`, `docs/spec/**` (inclui `style-inventory.json`), `scripts/style-inventory.mjs`, `scripts/check-credits.mjs`, `apps/site/e2e/baseline/*.spec.ts`, `packages/core/src/lib/config.ts` |
+| — | O resto do pacote `schema`: `packages/schema/src/**` (inclui `fields.ts`, `links.ts`, `issues.ts`, `json-schema.ts`, `constants.ts`, `defaults.ts`, `texts-defaults.ts`, `index.ts`), `packages/schema/scripts/write-json.mjs`, `packages/schema/test/**` |
+| `scripts/modules.mjs`, `sync-modules.mjs`, `check-modules.mjs` | `packages/engine/src/{codegen,modules,content,project}/**`, `packages/engine/src/{index.ts,paths.ts}`, `packages/engine/src/next.ts` (`withIris`), e os testes do engine dessas pastas (`packages/engine/test/{codegen,content,check-content,read,remove-content,json-numbers,load-config,next,exports}.test.ts`). `scripts/check-modules.mjs` continua na raiz e também é do arquiteto |
+| `package.json` raiz | `package.json` raiz, `tsconfig.base.json`, `.changeset/`, `packages/*/package.json` (campos `name`, `version`, `exports`, `license`, `engines`, `publishConfig` e o item `"NOTICE"` de `files`), `.github/workflows/{ci,release}.yml`, `.gitignore` |
+| — | `LICENSE`, `NOTICE`, as cópias `packages/*/{LICENSE,NOTICE}` (iguais byte a byte às da raiz, conferidas por `scripts/test/package-legal-files.test.mjs`; quem muda o da raiz atualiza as cópias no mesmo PR), `docs/spec/**` (inclui `style-inventory.json`), `scripts/style-inventory.mjs`, `scripts/check-credits.mjs`, `apps/site/e2e/baseline/*.spec.ts`, `apps/site/e2e/baseline/shared.ts`, `packages/core/src/lib/config.ts` |
+| — | Scripts de verificação e de lançamento da raiz (E6 a E9): `scripts/check-client-bundle.mjs`, `scripts/release-check.mjs`, `scripts/check-tarballs.mjs`, `scripts/npm-view-state.mjs`, `scripts/e2e-docker.mjs`, `scripts/lib/*`, `scripts/test/**`, `scripts/vitest.config.mjs` |
+| — | `packages/core/tsconfig.json`, `packages/core/eslint.config.mjs` (a regra `no-restricted-imports` do isolamento dos módulos), `packages/core/test/fixtures/`, e os testes do core que conferem contrato: `packages/core/test/{sections,imports,routes}.test.ts` |
+| — | Configuração de build, lint e teste do `schema` e do `engine`: `packages/{schema,engine}/{tsdown.config.ts,vitest.config.ts,eslint.config.mjs,tsconfig.json}`, e os auxiliares de teste compartilhados do engine, `packages/engine/test/{fixtures,helpers}/**` (os de `cli` e `create` são do `iris-cli`, dentro de `packages/{cli,create}/**`) |
+| — | `apps/site/{next.config.ts,tsconfig.json,app/globals.css}` (o `withIris`, os aliases e o `@source` do monorepo) |
 | `eslint.config.mjs`, `postcss.config.mjs`, `app/favicon.ico` | `apps/site/` (mesmos nomes) |
 
 Também do arquiteto: os 13 arquivos de reexport `packages/core/src/sections/<type>.tsx`, `apps/site/.gitignore` e `apps/site/playwright.config.ts`.
+
+Na tag, os scripts do `apps/site/package.json` e os `.mjs` finos que eles chamam (`apps/site/scripts/sync.mjs` e `apps/site/scripts/theme-add.mjs`) passam ao `iris-cli`, que mantém os nomes dos scripts ([§5.6](#56-api-do-engine-usada-pela-cli)). O teste `packages/core/test/catalog.test.ts` (repositórios do catálogo) vai com `catalog/*` para o `iris-commerce`. Os testes de tema do engine (`packages/engine/test/{brand,import-theme,sync-brand,theme-api,theme-file}.test.ts`) vão com `packages/engine/src/theme/**` para o `iris-theme`.
+
+**Arquivos gerados** (`apps/site/app/layout.tsx`, `apps/site/app/(iris)/**`, `apps/site/app/iris.registry.generated.tsx`, `apps/site/app/fonts.generated.ts`): ninguém edita à mão. Mudam só rodando o sync, no mesmo PR de quem mudou a fonte (config, conteúdo, schema ou gerador). O gerador é do arquiteto (`packages/engine/src/codegen/**`), e o `sync:check` da CI recusa diferença.
+
+**`package-lock.json`:** dono formal, o arquiteto (raiz do monorepo). Qualquer frente que muda dependência num `package.json` que é dela regenera o lock com `npm install` no mesmo PR. Conflito no lock não se resolve à mão: no rebase, fique com o lock do `main`, rode `npm install` de novo e commite o resultado.
+
+**Compartilhados por campo ou chave** (cada dono mexe só na sua parte):
+- `packages/{schema,engine,core}/package.json`: arquiteto nos campos `name`, `version`, `exports`, `license`, `engines`, `publishConfig` e no item `"NOTICE"` de `files`; o resto (dependências, scripts) é do dono do pacote, que no `schema` e no `engine` é o arquiteto, e no `core` são as frentes que tocam nele (`iris-theme` e `iris-commerce`), que só acrescentam dependências. `packages/{cli,create}/package.json`: os mesmos campos do arquiteto; o resto, do `iris-cli`.
+- `apps/site/package.json`: `scripts`, do `iris-cli`; o resto (nome, `private`, dependências `"*"` dos pacotes), do arquiteto.
+- `apps/site/site.config.ts`: `theme` e `brand.shape`, do `iris-theme`; `modules`, do arquiteto; as outras chaves (conteúdo de exemplo, inclusive `brand.logo`), do `iris-commerce` ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)).
+- `CREDITS.md`: as linhas das seções de fotos e de ícones de marca, do `iris-commerce` (o `scripts/check-credits.mjs`, do arquiteto, confere as fotos); o texto fora dessas listas, do `iris-docs`.
+
+**Fora de posse das frentes** (do dono do projeto; nenhuma frente altera): `.claude/agents/*`, `.vscode/**`, `instructions/*`.
 
 Cada frente pode acrescentar `dependencies` e `devDependencies` no `package.json` do pacote que é dela. `components.json` (config do shadcn) vai para `packages/core/components.json`, do `iris-theme`.
 
@@ -1185,7 +1204,7 @@ Na tag, **todo o conteúdo de exemplo** passa para o `iris-commerce`: `apps/site
 
 **Escopo:** o motor de tema no `engine` (camadas, presets, validação de tokens, contraste com alpha, `ListThemes`, `ListStyles`, `ValidateTheme`, `SyncBrand`, `ImportTheme`), o `iris.css` do core (`@theme inline`, utilitários e variantes congelados), os 4 estilos embutidos, o `data-style` no layout, e a troca de toda classe de forma fixa nos componentes por utilitário ou variante.
 
-**Pode tocar:** `packages/engine/src/theme/**`, `packages/engine/themes/**`, `packages/core/styles/**`, `packages/core/components.json`, os caminhos de `packages/core/src` marcados `iris-theme` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo), só as classes de estilo nos caminhos marcados `iris-commerce`, `apps/site/themes/**` (temas próprios do site de exemplo, se houver), as chaves `theme` e `brand.shape` de `apps/site/site.config.ts`, `apps/site/e2e/theme/**`, `lighthouserc.json`, `scripts/variant.mjs`, `.github/workflows/theme.yml`.
+**Pode tocar:** `packages/engine/src/theme/**`, os testes de tema do engine (`packages/engine/test/{brand,import-theme,sync-brand,theme-api,theme-file}.test.ts` e testes novos de tema em `packages/engine/test/`), `packages/engine/themes/**`, `packages/core/styles/**`, `packages/core/components.json`, os caminhos de `packages/core/src` marcados `iris-theme` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo), só as classes de estilo nos caminhos marcados `iris-commerce`, `apps/site/themes/**` (temas próprios do site de exemplo, se houver), as chaves `theme` e `brand.shape` de `apps/site/site.config.ts`, `apps/site/e2e/theme/**`, `lighthouserc.json`, `scripts/variant.mjs`, `.github/workflows/theme.yml`.
 
 **Proibido:** `packages/schema/**` (token novo = pedido ao arquiteto), lógica e JSX estrutural de catálogo e botões, `packages/cli/**`, README.
 
@@ -1207,7 +1226,7 @@ Na tag, **todo o conteúdo de exemplo** passa para o `iris-commerce`: `apps/site
 
 **Escopo:** `resolvePurchaseButtons`, os botões no card e no detalhe, ícones das plataformas, conteúdo de exemplo cobrindo as combinações, créditos dos ícones.
 
-**Pode tocar:** os caminhos de `packages/core/src` marcados `iris-commerce` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo) (JSX e lógica, usando só os utilitários de forma congelados), `apps/site/content/**`, `apps/site/public/{home,products,services,ultimos_projetos}/**`, as chaves de conteúdo de `apps/site/site.config.ts` ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)), `apps/site/e2e/commerce/**`, `apps/site/e2e/baseline/__screenshots__/**` (só pelo protocolo de [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), `CREDITS.md`, `.github/workflows/commerce.yml`.
+**Pode tocar:** os caminhos de `packages/core/src` marcados `iris-commerce` em [§5.1.1](#511-árvore-de-packagescoresrc-e-de-onde-vem-cada-arquivo) (JSX e lógica, usando só os utilitários de forma congelados), `packages/core/test/catalog.test.ts` e testes novos do core sobre catálogo e botões, `apps/site/content/**`, `apps/site/public/{home,products,services,ultimos_projetos}/**`, `apps/site/public/logo.svg`, as chaves de conteúdo de `apps/site/site.config.ts` ([§6.1.1](#611-conteúdo-de-exemplo-assistência-técnica-de-celulares)), `apps/site/e2e/commerce/**`, `apps/site/e2e/baseline/__screenshots__/**` (só pelo protocolo de [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), `CREDITS.md`, `.github/workflows/commerce.yml`.
 
 **Proibido:** `packages/schema/**` (inclusive `PLATFORM_HOSTS` e `DEFAULT_TEXTS`, que mudam por PR ao arquiteto), `packages/engine/**`, `packages/core/src/ui/**` e tokens, `packages/cli/**`, README.
 
@@ -1230,7 +1249,7 @@ Na tag, **todo o conteúdo de exemplo** passa para o `iris-commerce`: `apps/site
 
 **Escopo:** os pacotes `cli` e `create`, as perguntas e flags geradas do schema, a edição do `site.config.ts` com magicast, o starter dentro do `create` com as reescritas de [§5.1.4](#514-de-appssite-para-o-starter), os modelos de home do `create`, e a troca dos scripts do `apps/site` pela CLI.
 
-**Pode tocar:** `packages/cli/**`, `packages/create/**`, os scripts de `apps/site/package.json` (mantendo o nome `sync:check`), os arquivos gerados em `apps/site/app/` (só rodando o sync), `scripts/local-registry.mjs`, `.github/workflows/cli.yml`.
+**Pode tocar:** `packages/cli/**` e `packages/create/**` (menos as cópias de `LICENSE` e `NOTICE` e os campos do arquiteto no `package.json`, [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), os scripts de `apps/site/package.json` (mantendo o nome `sync:check`), os arquivos gerados em `apps/site/app/` (só rodando o sync), `scripts/local-registry.mjs`, `.github/workflows/cli.yml`.
 
 **Proibido:** `packages/schema/**` e o formato de qualquer arquivo de conteúdo, `packages/core/**`, `packages/engine/**` (chama, não altera), README.
 
@@ -1268,7 +1287,7 @@ A matriz não baixa temas da rede, para a CI não depender do tweakcn. `iris the
 
 **Escopo:** README do monorepo (quem desenvolve), README do projeto gerado (quem usa), guias de CLI, temas e catálogo, `CONTRIBUTING.md`, `AGENTS.md` e `CLAUDE.md` do starter (com o `@AGENTS.md` e o aviso da doc do Next, como o `create-next-app` gera), skills do starter, e os scripts que verificam a doc contra o código.
 
-**Pode tocar:** `README.md`, `AGENTS.md` e `CLAUDE.md` da raiz do monorepo, `docs/**` exceto `docs/spec/**`, `CONTRIBUTING.md`, `CREDITS.md` (texto), `apps/site/{README.md,AGENTS.md,CLAUDE.md}`, `apps/site/.claude/skills/**`, `scripts/docs-check/**`, `.github/workflows/docs.yml`.
+**Pode tocar:** `README.md`, `AGENTS.md` e `CLAUDE.md` da raiz do monorepo, `docs/**` exceto `docs/spec/**`, `CONTRIBUTING.md`, `CREDITS.md` (só o texto fora das listas de fotos e de ícones, [§5.8](#58-arquivos-de-posse-exclusiva-do-iris-architect)), `apps/site/{README.md,AGENTS.md,CLAUDE.md}`, `apps/site/.claude/skills/**`, `scripts/docs-check/**`, `.github/workflows/docs.yml`.
 
 **Proibido:** código de produto (pacotes, componentes, schemas, temas, CLI). Divergência entre doc e código vira pendência para a frente dona.
 

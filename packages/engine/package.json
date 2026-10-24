@@ -18,7 +18,8 @@
   },
   "files": [
     "dist",
-    "themes"
+    "themes",
+    "NOTICE"
   ],
   "exports": {
     ".": {

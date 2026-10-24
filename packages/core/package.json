@@ -18,7 +18,8 @@
   "files": [
     "src",
     "styles",
-    "components.json"
+    "components.json",
+    "NOTICE"
   ],
   "exports": {
     "./app/*": "./src/app/*.tsx",

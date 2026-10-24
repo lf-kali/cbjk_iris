@@ -17,7 +17,8 @@
   },
   "files": [
     "dist",
-    "template"
+    "template",
+    "NOTICE"
   ],
   "exports": {
     ".": {
