@@ -18,7 +18,8 @@
   },
   "files": [
     "dist",
-    "json"
+    "json",
+    "NOTICE"
   ],
   "exports": {
     ".": {

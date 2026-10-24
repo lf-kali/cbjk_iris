@@ -1,6 +1,6 @@
 # ADR 002: Schema zod por seção como fonte única
 
-- **Status:** Proposto. Vira Aceito no congelamento dos contratos (tag `contracts-v1`).
+- **Status:** Aceito em 2026-10-23, no congelamento dos contratos (tag `contracts-v1`).
 - **Data:** 2026-10-19
 - **Spec:** [§4 b](../SPEC.md#b-schema-por-seção-como-fonte-única), [§5.5](../SPEC.md#55-formato-do-schema-de-seção)
 

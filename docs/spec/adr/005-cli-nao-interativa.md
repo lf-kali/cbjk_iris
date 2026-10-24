@@ -1,6 +1,6 @@
 # ADR 005: CLI com modo não interativo para agentes e CI
 
-- **Status:** Proposto. Vira Aceito no congelamento dos contratos (tag `contracts-v1`).
+- **Status:** Aceito em 2026-10-23, no congelamento dos contratos (tag `contracts-v1`).
 - **Data:** 2026-10-19
 - **Spec:** [§4 e](../SPEC.md#e-cli-para-agentes-e-ci), [§5.7](../SPEC.md#57-interface-pública-da-cli)
 
